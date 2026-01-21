@@ -1,21 +1,14 @@
-package com.community.domain.user;
+package com.community.dto.admin;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import java.time.LocalDateTime;
 
-@TableName("user")
-public class User {
-    @TableId(type = IdType.AUTO)
+public class UserDetailDTO {
     private Long id;
     private String username;
-    private String nickname;
     private String phone;
-    private String password;
+    private String nickname;
     private Integer status;
     private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 
     public Long getId() {
         return id;
@@ -33,14 +26,6 @@ public class User {
         this.username = username;
     }
 
-    public String getNickname() {
-        return nickname;
-    }
-
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
-    }
-
     public String getPhone() {
         return phone;
     }
@@ -49,12 +34,12 @@ public class User {
         this.phone = phone;
     }
 
-    public String getPassword() {
-        return password;
+    public String getNickname() {
+        return nickname;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
     }
 
     public Integer getStatus() {
@@ -71,13 +56,5 @@ public class User {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
     }
 }

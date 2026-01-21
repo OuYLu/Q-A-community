@@ -37,6 +37,9 @@ public class AuthServiceImpl implements AuthService {
         if (user == null || !passwordService.matches(password, user.getPassword())) {
             throw new BizException(ErrorCode.BIZ_ERROR.getCode(), "用户名或密码错误");
         }
+        if (user.getStatus() != null && user.getStatus() != 1) {
+            throw new BizException(ErrorCode.UNAUTHORIZED.getCode(), "账号已被冻结");
+        }
         String token = jwtUtil.generateToken(user.getId(), user.getUsername());
         long expiresAt = System.currentTimeMillis() + jwtUtil.getExpireMillis();
         return new TokenResponse(token, expiresAt);

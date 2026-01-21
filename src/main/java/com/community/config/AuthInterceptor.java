@@ -3,6 +3,8 @@ package com.community.config;
 import com.community.common.context.CurrentUserContext;
 import com.community.common.exception.BizException;
 import com.community.common.result.ErrorCode;
+import com.community.domain.user.User;
+import com.community.mapper.UserMapper;
 import com.community.util.JwtUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -19,6 +21,9 @@ public class AuthInterceptor implements HandlerInterceptor {
     @Autowired
     private JwtUtil jwtUtil;
 
+    @Autowired
+    private UserMapper userMapper;
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         String authorization = request.getHeader("Authorization");
@@ -32,6 +37,10 @@ public class AuthInterceptor implements HandlerInterceptor {
             String username = claims.get("username", String.class);
             if (userId == null || username == null) {
                 throw new BizException(ErrorCode.UNAUTHORIZED.getCode(), "未登录或登录已过期");
+            }
+            User user = userMapper.selectById(userId);
+            if (user == null || (user.getStatus() != null && user.getStatus() != 1)) {
+                throw new BizException(ErrorCode.UNAUTHORIZED.getCode(), "账号已被冻结");
             }
             CurrentUserContext.set(new CurrentUserContext.UserInfo(userId, username));
             return true;

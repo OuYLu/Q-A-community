@@ -1,21 +1,13 @@
-package com.community.domain.user;
+package com.community.domain.role;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.time.LocalDateTime;
 
-@TableName("user_role")
-public class UserRole {
-    private Long userId;
+@TableName("role_permission")
+public class RolePermission {
     private Long roleId;
+    private Long permissionId;
     private LocalDateTime createdAt;
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
 
     public Long getRoleId() {
         return roleId;
@@ -23,6 +15,14 @@ public class UserRole {
 
     public void setRoleId(Long roleId) {
         this.roleId = roleId;
+    }
+
+    public Long getPermissionId() {
+        return permissionId;
+    }
+
+    public void setPermissionId(Long permissionId) {
+        this.permissionId = permissionId;
     }
 
     public LocalDateTime getCreatedAt() {
