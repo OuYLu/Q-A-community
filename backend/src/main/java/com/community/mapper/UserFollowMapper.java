@@ -1,9 +1,9 @@
 package com.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.community.domain.role.RolePermission;
+import com.community.entity.UserFollow;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
-public interface RolePermissionMapper extends BaseMapper<RolePermission> {
+public interface UserFollowMapper extends BaseMapper<UserFollow> {
 }

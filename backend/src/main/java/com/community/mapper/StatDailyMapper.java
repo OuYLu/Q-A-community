@@ -1,9 +1,9 @@
 package com.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.community.domain.user.User;
+import com.community.entity.StatDaily;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
-public interface UserMapper extends BaseMapper<User> {
+public interface StatDailyMapper extends BaseMapper<StatDaily> {
 }

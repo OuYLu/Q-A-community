@@ -1,0 +1,24 @@
+spring:
+  profiles:
+    active: local
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+      data-locations: classpath:data.sql
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+
+security:
+  jwt:
+    secret: "CHANGE_ME_TO_A_LONG_RANDOM_STRING_32_CHARS_MIN"
+    expire-minutes: 120
+    issuer: "smart-community"
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs

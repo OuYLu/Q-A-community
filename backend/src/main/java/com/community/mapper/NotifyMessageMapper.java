@@ -1,0 +1,9 @@
+package com.community.mapper;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.community.entity.NotifyMessage;
+import org.apache.ibatis.annotations.Mapper;
+
+@Mapper
+public interface NotifyMessageMapper extends BaseMapper<NotifyMessage> {
+}
