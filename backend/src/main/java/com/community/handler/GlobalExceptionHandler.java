@@ -6,6 +6,7 @@ import com.community.common.ResultCode;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -49,6 +50,11 @@ public class GlobalExceptionHandler {
         return Result.error(ResultCode.BAD_REQUEST, "请求体格式错误");
     }
 
+    @ExceptionHandler(DisabledException.class)
+    public Result<Void> handleDisabledException(DisabledException ex) {
+        return Result.error(ResultCode.UNAUTHORIZED, "你的账号已被冻结，如有疑问联系管理员777@gmail.com");
+    }
+
     @ExceptionHandler(AuthenticationException.class)
     public Result<Void> handleAuthenticationException(AuthenticationException ex) {
         return Result.error(ResultCode.UNAUTHORIZED, "认证失败");
@@ -64,4 +70,3 @@ public class GlobalExceptionHandler {
         return Result.error(ResultCode.SERVER_ERROR, "服务器内部错误");
     }
 }
-

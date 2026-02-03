@@ -8,10 +8,10 @@ import lombok.Data;
 @Schema(description = "登录请求")
 public class LoginDTO {
     @NotBlank(message = "username is required")
-    @Schema(description = "用户名", example = "admin")
+    @Schema(description = "用户名或手机号", example = "admin" )
     private String username;
 
     @NotBlank(message = "password is required")
-    @Schema(description = "密码", example = "Admin123!")
+    @Schema(description = "密码", example = "Admin123!" )
     private String password;
 }

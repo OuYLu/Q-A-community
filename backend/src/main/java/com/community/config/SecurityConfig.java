@@ -2,7 +2,7 @@ package com.community.config;
 
 import com.community.handler.AccessDeniedHandlerImpl;
 import com.community.handler.AuthenticationEntryPointImpl;
-import com.community.interceptor.JwtAuthenticationFilter;
+import com.community.handler.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,8 +11,6 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -43,6 +41,7 @@ public class SecurityConfig {
             .requestMatchers(
                 "/api/health",
                 "/api/auth/login",
+                "/api/customer/register",
                 "/error",
                 "/swagger-ui.html",
                 "/swagger-ui/**",
@@ -63,9 +62,4 @@ public class SecurityConfig {
         return configuration.getAuthenticationManager();
     }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        // BCrypt is a secure one-way password hashing algorithm
-        return new BCryptPasswordEncoder();
-    }
 }

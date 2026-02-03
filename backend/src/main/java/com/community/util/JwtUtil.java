@@ -12,6 +12,7 @@ import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -19,7 +20,7 @@ import java.util.Map;
 public class JwtUtil {
     private final JwtProperties jwtProperties;
 
-    public String generateToken(Long userId, String username) {
+    public String generateToken(Long userId, String username, List<String> roles) {
         Instant now = Instant.now();
         Instant expiry = now.plusSeconds(jwtProperties.getExpireMinutes() * 60);
 
@@ -28,7 +29,7 @@ public class JwtUtil {
             .setSubject(username)
             .setIssuedAt(Date.from(now))
             .setExpiration(Date.from(expiry))
-            .addClaims(Map.of("userId", userId))
+            .addClaims(Map.of("userId", userId, "roles", roles))
             .signWith(getSigningKey(), SignatureAlgorithm.HS256)
             .compact();
     }
