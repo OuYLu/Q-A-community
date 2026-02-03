@@ -4,10 +4,15 @@ import com.community.common.Result;
 import com.community.dto.AdminCreateStaffDTO;
 import com.community.dto.ExpertReviewDTO;
 import com.community.dto.PermissionSaveDTO;
+import com.community.dto.RoleCreateDTO;
+import com.community.dto.RolePermUpdateDTO;
+import com.community.dto.RoleUpdateDTO;
 import com.community.entity.ExpertApply;
 import com.community.entity.Permission;
+import com.community.entity.Role;
 import com.community.service.ExpertAdminService;
 import com.community.service.PermissionService;
+import com.community.service.RoleService;
 import com.community.service.UserService;
 import com.community.vo.UserVO;
 import com.github.pagehelper.PageInfo;
@@ -31,11 +36,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor
-@Tag(name = "用户管理")
+@Tag(name = "Admin User")
 public class AdminUserController {
     private final UserService userService;
     private final ExpertAdminService expertAdminService;
     private final PermissionService permissionService;
+    private final RoleService roleService;
 
     @PostMapping("/staff")
     @PreAuthorize("hasAuthority('rbac:user:manage')")
@@ -88,6 +94,53 @@ public class AdminUserController {
     @Operation(summary = "Delete permission", description = "Permission management")
     public Result<Void> deletePermission(@PathVariable Long id) {
         permissionService.delete(id);
+        return Result.success(null);
+    }
+
+    @GetMapping("/role/list")
+    @PreAuthorize("hasAuthority('rbac:role:manage')")
+    @Operation(summary = "Role list", description = "Role management")
+    public Result<PageInfo<Role>> listRoles(@RequestParam(defaultValue = "1") int pageNum,
+                                            @RequestParam(defaultValue = "10") int pageSize) {
+        return Result.success(roleService.listRoles(pageNum, pageSize));
+    }
+
+    @PostMapping("/role")
+    @PreAuthorize("hasAuthority('rbac:role:manage')")
+    @Operation(summary = "Create role", description = "Role management")
+    public Result<Role> createRole(@Valid @RequestBody RoleCreateDTO dto) {
+        return Result.success(roleService.create(dto));
+    }
+
+    @PutMapping("/role/{id}")
+    @PreAuthorize("hasAuthority('rbac:role:manage')")
+    @Operation(summary = "Update role name", description = "Role management")
+    public Result<Role> updateRole(@PathVariable Long id, @Valid @RequestBody RoleUpdateDTO dto) {
+        return Result.success(roleService.updateName(id, dto));
+    }
+
+    @DeleteMapping("/role/{id}")
+    @PreAuthorize("hasAuthority('rbac:role:manage')")
+    @Operation(summary = "Delete role", description = "Role management")
+    public Result<Void> deleteRole(@PathVariable Long id) {
+        roleService.delete(id);
+        return Result.success(null);
+    }
+
+    @GetMapping("/role/{id}/perm/list")
+    @PreAuthorize("hasAuthority('rbac:role:manage')")
+    @Operation(summary = "Role permissions", description = "Role management")
+    public Result<PageInfo<Permission>> listRolePermissions(@PathVariable Long id,
+                                                            @RequestParam(defaultValue = "1") int pageNum,
+                                                            @RequestParam(defaultValue = "10") int pageSize) {
+        return Result.success(roleService.listRolePermissions(id, pageNum, pageSize));
+    }
+
+    @PutMapping("/role/perm")
+    @PreAuthorize("hasAuthority('rbac:role:manage')")
+    @Operation(summary = "Update role permissions", description = "Role management")
+    public Result<Void> updateRolePermissions(@Valid @RequestBody RolePermUpdateDTO dto) {
+        roleService.updateRolePermissions(dto);
         return Result.success(null);
     }
 }
