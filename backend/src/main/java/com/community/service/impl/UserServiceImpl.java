@@ -150,7 +150,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         List<String> roles = securityUser.getAuthorities().stream()
             .map(GrantedAuthority::getAuthority)
             .toList();
-        return new UserVO(securityUser.getId(), securityUser.getUsername(), securityUser.getNickname(), roles);
+        return new UserVO(
+            securityUser.getId(),
+            securityUser.getUsername(),
+            securityUser.getNickname(),
+            roles,
+            securityUser.getRoleCodes(),
+            securityUser.getPermCodes()
+        );
     }
 
     @Override

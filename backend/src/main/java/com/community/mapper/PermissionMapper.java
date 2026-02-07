@@ -17,4 +17,15 @@ public interface PermissionMapper extends BaseMapper<Permission> {
         ORDER BY p.created_at DESC
         """)
     List<Permission> selectByRoleId(Long roleId);
+
+    @Select("""
+        SELECT p.*
+        FROM user_role ur
+        JOIN role_permission rp ON ur.role_id = rp.role_id
+        JOIN permission p ON rp.permission_id = p.id
+        WHERE ur.user_id = #{userId}
+          AND p.type = 'menu'
+        ORDER BY p.parent_id ASC, p.sort ASC, p.id ASC
+        """)
+    List<Permission> selectMenusByUserId(Long userId);
 }

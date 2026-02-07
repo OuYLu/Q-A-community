@@ -19,9 +19,19 @@ public class Permission {
 
     private String type;
 
+    private Long parentId;
+
     private String pathOrApi;
 
     private String method;
+
+    private Integer sort;
+
+    private String icon;
+
+    private String component;
+
+    private Integer visible;
 
     private LocalDateTime createdAt;
 }
