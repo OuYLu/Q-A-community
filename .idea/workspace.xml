@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="aa5f3f12-7cf3-407a-bba2-f4fa29dbf84b" name="Changes" comment="后端：用户管理的所有内容（补充版）">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/agent.md" beforeDir="false" afterPath="$PROJECT_DIR$/agent.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/community/interceptor/JwtAuthenticationFilter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/application.yml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ChangesViewManager">
+    <option name="groupingKeys">
+      <option value="module" />
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;OuYLu&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/OuYLu/Q-A-community.git&quot;,
+    &quot;accountId&quot;: &quot;75d9dd8b-07e1-4201-b51f-1695e7d199db&quot;
+  }
+}</component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="customMavenHome" value="D:\SoftWare\apache-maven-3.9.4" />
+        <option name="mavenHomeTypeForPersistence" value="CUSTOM" />
+        <option name="userSettingsFile" value="D:\SoftWare\apache-maven-3.9.4\conf\settings.xml" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="MavenRunner">
+    <option name="jreName" value="17" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="DEPENDENCY_CHECKER_PROBLEMS_TAB" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 2
+}</component>
+  <component name="ProjectId" id="36pc5exdipdWxnTrz51TQiGHf66" />
+  <component name="ProjectViewState">
+    <option name="autoscrollToSource" value="true" />
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+    <option name="showMembers" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.CommunityApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Application.SmartCommunityApplication.executor&quot;: &quot;Run&quot;,
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;Spring Boot.CommunityApplication.executor&quot;: &quot;Debug&quot;,
+    &quot;Spring Boot.SmartCommunityApplication.executor&quot;: &quot;Debug&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;dev-new&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;E:/study/agricutural/agricultural-comprehensive-service-platform&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.14941406&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.projectsettings.compiler.annotationProcessors&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  },
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;mysql&quot;
+    ]
+  }
+}</component>
+  <component name="RunManager" selected="Application.CommunityApplication">
+    <configuration name="CommunityApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.community.CommunityApplication" />
+      <module name="Smart-community" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.community.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="SmartCommunityApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.community.SmartCommunityApplication" />
+      <module name="Smart-community" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.community.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="CommunityApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="backend" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.community.CommunityApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="SmartCommunityApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="Smart-community" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.community.SmartCommunityApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-125ca727e0f0-intellij.indexing.shared.core-IU-243.23654.153" />
+        <option value="bundled-js-predefined-d6986cc7102b-822845ee3bb5-JavaScript-IU-243.23654.153" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="aa5f3f12-7cf3-407a-bba2-f4fa29dbf84b" name="Changes" comment="" />
+      <created>1765706775010</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1765706775010</updated>
+      <workItem from="1765706776220" duration="31000" />
+      <workItem from="1765726733316" duration="7070000" />
+      <workItem from="1767943865631" duration="6182000" />
+      <workItem from="1767951277949" duration="22067000" />
+      <workItem from="1769150894936" duration="1091000" />
+      <workItem from="1769154066885" duration="84000" />
+      <workItem from="1769154164730" duration="209000" />
+      <workItem from="1769332394168" duration="80000" />
+      <workItem from="1769958761025" duration="121000" />
+      <workItem from="1769959085607" duration="411000" />
+      <workItem from="1769959536340" duration="3879000" />
+      <workItem from="1769963461209" duration="1053000" />
+      <workItem from="1770038973717" duration="597000" />
+      <workItem from="1770039798837" duration="29223000" />
+      <workItem from="1770632493709" duration="11731000" />
+      <workItem from="1770864448231" duration="5631000" />
+      <workItem from="1770945584482" duration="4452000" />
+    </task>
+    <task id="LOCAL-00001" summary="返回统一响应体和全局异常处理">
+      <option name="closed" value="true" />
+      <created>1765888815270</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1765888815270</updated>
+    </task>
+    <task id="LOCAL-00002" summary="注册用户">
+      <option name="closed" value="true" />
+      <created>1765890886598</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1765890886598</updated>
+    </task>
+    <task id="LOCAL-00003" summary="rbac权限模型校验">
+      <option name="closed" value="true" />
+      <created>1767947882996</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1767947882996</updated>
+    </task>
+    <task id="LOCAL-00004" summary="rbac权限模型校验补充">
+      <option name="closed" value="true" />
+      <created>1767948332880</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1767948332880</updated>
+    </task>
+    <task id="LOCAL-00005" summary="rbac权限模型校验补充2">
+      <option name="closed" value="true" />
+      <created>1767948462835</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1767948462835</updated>
+    </task>
+    <task id="LOCAL-00006" summary="JWT验证">
+      <option name="closed" value="true" />
+      <created>1767948498672</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1767948498672</updated>
+    </task>
+    <task id="LOCAL-00007" summary="rbac角色模型与权限校验">
+      <option name="closed" value="true" />
+      <created>1769008362398</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1769008362398</updated>
+    </task>
+    <task id="LOCAL-00008" summary="初始化">
+      <option name="closed" value="true" />
+      <created>1769959146416</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1769959146416</updated>
+    </task>
+    <task id="LOCAL-00009" summary="初始化-前端">
+      <option name="closed" value="true" />
+      <created>1769959940877</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1769959940877</updated>
+    </task>
+    <task id="LOCAL-00010" summary="后端初始化">
+      <option name="closed" value="true" />
+      <created>1770018617764</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1770018617764</updated>
+    </task>
+    <task id="LOCAL-00011" summary="用户登录，普通用户注册，创建运营人员，专家申请，专家审核。">
+      <option name="closed" value="true" />
+      <created>1770118561938</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1770118561938</updated>
+    </task>
+    <task id="LOCAL-00012" summary="权限增删查改">
+      <option name="closed" value="true" />
+      <created>1770121162988</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1770121162988</updated>
+    </task>
+    <task id="LOCAL-00013" summary="角色的增删查改，角色与权限的绑定">
+      <option name="closed" value="true" />
+      <created>1770129363324</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1770129363324</updated>
+    </task>
+    <task id="LOCAL-00014" summary="动态菜单的查看，我的内容返回">
+      <option name="closed" value="true" />
+      <created>1770436819437</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1770436819437</updated>
+    </task>
+    <task id="LOCAL-00015" summary="后端：用户管理的所有内容">
+      <option name="closed" value="true" />
+      <created>1771160998444</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1771160998444</updated>
+    </task>
+    <task id="LOCAL-00016" summary="后端：用户管理的所有内容（补充版）">
+      <option name="closed" value="true" />
+      <created>1771161035821</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1771161035821</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="返回统一响应体和全局异常处理" />
+    <MESSAGE value="注册用户" />
+    <MESSAGE value="rabc权限模型校验" />
+    <MESSAGE value="rbac权限模型校验" />
+    <MESSAGE value="rbac权限模型校验补充" />
+    <MESSAGE value="rbac权限模型校验补充2" />
+    <MESSAGE value="JWT验证" />
+    <MESSAGE value="rbac角色模型与权限校验" />
+    <MESSAGE value="初始化" />
+    <MESSAGE value="初始化-前端" />
+    <MESSAGE value="后端初始化" />
+    <MESSAGE value="用户登录，普通用户注册，创建运营人员，专家申请，专家审核。" />
+    <MESSAGE value="权限增删查改" />
+    <MESSAGE value="角色的增删查改，角色与权限的绑定" />
+    <MESSAGE value="动态菜单的查看，我的内容返回" />
+    <MESSAGE value="后端：用户管理的所有内容" />
+    <MESSAGE value="后端：用户管理的所有内容（补充版）" />
+    <option name="LAST_COMMIT_MESSAGE" value="后端：用户管理的所有内容（补充版）" />
+  </component>
+</project>
