@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.community.common.BizException;
 import com.community.common.ResultCode;
 import com.community.common.SecurityUser;
+import com.community.dto.ExpertApplyQueryDTO;
 import com.community.dto.ExpertReviewDTO;
 import com.community.entity.ExpertApply;
 import com.community.entity.ExpertProfile;
@@ -19,6 +20,7 @@ import com.community.mapper.RoleMapper;
 import com.community.mapper.UserMapper;
 import com.community.mapper.UserRoleMapper;
 import com.community.service.ExpertAdminService;
+import com.community.vo.ExpertApplyDetailVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -36,10 +38,26 @@ public class ExpertAdminServiceImpl extends ServiceImpl<ExpertApplyMapper, Exper
     private final UserRoleMapper userRoleMapper;
 
     @Override
-    public PageInfo<ExpertApply> listApplies(Integer status, int pageNum, int pageSize) {
+    public PageInfo<ExpertApply> listApplies(ExpertApplyQueryDTO query) {
         LambdaQueryWrapper<ExpertApply> wrapper = new LambdaQueryWrapper<>();
+        Integer status = query == null ? null : query.getStatus();
+        String realName = query == null ? null : query.getRealName();
+        String organization = query == null ? null : query.getOrganization();
+        String expertise = query == null ? null : query.getExpertise();
+        Integer pageNum = query == null || query.getPageNum() == null ? 1 : query.getPageNum();
+        Integer pageSize = query == null || query.getPageSize() == null ? 10 : query.getPageSize();
+
         if (status != null) {
             wrapper.eq(ExpertApply::getStatus, status);
+        }
+        if (realName != null && !realName.isBlank()) {
+            wrapper.like(ExpertApply::getRealName, realName);
+        }
+        if (organization != null && !organization.isBlank()) {
+            wrapper.like(ExpertApply::getOrganization, organization);
+        }
+        if (expertise != null && !expertise.isBlank()) {
+            wrapper.like(ExpertApply::getExpertise, expertise);
         }
         wrapper.orderByDesc(ExpertApply::getCreatedAt);
         PageHelper.startPage(pageNum, pageSize);
@@ -138,6 +156,28 @@ public class ExpertAdminServiceImpl extends ServiceImpl<ExpertApplyMapper, Exper
         }
 
         this.updateById(apply);
+    }
+
+    @Override
+    public ExpertApplyDetailVO getDetailByUserId(Long userId) {
+        ExpertApply apply = this.getOne(new LambdaQueryWrapper<ExpertApply>()
+            .eq(ExpertApply::getUserId, userId)
+            .orderByDesc(ExpertApply::getCreatedAt)
+            .last("LIMIT 1"));
+        if (apply == null) {
+            throw new BizException(ResultCode.BAD_REQUEST, "Expert apply detail not found");
+        }
+
+        ExpertApplyDetailVO vo = new ExpertApplyDetailVO();
+        vo.setRealName(apply.getRealName());
+        vo.setOrganization(apply.getOrganization());
+        vo.setTitle(apply.getTitle());
+        vo.setExpertise(apply.getExpertise());
+        vo.setProofUrls(apply.getProofUrls());
+        vo.setStatus(apply.getStatus());
+        vo.setCreatedAt(apply.getCreatedAt());
+        vo.setUpdatedAt(apply.getUpdatedAt());
+        return vo;
     }
 
     private SecurityUser getCurrentSecurityUser() {

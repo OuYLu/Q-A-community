@@ -6,6 +6,7 @@ import com.community.common.BizException;
 import com.community.common.ResultCode;
 import com.community.dto.RoleCreateDTO;
 import com.community.dto.RolePermUpdateDTO;
+import com.community.dto.RoleQueryDTO;
 import com.community.dto.RoleUpdateDTO;
 import com.community.entity.Permission;
 import com.community.entity.Role;
@@ -34,10 +35,17 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     private final PermissionMapper permissionMapper;
 
     @Override
-    public PageInfo<Role> listRoles(int pageNum, int pageSize) {
+    public PageInfo<Role> listRoles(RoleQueryDTO query) {
+        String name = query == null ? null : query.getName();
+        Integer pageNum = query == null || query.getPageNum() == null ? 1 : query.getPageNum();
+        Integer pageSize = query == null || query.getPageSize() == null ? 10 : query.getPageSize();
+        LambdaQueryWrapper<Role> wrapper = new LambdaQueryWrapper<>();
+        if (name != null && !name.isBlank()) {
+            wrapper.like(Role::getName, name);
+        }
+        wrapper.orderByDesc(Role::getCreatedAt);
         PageHelper.startPage(pageNum, pageSize);
-        return new PageInfo<>(this.list(new LambdaQueryWrapper<Role>()
-            .orderByDesc(Role::getCreatedAt)));
+        return new PageInfo<>(this.list(wrapper));
     }
 
     @Override
@@ -129,5 +137,14 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
             rp.setCreatedAt(now);
             rolePermissionMapper.insert(rp);
         }
+    }
+
+    @Override
+    public Role getById(Long id) {
+        Role role = super.getById(id);
+        if (role == null) {
+            throw new BizException(ResultCode.BAD_REQUEST, "角色不存在");
+        }
+        return role;
     }
 }

@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.community.common.BizException;
 import com.community.common.ResultCode;
 import com.community.dto.PermissionSaveDTO;
+import com.community.dto.PermissionQueryDTO;
 import com.community.entity.Permission;
 import com.community.entity.Role;
 import com.community.entity.RolePermission;
@@ -30,10 +31,17 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
     private final RoleMapper roleMapper;
 
     @Override
-    public PageInfo<Permission> listAll(int pageNum, int pageSize) {
+    public PageInfo<Permission> listAll(PermissionQueryDTO query) {
+        String name = query == null ? null : query.getName();
+        Integer pageNum = query == null || query.getPageNum() == null ? 1 : query.getPageNum();
+        Integer pageSize = query == null || query.getPageSize() == null ? 10 : query.getPageSize();
+        LambdaQueryWrapper<Permission> wrapper = new LambdaQueryWrapper<>();
+        if (name != null && !name.isBlank()) {
+            wrapper.like(Permission::getName, name);
+        }
+        wrapper.orderByDesc(Permission::getCreatedAt);
         PageHelper.startPage(pageNum, pageSize);
-        return new PageInfo<>(this.list(new LambdaQueryWrapper<Permission>()
-            .orderByDesc(Permission::getCreatedAt)));
+        return new PageInfo<>(this.list(wrapper));
     }
 
     @Override
@@ -109,5 +117,14 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
         }
 
         this.removeById(id);
+    }
+
+    @Override
+    public Permission getById(Long id) {
+        Permission permission = super.getById(id);
+        if (permission == null) {
+            throw new BizException(ResultCode.BAD_REQUEST, "权限不存在");
+        }
+        return permission;
     }
 }

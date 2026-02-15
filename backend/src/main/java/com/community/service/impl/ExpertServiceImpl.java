@@ -17,6 +17,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 
@@ -31,21 +32,21 @@ public class ExpertServiceImpl extends ServiceImpl<ExpertApplyMapper, ExpertAppl
     public Long applyExpert(ExpertApplyDTO dto) {
         SecurityUser securityUser = getCurrentSecurityUser();
         if (securityUser == null) {
-            throw new BizException(ResultCode.UNAUTHORIZED, "请先登录");
+            throw new BizException(ResultCode.UNAUTHORIZED, "Please login first");
         }
 
         User user = userMapper.selectById(securityUser.getId());
         if (user == null) {
-            throw new BizException(ResultCode.BAD_REQUEST, "找不到用户");
+            throw new BizException(ResultCode.BAD_REQUEST, "User not found");
         }
 
         Integer expertStatus = user.getExpertStatus();
         if (expertStatus != null) {
             if (expertStatus == 2) {
-                throw new BizException(ResultCode.BAD_REQUEST, "专家认证正在审核中");
+                throw new BizException(ResultCode.BAD_REQUEST, "Expert certification is under review");
             }
             if (expertStatus == 3) {
-                throw new BizException(ResultCode.BAD_REQUEST, "专家认证已通过");
+                throw new BizException(ResultCode.BAD_REQUEST, "Expert certification already approved");
             }
         }
 
@@ -54,7 +55,13 @@ public class ExpertServiceImpl extends ServiceImpl<ExpertApplyMapper, ExpertAppl
             .eq(ExpertApply::getStatus, 1)
             .last("LIMIT 1"));
         if (pending != null) {
-            throw new BizException(ResultCode.BAD_REQUEST, "你当前正在申请中，请勿重复提交");
+            throw new BizException(ResultCode.BAD_REQUEST, "You already have a pending application. Please do not submit again");
+        }
+
+        if (dto.getProofUrls() == null
+            || CollectionUtils.isEmpty(dto.getProofUrls().getLicense())
+            || CollectionUtils.isEmpty(dto.getProofUrls().getEmployment())) {
+            throw new BizException(ResultCode.BAD_REQUEST, "LICENSE and EMPLOYMENT materials are required");
         }
 
         LocalDateTime now = LocalDateTime.now();

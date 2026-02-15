@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -36,9 +37,14 @@ public class AuthServiceImpl implements AuthService {
             throw new BizException(ResultCode.UNAUTHORIZED, "你的账号已被冻结，如有疑问联系管理员777@gmail.com");
         }
 
-        Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(loginDTO.getUsername(), loginDTO.getPassword())
-        );
+        Authentication authentication;
+        try {
+            authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginDTO.getUsername(), loginDTO.getPassword())
+            );
+        } catch (AuthenticationException ex) {
+            throw new BizException(ResultCode.BAD_REQUEST, "账号或密码错误");
+        }
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
