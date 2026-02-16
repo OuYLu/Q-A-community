@@ -39,8 +39,10 @@
       <el-pagination
         :current-page="query.pageNum"
         :page-size="query.pageSize"
+        :page-sizes="pageSizes"
         :total="total"
-        layout="total, prev, pager, next"
+        layout="total, sizes, prev, pager, next"
+        @size-change="handleSizeChange"
         @current-change="handlePage"
       />
     </div>
@@ -92,6 +94,7 @@ import type {
 } from "../../types/adminUser";
 
 const query = reactive<PermissionQueryDTO>({ pageNum: 1, pageSize: 10 });
+const pageSizes = [10, 20, 50, 100];
 const rows = ref<Permission[]>([]);
 const total = ref(0);
 const loading = ref(false);
@@ -138,6 +141,12 @@ const loadData = async () => {
 
 const handlePage = (page: number) => {
   query.pageNum = page;
+  loadData();
+};
+
+const handleSizeChange = (size: number) => {
+  query.pageSize = size;
+  query.pageNum = 1;
   loadData();
 };
 

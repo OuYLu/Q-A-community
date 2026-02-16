@@ -1,0 +1,4209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataSource name="@localhost">
+  <database-model serializer="dbm" dbms="MYSQL" family-id="MYSQL" format-version="4.54">
+    <root id="1">
+      <DefaultAuthPlugin>caching_sha2_password</DefaultAuthPlugin>
+      <DefaultCasing>lower/lower</DefaultCasing>
+      <DefaultEngine>InnoDB</DefaultEngine>
+      <DefaultTmpEngine>InnoDB</DefaultTmpEngine>
+      <Grants>|root||root|localhost|ALTER|G
+|root||root|localhost|ALTER ROUTINE|G
+|root||root|localhost|APPLICATION_PASSWORD_ADMIN|G
+|root||mysql.infoschema|localhost|AUDIT_ABORT_EXEMPT|G
+|root||mysql.session|localhost|AUDIT_ABORT_EXEMPT|G
+|root||mysql.sys|localhost|AUDIT_ABORT_EXEMPT|G
+|root||root|localhost|AUDIT_ABORT_EXEMPT|G
+|root||root|localhost|AUDIT_ADMIN|G
+|root||mysql.session|localhost|AUTHENTICATION_POLICY_ADMIN|G
+|root||root|localhost|AUTHENTICATION_POLICY_ADMIN|G
+|root||mysql.session|localhost|BACKUP_ADMIN|G
+|root||root|localhost|BACKUP_ADMIN|G
+|root||root|localhost|BINLOG_ADMIN|G
+|root||root|localhost|BINLOG_ENCRYPTION_ADMIN|G
+|root||mysql.session|localhost|CLONE_ADMIN|G
+|root||root|localhost|CLONE_ADMIN|G
+|root||mysql.session|localhost|CONNECTION_ADMIN|G
+|root||root|localhost|CONNECTION_ADMIN|G
+|root||root|localhost|CREATE|G
+|root||root|localhost|CREATE ROLE|G
+|root||root|localhost|CREATE ROUTINE|G
+|root||root|localhost|CREATE TABLESPACE|G
+|root||root|localhost|CREATE TEMPORARY TABLES|G
+|root||root|localhost|CREATE USER|G
+|root||root|localhost|CREATE VIEW|G
+|root||root|localhost|DELETE|G
+|root||root|localhost|DROP|G
+|root||root|localhost|DROP ROLE|G
+|root||root|localhost|ENCRYPTION_KEY_ADMIN|G
+|root||root|localhost|EVENT|G
+|root||root|localhost|EXECUTE|G
+|root||root|localhost|FILE|G
+|root||mysql.infoschema|localhost|FIREWALL_EXEMPT|G
+|root||mysql.session|localhost|FIREWALL_EXEMPT|G
+|root||mysql.sys|localhost|FIREWALL_EXEMPT|G
+|root||root|localhost|FIREWALL_EXEMPT|G
+|root||root|localhost|FLUSH_OPTIMIZER_COSTS|G
+|root||root|localhost|FLUSH_STATUS|G
+|root||root|localhost|FLUSH_TABLES|G
+|root||root|localhost|FLUSH_USER_RESOURCES|G
+|root||root|localhost|GROUP_REPLICATION_ADMIN|G
+|root||root|localhost|GROUP_REPLICATION_STREAM|G
+|root||root|localhost|INDEX|G
+|root||root|localhost|INNODB_REDO_LOG_ARCHIVE|G
+|root||root|localhost|INNODB_REDO_LOG_ENABLE|G
+|root||root|localhost|INSERT|G
+|root||root|localhost|LOCK TABLES|G
+|root||root|localhost|PASSWORDLESS_USER_ADMIN|G
+|root||mysql.session|localhost|PERSIST_RO_VARIABLES_ADMIN|G
+|root||root|localhost|PERSIST_RO_VARIABLES_ADMIN|G
+|root||root|localhost|PROCESS|G
+|root||root|localhost|REFERENCES|G
+|root||root|localhost|RELOAD|G
+|root||root|localhost|REPLICATION CLIENT|G
+|root||root|localhost|REPLICATION SLAVE|G
+|root||root|localhost|REPLICATION_APPLIER|G
+|root||root|localhost|REPLICATION_SLAVE_ADMIN|G
+|root||root|localhost|RESOURCE_GROUP_ADMIN|G
+|root||root|localhost|RESOURCE_GROUP_USER|G
+|root||root|localhost|ROLE_ADMIN|G
+|root||mysql.infoschema|localhost|SELECT|G
+|root||root|localhost|SELECT|G
+|root||root|localhost|SENSITIVE_VARIABLES_OBSERVER|G
+|root||root|localhost|SERVICE_CONNECTION_ADMIN|G
+|root||mysql.session|localhost|SESSION_VARIABLES_ADMIN|G
+|root||root|localhost|SESSION_VARIABLES_ADMIN|G
+|root||root|localhost|SET_USER_ID|G
+|root||root|localhost|SHOW DATABASES|G
+|root||root|localhost|SHOW VIEW|G
+|root||root|localhost|SHOW_ROUTINE|G
+|root||mysql.session|localhost|SHUTDOWN|G
+|root||root|localhost|SHUTDOWN|G
+|root||mysql.session|localhost|SUPER|G
+|root||root|localhost|SUPER|G
+|root||mysql.infoschema|localhost|SYSTEM_USER|G
+|root||mysql.session|localhost|SYSTEM_USER|G
+|root||mysql.sys|localhost|SYSTEM_USER|G
+|root||root|localhost|SYSTEM_USER|G
+|root||mysql.session|localhost|SYSTEM_VARIABLES_ADMIN|G
+|root||root|localhost|SYSTEM_VARIABLES_ADMIN|G
+|root||root|localhost|TABLE_ENCRYPTION_ADMIN|G
+|root||root|localhost|TELEMETRY_LOG_ADMIN|G
+|root||root|localhost|TRIGGER|G
+|root||root|localhost|UPDATE|G
+|root||root|localhost|XA_RECOVER_ADMIN|G
+|root||root|localhost|grant option|G
+performance_schema|schema||mysql.session|localhost|SELECT|G
+sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
+      <ServerVersion>8.0.39</ServerVersion>
+    </root>
+    <collation id="2" parent="1" name="armscii8_bin">
+      <Charset>armscii8</Charset>
+    </collation>
+    <collation id="3" parent="1" name="armscii8_general_ci">
+      <Charset>armscii8</Charset>
+      <DefaultForCharset>1</DefaultForCharset>
+    </collation>
+    <collation id="4" parent="1" name="ascii_bin">
+      <Charset>ascii</Charset>
+    </collation>
+    <collation id="5" parent="1" name="ascii_general_ci">
+      <Charset>ascii</Charset>
+      <DefaultForCharset>1</DefaultForCharset>
+    </collation>
+    <collation id="6" parent="1" name="big5_bin">
+      <Charset>big5</Charset>
+    </collation>
+    <collation id="7" parent="1" name="big5_chinese_ci">
+      <Charset>big5</Charset>
+      <DefaultForCharset>1</DefaultForCharset>
+    </collation>
+    <collation id="8" parent="1" name="binary">
+      <Charset>binary</Charset>
+      <DefaultForCharset>1</DefaultForCharset>
+    </collation>
+    <collation id="9" parent="1" name="cp1250_bin">
+      <Charset>cp1250</Charset>
+    </collation>
+    <collation id="10" parent="1" name="cp1250_croatian_ci">
+      <Charset>cp1250</Charset>
+    </collation>
+    <collation id="11" parent="1" name="cp1250_czech_cs">
+      <Charset>cp1250</Charset>
+    </collation>
+    <collation id="12" parent="1" name="cp1250_general_ci">
+      <Charset>cp1250</Charset>
+      <DefaultForCharset>1</DefaultForCharset>
+    </collation>
+    <collation id="13" parent="1" name="cp1250_polish_ci">
+      <Charset>cp1250</Charset>
+    </collation>
+    <collation id="14" parent="1" name="cp1251_bin">
+      <Charset>cp1251</Charset>
+    </collation>
+    <collation id="15" parent="1" name="cp1251_bulgarian_ci">
+      <Charset>cp1251</Charset>
+    </collation>
+    <collation id="16" parent="1" name="cp1251_general_ci">
+      <Charset>cp1251</Charset>
+      <DefaultForCharset>1</DefaultForCharset>
+    </collation>
+    <collation id="17" parent="1" name="cp1251_general_cs">
+      <Charset>cp1251</Charset>
+    </collation>
+    <collation id="18" parent="1" name="cp1251_ukrainian_ci">
+      <Charset>cp1251</Charset>
+    </collation>
+    <collation id="19" parent="1" name="cp1256_bin">
+      <Charset>cp1256</Charset>
+    </collation>
+    <collation id="20" parent="1" name="cp1256_general_ci">
+      <Charset>cp1256</Charset>
+      <DefaultForCharset>1</DefaultForCharset>
+    </collation>
+    <collation id="21" parent="1" name="cp1257_bin">
+      <Charset>cp1257</Charset>
+    </collation>
+    <collation id="22" parent="1" name="cp1257_general_ci">
+      <Charset>cp1257</Charset>
+      <DefaultForCharset>1</DefaultForCharset>
+    </collation>
+    <collation id="23" parent="1" name="cp1257_lithuanian_ci">
+      <Charset>cp1257</Charset>
+    </collation>
+    <collation id="24" parent="1" name="cp850_bin">
+      <Charset>cp850</Charset>
+    </collation>
+    <collation id="25" parent="1" name="cp850_general_ci">
+      <Charset>cp850</Charset>
+      <DefaultForCharset>1</DefaultForCharset>
+    </collation>
+    <collation id="26" parent="1" name="cp852_bin">
+      <Charset>cp852</Charset>
+    </collation>
+    <collation id="27" parent="1" name="cp852_general_ci">
+      <Charset>cp852</Charset>
+      <DefaultForCharset>1</DefaultForCharset>
+    </collation>
+    <collation id="28" parent="1" name="cp866_bin">
+      <Charset>cp866</Charset>
+    </collation>
+    <collation id="29" parent="1" name="cp866_general_ci">
+      <Charset>cp866</Charset>
+      <DefaultForCharset>1</DefaultForCharset>
+    </collation>
+    <collation id="30" parent="1" name="cp932_bin">
+      <Charset>cp932</Charset>
+    </collation>
+    <collation id="31" parent="1" name="cp932_japanese_ci">
+      <Charset>cp932</Charset>
+      <DefaultForCharset>1</DefaultForCharset>
+    </collation>
+    <collation id="32" parent="1" name="dec8_bin">
+      <Charset>dec8</Charset>
+    </collation>
+    <collation id="33" parent="1" name="dec8_swedish_ci">
+      <Charset>dec8</Charset>
+      <DefaultForCharset>1</DefaultForCharset>
+    </collation>
+    <collation id="34" parent="1" name="eucjpms_bin">
+      <Charset>eucjpms</Charset>
+    </collation>
+    <collation id="35" parent="1" name="eucjpms_japanese_ci">
+      <Charset>eucjpms</Charset>
+      <DefaultForCharset>1</DefaultForCharset>
+    </collation>
+    <collation id="36" parent="1" name="euckr_bin">
+      <Charset>euckr</Charset>
+    </collation>
+    <collation id="37" parent="1" name="euckr_korean_ci">
+      <Charset>euckr</Charset>
+      <DefaultForCharset>1</DefaultForCharset>
+    </collation>
+    <collation id="38" parent="1" name="gb18030_bin">
+      <Charset>gb18030</Charset>
+    </collation>
+    <collation id="39" parent="1" name="gb18030_chinese_ci">
+      <Charset>gb18030</Charset>
+      <DefaultForCharset>1</DefaultForCharset>
+    </collation>
+    <collation id="40" parent="1" name="gb18030_unicode_520_ci">
+      <Charset>gb18030</Charset>
+    </collation>
+    <collation id="41" parent="1" name="gb2312_bin">
+      <Charset>gb2312</Charset>
+    </collation>
+    <collation id="42" parent="1" name="gb2312_chinese_ci">
+      <Charset>gb2312</Charset>
+      <DefaultForCharset>1</DefaultForCharset>
+    </collation>
+    <collation id="43" parent="1" name="gbk_bin">
+      <Charset>gbk</Charset>
+    </collation>
+    <collation id="44" parent="1" name="gbk_chinese_ci">
+      <Charset>gbk</Charset>
+      <DefaultForCharset>1</DefaultForCharset>
+    </collation>
+    <collation id="45" parent="1" name="geostd8_bin">
+      <Charset>geostd8</Charset>
+    </collation>
+    <collation id="46" parent="1" name="geostd8_general_ci">
+      <Charset>geostd8</Charset>
+      <DefaultForCharset>1</DefaultForCharset>
+    </collation>
+    <collation id="47" parent="1" name="greek_bin">
+      <Charset>greek</Charset>
+    </collation>
+    <collation id="48" parent="1" name="greek_general_ci">
+      <Charset>greek</Charset>
+      <DefaultForCharset>1</DefaultForCharset>
+    </collation>
+    <collation id="49" parent="1" name="hebrew_bin">
+      <Charset>hebrew</Charset>
+    </collation>
+    <collation id="50" parent="1" name="hebrew_general_ci">
+      <Charset>hebrew</Charset>
+      <DefaultForCharset>1</DefaultForCharset>
+    </collation>
+    <collation id="51" parent="1" name="hp8_bin">
+      <Charset>hp8</Charset>
+    </collation>
+    <collation id="52" parent="1" name="hp8_english_ci">
+      <Charset>hp8</Charset>
+      <DefaultForCharset>1</DefaultForCharset>
+    </collation>
+    <collation id="53" parent="1" name="keybcs2_bin">
+      <Charset>keybcs2</Charset>
+    </collation>
+    <collation id="54" parent="1" name="keybcs2_general_ci">
+      <Charset>keybcs2</Charset>
+      <DefaultForCharset>1</DefaultForCharset>
+    </collation>
+    <collation id="55" parent="1" name="koi8r_bin">
+      <Charset>koi8r</Charset>
+    </collation>
+    <collation id="56" parent="1" name="koi8r_general_ci">
+      <Charset>koi8r</Charset>
+      <DefaultForCharset>1</DefaultForCharset>
+    </collation>
+    <collation id="57" parent="1" name="koi8u_bin">
+      <Charset>koi8u</Charset>
+    </collation>
+    <collation id="58" parent="1" name="koi8u_general_ci">
+      <Charset>koi8u</Charset>
+      <DefaultForCharset>1</DefaultForCharset>
+    </collation>
+    <collation id="59" parent="1" name="latin1_bin">
+      <Charset>latin1</Charset>
+    </collation>
+    <collation id="60" parent="1" name="latin1_danish_ci">
+      <Charset>latin1</Charset>
+    </collation>
+    <collation id="61" parent="1" name="latin1_general_ci">
+      <Charset>latin1</Charset>
+    </collation>
+    <collation id="62" parent="1" name="latin1_general_cs">
+      <Charset>latin1</Charset>
+    </collation>
+    <collation id="63" parent="1" name="latin1_german1_ci">
+      <Charset>latin1</Charset>
+    </collation>
+    <collation id="64" parent="1" name="latin1_german2_ci">
+      <Charset>latin1</Charset>
+    </collation>
+    <collation id="65" parent="1" name="latin1_spanish_ci">
+      <Charset>latin1</Charset>
+    </collation>
+    <collation id="66" parent="1" name="latin1_swedish_ci">
+      <Charset>latin1</Charset>
+      <DefaultForCharset>1</DefaultForCharset>
+    </collation>
+    <collation id="67" parent="1" name="latin2_bin">
+      <Charset>latin2</Charset>
+    </collation>
+    <collation id="68" parent="1" name="latin2_croatian_ci">
+      <Charset>latin2</Charset>
+    </collation>
+    <collation id="69" parent="1" name="latin2_czech_cs">
+      <Charset>latin2</Charset>
+    </collation>
+    <collation id="70" parent="1" name="latin2_general_ci">
+      <Charset>latin2</Charset>
+      <DefaultForCharset>1</DefaultForCharset>
+    </collation>
+    <collation id="71" parent="1" name="latin2_hungarian_ci">
+      <Charset>latin2</Charset>
+    </collation>
+    <collation id="72" parent="1" name="latin5_bin">
+      <Charset>latin5</Charset>
+    </collation>
+    <collation id="73" parent="1" name="latin5_turkish_ci">
+      <Charset>latin5</Charset>
+      <DefaultForCharset>1</DefaultForCharset>
+    </collation>
+    <collation id="74" parent="1" name="latin7_bin">
+      <Charset>latin7</Charset>
+    </collation>
+    <collation id="75" parent="1" name="latin7_estonian_cs">
+      <Charset>latin7</Charset>
+    </collation>
+    <collation id="76" parent="1" name="latin7_general_ci">
+      <Charset>latin7</Charset>
+      <DefaultForCharset>1</DefaultForCharset>
+    </collation>
+    <collation id="77" parent="1" name="latin7_general_cs">
+      <Charset>latin7</Charset>
+    </collation>
+    <collation id="78" parent="1" name="macce_bin">
+      <Charset>macce</Charset>
+    </collation>
+    <collation id="79" parent="1" name="macce_general_ci">
+      <Charset>macce</Charset>
+      <DefaultForCharset>1</DefaultForCharset>
+    </collation>
+    <collation id="80" parent="1" name="macroman_bin">
+      <Charset>macroman</Charset>
+    </collation>
+    <collation id="81" parent="1" name="macroman_general_ci">
+      <Charset>macroman</Charset>
+      <DefaultForCharset>1</DefaultForCharset>
+    </collation>
+    <collation id="82" parent="1" name="sjis_bin">
+      <Charset>sjis</Charset>
+    </collation>
+    <collation id="83" parent="1" name="sjis_japanese_ci">
+      <Charset>sjis</Charset>
+      <DefaultForCharset>1</DefaultForCharset>
+    </collation>
+    <collation id="84" parent="1" name="swe7_bin">
+      <Charset>swe7</Charset>
+    </collation>
+    <collation id="85" parent="1" name="swe7_swedish_ci">
+      <Charset>swe7</Charset>
+      <DefaultForCharset>1</DefaultForCharset>
+    </collation>
+    <collation id="86" parent="1" name="tis620_bin">
+      <Charset>tis620</Charset>
+    </collation>
+    <collation id="87" parent="1" name="tis620_thai_ci">
+      <Charset>tis620</Charset>
+      <DefaultForCharset>1</DefaultForCharset>
+    </collation>
+    <collation id="88" parent="1" name="ucs2_bin">
+      <Charset>ucs2</Charset>
+    </collation>
+    <collation id="89" parent="1" name="ucs2_croatian_ci">
+      <Charset>ucs2</Charset>
+    </collation>
+    <collation id="90" parent="1" name="ucs2_czech_ci">
+      <Charset>ucs2</Charset>
+    </collation>
+    <collation id="91" parent="1" name="ucs2_danish_ci">
+      <Charset>ucs2</Charset>
+    </collation>
+    <collation id="92" parent="1" name="ucs2_esperanto_ci">
+      <Charset>ucs2</Charset>
+    </collation>
+    <collation id="93" parent="1" name="ucs2_estonian_ci">
+      <Charset>ucs2</Charset>
+    </collation>
+    <collation id="94" parent="1" name="ucs2_general_ci">
+      <Charset>ucs2</Charset>
+      <DefaultForCharset>1</DefaultForCharset>
+    </collation>
+    <collation id="95" parent="1" name="ucs2_general_mysql500_ci">
+      <Charset>ucs2</Charset>
+    </collation>
+    <collation id="96" parent="1" name="ucs2_german2_ci">
+      <Charset>ucs2</Charset>
+    </collation>
+    <collation id="97" parent="1" name="ucs2_hungarian_ci">
+      <Charset>ucs2</Charset>
+    </collation>
+    <collation id="98" parent="1" name="ucs2_icelandic_ci">
+      <Charset>ucs2</Charset>
+    </collation>
+    <collation id="99" parent="1" name="ucs2_latvian_ci">
+      <Charset>ucs2</Charset>
+    </collation>
+    <collation id="100" parent="1" name="ucs2_lithuanian_ci">
+      <Charset>ucs2</Charset>
+    </collation>
+    <collation id="101" parent="1" name="ucs2_persian_ci">
+      <Charset>ucs2</Charset>
+    </collation>
+    <collation id="102" parent="1" name="ucs2_polish_ci">
+      <Charset>ucs2</Charset>
+    </collation>
+    <collation id="103" parent="1" name="ucs2_roman_ci">
+      <Charset>ucs2</Charset>
+    </collation>
+    <collation id="104" parent="1" name="ucs2_romanian_ci">
+      <Charset>ucs2</Charset>
+    </collation>
+    <collation id="105" parent="1" name="ucs2_sinhala_ci">
+      <Charset>ucs2</Charset>
+    </collation>
+    <collation id="106" parent="1" name="ucs2_slovak_ci">
+      <Charset>ucs2</Charset>
+    </collation>
+    <collation id="107" parent="1" name="ucs2_slovenian_ci">
+      <Charset>ucs2</Charset>
+    </collation>
+    <collation id="108" parent="1" name="ucs2_spanish2_ci">
+      <Charset>ucs2</Charset>
+    </collation>
+    <collation id="109" parent="1" name="ucs2_spanish_ci">
+      <Charset>ucs2</Charset>
+    </collation>
+    <collation id="110" parent="1" name="ucs2_swedish_ci">
+      <Charset>ucs2</Charset>
+    </collation>
+    <collation id="111" parent="1" name="ucs2_turkish_ci">
+      <Charset>ucs2</Charset>
+    </collation>
+    <collation id="112" parent="1" name="ucs2_unicode_520_ci">
+      <Charset>ucs2</Charset>
+    </collation>
+    <collation id="113" parent="1" name="ucs2_unicode_ci">
+      <Charset>ucs2</Charset>
+    </collation>
+    <collation id="114" parent="1" name="ucs2_vietnamese_ci">
+      <Charset>ucs2</Charset>
+    </collation>
+    <collation id="115" parent="1" name="ujis_bin">
+      <Charset>ujis</Charset>
+    </collation>
+    <collation id="116" parent="1" name="ujis_japanese_ci">
+      <Charset>ujis</Charset>
+      <DefaultForCharset>1</DefaultForCharset>
+    </collation>
+    <collation id="117" parent="1" name="utf16_bin">
+      <Charset>utf16</Charset>
+    </collation>
+    <collation id="118" parent="1" name="utf16_croatian_ci">
+      <Charset>utf16</Charset>
+    </collation>
+    <collation id="119" parent="1" name="utf16_czech_ci">
+      <Charset>utf16</Charset>
+    </collation>
+    <collation id="120" parent="1" name="utf16_danish_ci">
+      <Charset>utf16</Charset>
+    </collation>
+    <collation id="121" parent="1" name="utf16_esperanto_ci">
+      <Charset>utf16</Charset>
+    </collation>
+    <collation id="122" parent="1" name="utf16_estonian_ci">
+      <Charset>utf16</Charset>
+    </collation>
+    <collation id="123" parent="1" name="utf16_general_ci">
+      <Charset>utf16</Charset>
+      <DefaultForCharset>1</DefaultForCharset>
+    </collation>
+    <collation id="124" parent="1" name="utf16_german2_ci">
+      <Charset>utf16</Charset>
+    </collation>
+    <collation id="125" parent="1" name="utf16_hungarian_ci">
+      <Charset>utf16</Charset>
+    </collation>
+    <collation id="126" parent="1" name="utf16_icelandic_ci">
+      <Charset>utf16</Charset>
+    </collation>
+    <collation id="127" parent="1" name="utf16_latvian_ci">
+      <Charset>utf16</Charset>
+    </collation>
+    <collation id="128" parent="1" name="utf16_lithuanian_ci">
+      <Charset>utf16</Charset>
+    </collation>
+    <collation id="129" parent="1" name="utf16_persian_ci">
+      <Charset>utf16</Charset>
+    </collation>
+    <collation id="130" parent="1" name="utf16_polish_ci">
+      <Charset>utf16</Charset>
+    </collation>
+    <collation id="131" parent="1" name="utf16_roman_ci">
+      <Charset>utf16</Charset>
+    </collation>
+    <collation id="132" parent="1" name="utf16_romanian_ci">
+      <Charset>utf16</Charset>
+    </collation>
+    <collation id="133" parent="1" name="utf16_sinhala_ci">
+      <Charset>utf16</Charset>
+    </collation>
+    <collation id="134" parent="1" name="utf16_slovak_ci">
+      <Charset>utf16</Charset>
+    </collation>
+    <collation id="135" parent="1" name="utf16_slovenian_ci">
+      <Charset>utf16</Charset>
+    </collation>
+    <collation id="136" parent="1" name="utf16_spanish2_ci">
+      <Charset>utf16</Charset>
+    </collation>
+    <collation id="137" parent="1" name="utf16_spanish_ci">
+      <Charset>utf16</Charset>
+    </collation>
+    <collation id="138" parent="1" name="utf16_swedish_ci">
+      <Charset>utf16</Charset>
+    </collation>
+    <collation id="139" parent="1" name="utf16_turkish_ci">
+      <Charset>utf16</Charset>
+    </collation>
+    <collation id="140" parent="1" name="utf16_unicode_520_ci">
+      <Charset>utf16</Charset>
+    </collation>
+    <collation id="141" parent="1" name="utf16_unicode_ci">
+      <Charset>utf16</Charset>
+    </collation>
+    <collation id="142" parent="1" name="utf16_vietnamese_ci">
+      <Charset>utf16</Charset>
+    </collation>
+    <collation id="143" parent="1" name="utf16le_bin">
+      <Charset>utf16le</Charset>
+    </collation>
+    <collation id="144" parent="1" name="utf16le_general_ci">
+      <Charset>utf16le</Charset>
+      <DefaultForCharset>1</DefaultForCharset>
+    </collation>
+    <collation id="145" parent="1" name="utf32_bin">
+      <Charset>utf32</Charset>
+    </collation>
+    <collation id="146" parent="1" name="utf32_croatian_ci">
+      <Charset>utf32</Charset>
+    </collation>
+    <collation id="147" parent="1" name="utf32_czech_ci">
+      <Charset>utf32</Charset>
+    </collation>
+    <collation id="148" parent="1" name="utf32_danish_ci">
+      <Charset>utf32</Charset>
+    </collation>
+    <collation id="149" parent="1" name="utf32_esperanto_ci">
+      <Charset>utf32</Charset>
+    </collation>
+    <collation id="150" parent="1" name="utf32_estonian_ci">
+      <Charset>utf32</Charset>
+    </collation>
+    <collation id="151" parent="1" name="utf32_general_ci">
+      <Charset>utf32</Charset>
+      <DefaultForCharset>1</DefaultForCharset>
+    </collation>
+    <collation id="152" parent="1" name="utf32_german2_ci">
+      <Charset>utf32</Charset>
+    </collation>
+    <collation id="153" parent="1" name="utf32_hungarian_ci">
+      <Charset>utf32</Charset>
+    </collation>
+    <collation id="154" parent="1" name="utf32_icelandic_ci">
+      <Charset>utf32</Charset>
+    </collation>
+    <collation id="155" parent="1" name="utf32_latvian_ci">
+      <Charset>utf32</Charset>
+    </collation>
+    <collation id="156" parent="1" name="utf32_lithuanian_ci">
+      <Charset>utf32</Charset>
+    </collation>
+    <collation id="157" parent="1" name="utf32_persian_ci">
+      <Charset>utf32</Charset>
+    </collation>
+    <collation id="158" parent="1" name="utf32_polish_ci">
+      <Charset>utf32</Charset>
+    </collation>
+    <collation id="159" parent="1" name="utf32_roman_ci">
+      <Charset>utf32</Charset>
+    </collation>
+    <collation id="160" parent="1" name="utf32_romanian_ci">
+      <Charset>utf32</Charset>
+    </collation>
+    <collation id="161" parent="1" name="utf32_sinhala_ci">
+      <Charset>utf32</Charset>
+    </collation>
+    <collation id="162" parent="1" name="utf32_slovak_ci">
+      <Charset>utf32</Charset>
+    </collation>
+    <collation id="163" parent="1" name="utf32_slovenian_ci">
+      <Charset>utf32</Charset>
+    </collation>
+    <collation id="164" parent="1" name="utf32_spanish2_ci">
+      <Charset>utf32</Charset>
+    </collation>
+    <collation id="165" parent="1" name="utf32_spanish_ci">
+      <Charset>utf32</Charset>
+    </collation>
+    <collation id="166" parent="1" name="utf32_swedish_ci">
+      <Charset>utf32</Charset>
+    </collation>
+    <collation id="167" parent="1" name="utf32_turkish_ci">
+      <Charset>utf32</Charset>
+    </collation>
+    <collation id="168" parent="1" name="utf32_unicode_520_ci">
+      <Charset>utf32</Charset>
+    </collation>
+    <collation id="169" parent="1" name="utf32_unicode_ci">
+      <Charset>utf32</Charset>
+    </collation>
+    <collation id="170" parent="1" name="utf32_vietnamese_ci">
+      <Charset>utf32</Charset>
+    </collation>
+    <collation id="171" parent="1" name="utf8mb3_bin">
+      <Charset>utf8mb3</Charset>
+    </collation>
+    <collation id="172" parent="1" name="utf8mb3_croatian_ci">
+      <Charset>utf8mb3</Charset>
+    </collation>
+    <collation id="173" parent="1" name="utf8mb3_czech_ci">
+      <Charset>utf8mb3</Charset>
+    </collation>
+    <collation id="174" parent="1" name="utf8mb3_danish_ci">
+      <Charset>utf8mb3</Charset>
+    </collation>
+    <collation id="175" parent="1" name="utf8mb3_esperanto_ci">
+      <Charset>utf8mb3</Charset>
+    </collation>
+    <collation id="176" parent="1" name="utf8mb3_estonian_ci">
+      <Charset>utf8mb3</Charset>
+    </collation>
+    <collation id="177" parent="1" name="utf8mb3_general_ci">
+      <Charset>utf8mb3</Charset>
+      <DefaultForCharset>1</DefaultForCharset>
+    </collation>
+    <collation id="178" parent="1" name="utf8mb3_general_mysql500_ci">
+      <Charset>utf8mb3</Charset>
+    </collation>
+    <collation id="179" parent="1" name="utf8mb3_german2_ci">
+      <Charset>utf8mb3</Charset>
+    </collation>
+    <collation id="180" parent="1" name="utf8mb3_hungarian_ci">
+      <Charset>utf8mb3</Charset>
+    </collation>
+    <collation id="181" parent="1" name="utf8mb3_icelandic_ci">
+      <Charset>utf8mb3</Charset>
+    </collation>
+    <collation id="182" parent="1" name="utf8mb3_latvian_ci">
+      <Charset>utf8mb3</Charset>
+    </collation>
+    <collation id="183" parent="1" name="utf8mb3_lithuanian_ci">
+      <Charset>utf8mb3</Charset>
+    </collation>
+    <collation id="184" parent="1" name="utf8mb3_persian_ci">
+      <Charset>utf8mb3</Charset>
+    </collation>
+    <collation id="185" parent="1" name="utf8mb3_polish_ci">
+      <Charset>utf8mb3</Charset>
+    </collation>
+    <collation id="186" parent="1" name="utf8mb3_roman_ci">
+      <Charset>utf8mb3</Charset>
+    </collation>
+    <collation id="187" parent="1" name="utf8mb3_romanian_ci">
+      <Charset>utf8mb3</Charset>
+    </collation>
+    <collation id="188" parent="1" name="utf8mb3_sinhala_ci">
+      <Charset>utf8mb3</Charset>
+    </collation>
+    <collation id="189" parent="1" name="utf8mb3_slovak_ci">
+      <Charset>utf8mb3</Charset>
+    </collation>
+    <collation id="190" parent="1" name="utf8mb3_slovenian_ci">
+      <Charset>utf8mb3</Charset>
+    </collation>
+    <collation id="191" parent="1" name="utf8mb3_spanish2_ci">
+      <Charset>utf8mb3</Charset>
+    </collation>
+    <collation id="192" parent="1" name="utf8mb3_spanish_ci">
+      <Charset>utf8mb3</Charset>
+    </collation>
+    <collation id="193" parent="1" name="utf8mb3_swedish_ci">
+      <Charset>utf8mb3</Charset>
+    </collation>
+    <collation id="194" parent="1" name="utf8mb3_tolower_ci">
+      <Charset>utf8mb3</Charset>
+    </collation>
+    <collation id="195" parent="1" name="utf8mb3_turkish_ci">
+      <Charset>utf8mb3</Charset>
+    </collation>
+    <collation id="196" parent="1" name="utf8mb3_unicode_520_ci">
+      <Charset>utf8mb3</Charset>
+    </collation>
+    <collation id="197" parent="1" name="utf8mb3_unicode_ci">
+      <Charset>utf8mb3</Charset>
+    </collation>
+    <collation id="198" parent="1" name="utf8mb3_vietnamese_ci">
+      <Charset>utf8mb3</Charset>
+    </collation>
+    <collation id="199" parent="1" name="utf8mb4_0900_ai_ci">
+      <Charset>utf8mb4</Charset>
+      <DefaultForCharset>1</DefaultForCharset>
+    </collation>
+    <collation id="200" parent="1" name="utf8mb4_0900_as_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="201" parent="1" name="utf8mb4_0900_as_cs">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="202" parent="1" name="utf8mb4_0900_bin">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="203" parent="1" name="utf8mb4_bg_0900_ai_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="204" parent="1" name="utf8mb4_bg_0900_as_cs">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="205" parent="1" name="utf8mb4_bin">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="206" parent="1" name="utf8mb4_bs_0900_ai_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="207" parent="1" name="utf8mb4_bs_0900_as_cs">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="208" parent="1" name="utf8mb4_croatian_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="209" parent="1" name="utf8mb4_cs_0900_ai_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="210" parent="1" name="utf8mb4_cs_0900_as_cs">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="211" parent="1" name="utf8mb4_czech_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="212" parent="1" name="utf8mb4_da_0900_ai_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="213" parent="1" name="utf8mb4_da_0900_as_cs">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="214" parent="1" name="utf8mb4_danish_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="215" parent="1" name="utf8mb4_de_pb_0900_ai_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="216" parent="1" name="utf8mb4_de_pb_0900_as_cs">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="217" parent="1" name="utf8mb4_eo_0900_ai_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="218" parent="1" name="utf8mb4_eo_0900_as_cs">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="219" parent="1" name="utf8mb4_es_0900_ai_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="220" parent="1" name="utf8mb4_es_0900_as_cs">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="221" parent="1" name="utf8mb4_es_trad_0900_ai_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="222" parent="1" name="utf8mb4_es_trad_0900_as_cs">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="223" parent="1" name="utf8mb4_esperanto_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="224" parent="1" name="utf8mb4_estonian_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="225" parent="1" name="utf8mb4_et_0900_ai_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="226" parent="1" name="utf8mb4_et_0900_as_cs">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="227" parent="1" name="utf8mb4_general_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="228" parent="1" name="utf8mb4_german2_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="229" parent="1" name="utf8mb4_gl_0900_ai_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="230" parent="1" name="utf8mb4_gl_0900_as_cs">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="231" parent="1" name="utf8mb4_hr_0900_ai_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="232" parent="1" name="utf8mb4_hr_0900_as_cs">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="233" parent="1" name="utf8mb4_hu_0900_ai_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="234" parent="1" name="utf8mb4_hu_0900_as_cs">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="235" parent="1" name="utf8mb4_hungarian_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="236" parent="1" name="utf8mb4_icelandic_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="237" parent="1" name="utf8mb4_is_0900_ai_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="238" parent="1" name="utf8mb4_is_0900_as_cs">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="239" parent="1" name="utf8mb4_ja_0900_as_cs">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="240" parent="1" name="utf8mb4_ja_0900_as_cs_ks">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="241" parent="1" name="utf8mb4_la_0900_ai_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="242" parent="1" name="utf8mb4_la_0900_as_cs">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="243" parent="1" name="utf8mb4_latvian_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="244" parent="1" name="utf8mb4_lithuanian_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="245" parent="1" name="utf8mb4_lt_0900_ai_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="246" parent="1" name="utf8mb4_lt_0900_as_cs">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="247" parent="1" name="utf8mb4_lv_0900_ai_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="248" parent="1" name="utf8mb4_lv_0900_as_cs">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="249" parent="1" name="utf8mb4_mn_cyrl_0900_ai_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="250" parent="1" name="utf8mb4_mn_cyrl_0900_as_cs">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="251" parent="1" name="utf8mb4_nb_0900_ai_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="252" parent="1" name="utf8mb4_nb_0900_as_cs">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="253" parent="1" name="utf8mb4_nn_0900_ai_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="254" parent="1" name="utf8mb4_nn_0900_as_cs">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="255" parent="1" name="utf8mb4_persian_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="256" parent="1" name="utf8mb4_pl_0900_ai_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="257" parent="1" name="utf8mb4_pl_0900_as_cs">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="258" parent="1" name="utf8mb4_polish_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="259" parent="1" name="utf8mb4_ro_0900_ai_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="260" parent="1" name="utf8mb4_ro_0900_as_cs">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="261" parent="1" name="utf8mb4_roman_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="262" parent="1" name="utf8mb4_romanian_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="263" parent="1" name="utf8mb4_ru_0900_ai_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="264" parent="1" name="utf8mb4_ru_0900_as_cs">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="265" parent="1" name="utf8mb4_sinhala_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="266" parent="1" name="utf8mb4_sk_0900_ai_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="267" parent="1" name="utf8mb4_sk_0900_as_cs">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="268" parent="1" name="utf8mb4_sl_0900_ai_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="269" parent="1" name="utf8mb4_sl_0900_as_cs">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="270" parent="1" name="utf8mb4_slovak_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="271" parent="1" name="utf8mb4_slovenian_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="272" parent="1" name="utf8mb4_spanish2_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="273" parent="1" name="utf8mb4_spanish_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="274" parent="1" name="utf8mb4_sr_latn_0900_ai_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="275" parent="1" name="utf8mb4_sr_latn_0900_as_cs">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="276" parent="1" name="utf8mb4_sv_0900_ai_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="277" parent="1" name="utf8mb4_sv_0900_as_cs">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="278" parent="1" name="utf8mb4_swedish_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="279" parent="1" name="utf8mb4_tr_0900_ai_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="280" parent="1" name="utf8mb4_tr_0900_as_cs">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="281" parent="1" name="utf8mb4_turkish_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="282" parent="1" name="utf8mb4_unicode_520_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="283" parent="1" name="utf8mb4_unicode_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="284" parent="1" name="utf8mb4_vi_0900_ai_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="285" parent="1" name="utf8mb4_vi_0900_as_cs">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="286" parent="1" name="utf8mb4_vietnamese_ci">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <collation id="287" parent="1" name="utf8mb4_zh_0900_as_cs">
+      <Charset>utf8mb4</Charset>
+    </collation>
+    <schema id="288" parent="1" name="agricultural_comprehensive_service_platform">
+      <CollationName>utf8mb4_general_ci</CollationName>
+    </schema>
+    <schema id="289" parent="1" name="db01">
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </schema>
+    <schema id="290" parent="1" name="db03">
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </schema>
+    <schema id="291" parent="1" name="employee">
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </schema>
+    <schema id="292" parent="1" name="employee_management_system">
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </schema>
+    <schema id="293" parent="1" name="hmdp">
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </schema>
+    <schema id="294" parent="1" name="information_schema">
+      <CollationName>utf8mb3_general_ci</CollationName>
+    </schema>
+    <schema id="295" parent="1" name="jxt_base">
+      <CollationName>utf8mb4_bin</CollationName>
+    </schema>
+    <schema id="296" parent="1" name="meeting">
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </schema>
+    <schema id="297" parent="1" name="mp">
+      <CollationName>utf8mb4_general_ci</CollationName>
+    </schema>
+    <schema id="298" parent="1" name="mysql">
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </schema>
+    <schema id="299" parent="1" name="performance_schema">
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </schema>
+    <schema id="300" parent="1" name="sky_take_out">
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </schema>
+    <schema id="301" parent="1" name="smart_community">
+      <AutoIntrospectionLevel>3</AutoIntrospectionLevel>
+      <LastIntrospectionLevel>3</LastIntrospectionLevel>
+      <LastIntrospectionLocalTimestamp>2026-02-16.03:19:58</LastIntrospectionLocalTimestamp>
+      <CollationName>utf8mb4_unicode_ci</CollationName>
+    </schema>
+    <schema id="302" parent="1" name="smart_health_qa">
+      <AutoIntrospectionLevel>3</AutoIntrospectionLevel>
+      <LastIntrospectionLevel>3</LastIntrospectionLevel>
+      <LastIntrospectionLocalTimestamp>2026-02-16.03:19:58</LastIntrospectionLocalTimestamp>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </schema>
+    <schema id="303" parent="1" name="student_manager_end">
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </schema>
+    <schema id="304" parent="1" name="sys">
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </schema>
+    <schema id="305" parent="1" name="tlias">
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </schema>
+    <schema id="306" parent="1" name="train_system">
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </schema>
+    <schema id="307" parent="1" name="web01">
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </schema>
+    <schema id="308" parent="1" name="xm_meeting_reservation">
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </schema>
+    <user id="309" parent="1" name="mysql.infoschema">
+      <CanLogin>0</CanLogin>
+      <Host>localhost</Host>
+    </user>
+    <user id="310" parent="1" name="mysql.session">
+      <CanLogin>0</CanLogin>
+      <Host>localhost</Host>
+    </user>
+    <user id="311" parent="1" name="mysql.sys">
+      <CanLogin>0</CanLogin>
+      <Host>localhost</Host>
+    </user>
+    <user id="312" parent="1" name="root">
+      <Host>localhost</Host>
+    </user>
+    <table id="313" parent="301" name="cms_audit">
+      <Comment>审核单（只处理“机器疑似/举报触发”的人工治理流程）</Comment>
+      <DetailsLevel>3</DetailsLevel>
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <table id="314" parent="301" name="cms_report">
+      <Comment>举报单（被举报内容进入人工治理流程）</Comment>
+      <DetailsLevel>3</DetailsLevel>
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <table id="315" parent="301" name="cms_sensitive_word">
+      <Comment>敏感词库（强敏感自动拦截，疑似进入人工审核）</Comment>
+      <DetailsLevel>3</DetailsLevel>
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <table id="316" parent="301" name="expert_apply">
+      <Comment>专家认证申请表（提交资质→审核→通过/驳回）</Comment>
+      <DetailsLevel>3</DetailsLevel>
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <table id="317" parent="301" name="expert_profile">
+      <Comment>专家资料表（通过认证后展示用）</Comment>
+      <DetailsLevel>3</DetailsLevel>
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <table id="318" parent="301" name="kb_category">
+      <Comment>知识库分类表</Comment>
+      <DetailsLevel>3</DetailsLevel>
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <table id="319" parent="301" name="kb_entry">
+      <Comment>知识库条目表（科普/常见误区/FAQ等）</Comment>
+      <DetailsLevel>3</DetailsLevel>
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <table id="320" parent="301" name="kb_entry_tag">
+      <Comment>知识库条目-标签关联表（用于筛选/推荐/混合搜索增强）</Comment>
+      <DetailsLevel>3</DetailsLevel>
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <table id="321" parent="301" name="notify_message">
+      <Comment>站内通知表</Comment>
+      <DetailsLevel>3</DetailsLevel>
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <table id="322" parent="301" name="permission">
+      <Comment>权限表（菜单/按钮/API）</Comment>
+      <DetailsLevel>3</DetailsLevel>
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <table id="323" parent="301" name="qa_answer">
+      <Comment>回答表</Comment>
+      <DetailsLevel>3</DetailsLevel>
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <table id="324" parent="301" name="qa_category">
+      <Comment>问答分类表</Comment>
+      <DetailsLevel>3</DetailsLevel>
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <table id="325" parent="301" name="qa_comment">
+      <Comment>评论表（楼中楼，多态：问题/回答）</Comment>
+      <DetailsLevel>3</DetailsLevel>
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <table id="326" parent="301" name="qa_favorite">
+      <Comment>问题收藏表</Comment>
+      <DetailsLevel>3</DetailsLevel>
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <table id="327" parent="301" name="qa_question">
+      <Comment>问题表</Comment>
+      <DetailsLevel>3</DetailsLevel>
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <table id="328" parent="301" name="qa_question_tag">
+      <Comment>问题-标签关联表</Comment>
+      <DetailsLevel>3</DetailsLevel>
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <table id="329" parent="301" name="qa_tag">
+      <Comment>标签表（问答/知识库可复用）</Comment>
+      <DetailsLevel>3</DetailsLevel>
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <table id="330" parent="301" name="qa_topic">
+      <Comment>专题表</Comment>
+      <DetailsLevel>3</DetailsLevel>
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <table id="331" parent="301" name="qa_topic_category">
+      <Comment>专题-分类关联表</Comment>
+      <DetailsLevel>3</DetailsLevel>
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <table id="332" parent="301" name="qa_topic_follow">
+      <Comment>专题关注表</Comment>
+      <DetailsLevel>3</DetailsLevel>
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <table id="333" parent="301" name="qa_vote">
+      <Comment>点赞表（多态：问题/回答/评论）</Comment>
+      <DetailsLevel>3</DetailsLevel>
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <table id="334" parent="301" name="rec_user_behavior">
+      <Comment>推荐行为埋点表</Comment>
+      <DetailsLevel>3</DetailsLevel>
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <table id="335" parent="301" name="rec_user_interest">
+      <Comment>用户兴趣画像表（推荐用）</Comment>
+      <DetailsLevel>3</DetailsLevel>
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <table id="336" parent="301" name="role">
+      <Comment>角色表</Comment>
+      <DetailsLevel>3</DetailsLevel>
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <table id="337" parent="301" name="role_permission">
+      <Comment>角色-权限关联表</Comment>
+      <DetailsLevel>3</DetailsLevel>
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <table id="338" parent="301" name="search_query_log">
+      <Comment>搜索日志表（用于搜索历史与推荐）</Comment>
+      <DetailsLevel>3</DetailsLevel>
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <table id="339" parent="301" name="stat_daily">
+      <Comment>每日统计表（后台看板）</Comment>
+      <DetailsLevel>3</DetailsLevel>
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <table id="340" parent="301" name="user">
+      <Comment>用户表（含普通用户/专家/后台账号）</Comment>
+      <DetailsLevel>3</DetailsLevel>
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <table id="341" parent="301" name="user_browse_history">
+      <Comment>浏览历史表</Comment>
+      <DetailsLevel>3</DetailsLevel>
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <table id="342" parent="301" name="user_follow">
+      <Comment>用户关注关系表（关注/粉丝）</Comment>
+      <DetailsLevel>3</DetailsLevel>
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <table id="343" parent="301" name="user_role">
+      <Comment>用户-角色关联表</Comment>
+      <DetailsLevel>3</DetailsLevel>
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <table id="344" parent="301" name="user_stat">
+      <Comment>用户统计汇总表（可选，便于展示“我的”页面数据）</Comment>
+      <DetailsLevel>3</DetailsLevel>
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <table id="345" parent="302" name="flyway_schema_history">
+      <DetailsLevel>3</DetailsLevel>
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <table id="346" parent="302" name="permission">
+      <DetailsLevel>3</DetailsLevel>
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <table id="347" parent="302" name="role">
+      <DetailsLevel>3</DetailsLevel>
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <table id="348" parent="302" name="role_permission">
+      <DetailsLevel>3</DetailsLevel>
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <table id="349" parent="302" name="t_demo">
+      <DetailsLevel>3</DetailsLevel>
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <table id="350" parent="302" name="user">
+      <DetailsLevel>3</DetailsLevel>
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <table id="351" parent="302" name="user_role">
+      <DetailsLevel>3</DetailsLevel>
+      <Engine>InnoDB</Engine>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
+    </table>
+    <column id="352" parent="313" name="id">
+      <AutoIncrement>1</AutoIncrement>
+      <Comment>审核单ID（主键）</Comment>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="353" parent="313" name="biz_type">
+      <Comment>业务类型：1-问题，2-回答，3-评论，4-知识库，5-专家认证</Comment>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StoredType>tinyint|0s</StoredType>
+    </column>
+    <column id="354" parent="313" name="biz_id">
+      <Comment>业务ID（对应实体ID）</Comment>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="355" parent="313" name="trigger_source">
+      <Comment>触发来源：1-机器疑似，2-举报触发</Comment>
+      <NotNull>1</NotNull>
+      <Position>4</Position>
+      <StoredType>tinyint|0s</StoredType>
+    </column>
+    <column id="356" parent="313" name="audit_type">
+      <Comment>审核类型：1-机器审核，2-人工审核</Comment>
+      <NotNull>1</NotNull>
+      <Position>5</Position>
+      <StoredType>tinyint|0s</StoredType>
+    </column>
+    <column id="357" parent="313" name="audit_status">
+      <Comment>审核状态：1-待审，2-通过，3-驳回</Comment>
+      <DefaultExpression>1</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>6</Position>
+      <StoredType>tinyint|0s</StoredType>
+    </column>
+    <column id="358" parent="313" name="action">
+      <Comment>处理动作（pass/reject/block等）</Comment>
+      <Position>7</Position>
+      <StoredType>varchar(20)|0s</StoredType>
+    </column>
+    <column id="359" parent="313" name="model_label">
+      <Comment>模型标签（spam/abuse/medical等，可空）</Comment>
+      <Position>8</Position>
+      <StoredType>varchar(50)|0s</StoredType>
+    </column>
+    <column id="360" parent="313" name="model_score">
+      <Comment>模型置信度（0~1）</Comment>
+      <Position>9</Position>
+      <StoredType>decimal(6,4 digit)|0s</StoredType>
+    </column>
+    <column id="361" parent="313" name="hit_detail">
+      <Comment>命中详情（JSON，记录命中词/规则/分数等）</Comment>
+      <Position>10</Position>
+      <StoredType>json|0s</StoredType>
+    </column>
+    <column id="362" parent="313" name="reject_reason">
+      <Comment>驳回原因（audit_status=3时填写）</Comment>
+      <Position>11</Position>
+      <StoredType>varchar(255)|0s</StoredType>
+    </column>
+    <column id="363" parent="313" name="submit_user_id">
+      <Comment>内容提交者/作者ID → user.id</Comment>
+      <Position>12</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="364" parent="313" name="auditor_id">
+      <Comment>审核人ID → user.id（人工审核时）</Comment>
+      <Position>13</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="365" parent="313" name="audited_at">
+      <Comment>审核时间</Comment>
+      <Position>14</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <column id="366" parent="313" name="created_at">
+      <Comment>创建时间</Comment>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>15</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <column id="367" parent="313" name="updated_at">
+      <Comment>更新时间</Comment>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <OnUpdate>CURRENT_TIMESTAMP</OnUpdate>
+      <Position>16</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <foreign-key id="368" parent="313" name="fk_audit_submit_user">
+      <ColNames>submit_user_id</ColNames>
+      <OnDelete>set-null</OnDelete>
+      <RefColNames>id</RefColNames>
+      <RefTableName>user</RefTableName>
+    </foreign-key>
+    <foreign-key id="369" parent="313" name="fk_audit_auditor">
+      <ColNames>auditor_id</ColNames>
+      <OnDelete>set-null</OnDelete>
+      <RefColNames>id</RefColNames>
+      <RefTableName>user</RefTableName>
+    </foreign-key>
+    <index id="370" parent="313" name="PRIMARY">
+      <ColNames>id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="371" parent="313" name="idx_audit_biz">
+      <ColNames>biz_type
+biz_id</ColNames>
+      <Type>btree</Type>
+    </index>
+    <index id="372" parent="313" name="idx_audit_status">
+      <ColNames>audit_status</ColNames>
+      <Type>btree</Type>
+    </index>
+    <index id="373" parent="313" name="fk_audit_submit_user">
+      <ColNames>submit_user_id</ColNames>
+      <Type>btree</Type>
+    </index>
+    <index id="374" parent="313" name="fk_audit_auditor">
+      <ColNames>auditor_id</ColNames>
+      <Type>btree</Type>
+    </index>
+    <index id="375" parent="313" name="idx_audit_created">
+      <ColNames>created_at</ColNames>
+      <Type>btree</Type>
+    </index>
+    <key id="376" parent="313" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
+    <column id="377" parent="314" name="id">
+      <AutoIncrement>1</AutoIncrement>
+      <Comment>举报ID（主键）</Comment>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="378" parent="314" name="biz_type">
+      <Comment>业务类型：1-问题，2-回答，3-评论，4-知识库</Comment>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StoredType>tinyint|0s</StoredType>
+    </column>
+    <column id="379" parent="314" name="biz_id">
+      <Comment>业务ID（对应实体ID）</Comment>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="380" parent="314" name="reason_type">
+      <Comment>举报原因类型（枚举，可选：广告/辱骂/不实信息等）</Comment>
+      <Position>4</Position>
+      <StoredType>tinyint|0s</StoredType>
+    </column>
+    <column id="381" parent="314" name="reporter_id">
+      <Comment>举报人ID → user.id</Comment>
+      <NotNull>1</NotNull>
+      <Position>5</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="382" parent="314" name="reason_code">
+      <Comment>举报原因编码（可选，用于运营统计）</Comment>
+      <Position>6</Position>
+      <StoredType>varchar(50)|0s</StoredType>
+    </column>
+    <column id="383" parent="314" name="reason_detail">
+      <Comment>举报补充说明（用户输入）</Comment>
+      <Position>7</Position>
+      <StoredType>varchar(500)|0s</StoredType>
+    </column>
+    <column id="384" parent="314" name="status">
+      <Comment>处理状态：1-待处理，2-已处理，3-驳回/不成立</Comment>
+      <DefaultExpression>1</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>8</Position>
+      <StoredType>tinyint|0s</StoredType>
+    </column>
+    <column id="385" parent="314" name="handler_id">
+      <Comment>处理人ID → user.id（运营/管理员）</Comment>
+      <Position>9</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="386" parent="314" name="handle_action">
+      <Comment>处理动作：1-下架内容，2-警告用户，3-封禁/禁言，4-不处理</Comment>
+      <Position>10</Position>
+      <StoredType>tinyint|0s</StoredType>
+    </column>
+    <column id="387" parent="314" name="handle_result">
+      <Comment>处理说明（处理结论/备注）</Comment>
+      <Position>11</Position>
+      <StoredType>varchar(255)|0s</StoredType>
+    </column>
+    <column id="388" parent="314" name="handled_at">
+      <Comment>处理时间</Comment>
+      <Position>12</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <column id="389" parent="314" name="created_at">
+      <Comment>创建时间</Comment>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>13</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <column id="390" parent="314" name="updated_at">
+      <Comment>更新时间</Comment>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <OnUpdate>CURRENT_TIMESTAMP</OnUpdate>
+      <Position>14</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <foreign-key id="391" parent="314" name="fk_report_reporter">
+      <ColNames>reporter_id</ColNames>
+      <OnDelete>cascade</OnDelete>
+      <RefColNames>id</RefColNames>
+      <RefTableName>user</RefTableName>
+    </foreign-key>
+    <foreign-key id="392" parent="314" name="fk_report_handler">
+      <ColNames>handler_id</ColNames>
+      <OnDelete>set-null</OnDelete>
+      <RefColNames>id</RefColNames>
+      <RefTableName>user</RefTableName>
+    </foreign-key>
+    <index id="393" parent="314" name="PRIMARY">
+      <ColNames>id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="394" parent="314" name="idx_report_biz">
+      <ColNames>biz_type
+biz_id</ColNames>
+      <Type>btree</Type>
+    </index>
+    <index id="395" parent="314" name="idx_report_reporter">
+      <ColNames>reporter_id</ColNames>
+      <Type>btree</Type>
+    </index>
+    <index id="396" parent="314" name="idx_report_status">
+      <ColNames>status</ColNames>
+      <Type>btree</Type>
+    </index>
+    <index id="397" parent="314" name="fk_report_handler">
+      <ColNames>handler_id</ColNames>
+      <Type>btree</Type>
+    </index>
+    <key id="398" parent="314" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
+    <column id="399" parent="315" name="id">
+      <AutoIncrement>1</AutoIncrement>
+      <Comment>敏感词ID（主键）</Comment>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="400" parent="315" name="word">
+      <Comment>敏感词文本</Comment>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StoredType>varchar(100)|0s</StoredType>
+    </column>
+    <column id="401" parent="315" name="level">
+      <Comment>敏感级别：1-疑似需复审，2-强拦截（直接拒绝发布）</Comment>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StoredType>tinyint|0s</StoredType>
+    </column>
+    <column id="402" parent="315" name="category">
+      <Comment>敏感词分类（广告/辱骂/涉政/涉黄等）</Comment>
+      <Position>4</Position>
+      <StoredType>varchar(50)|0s</StoredType>
+    </column>
+    <column id="403" parent="315" name="hit_action_desc">
+      <Comment>命中提示文案（前端提示/运营说明）</Comment>
+      <Position>5</Position>
+      <StoredType>varchar(200)|0s</StoredType>
+    </column>
+    <column id="404" parent="315" name="reason_template">
+      <Comment>拦截原因模板（强拦截时返回给用户）</Comment>
+      <Position>6</Position>
+      <StoredType>varchar(255)|0s</StoredType>
+    </column>
+    <column id="405" parent="315" name="enabled">
+      <Comment>是否启用：1-启用，0-禁用</Comment>
+      <DefaultExpression>1</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>7</Position>
+      <StoredType>tinyint|0s</StoredType>
+    </column>
+    <column id="406" parent="315" name="created_at">
+      <Comment>创建时间</Comment>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>8</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <index id="407" parent="315" name="PRIMARY">
+      <ColNames>id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="408" parent="315" name="uk_sensitive_word">
+      <ColNames>word</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="409" parent="315" name="idx_sensitive_level">
+      <ColNames>level</ColNames>
+      <Type>btree</Type>
+    </index>
+    <index id="410" parent="315" name="idx_sensitive_enabled">
+      <ColNames>enabled</ColNames>
+      <Type>btree</Type>
+    </index>
+    <key id="411" parent="315" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
+    <key id="412" parent="315" name="uk_sensitive_word">
+      <UnderlyingIndexName>uk_sensitive_word</UnderlyingIndexName>
+    </key>
+    <column id="413" parent="316" name="id">
+      <AutoIncrement>4</AutoIncrement>
+      <Comment>专家认证申请ID（主键）</Comment>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="414" parent="316" name="user_id">
+      <Comment>申请人用户ID → user.id</Comment>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="415" parent="316" name="real_name">
+      <Comment>真实姓名</Comment>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StoredType>varchar(50)|0s</StoredType>
+    </column>
+    <column id="416" parent="316" name="organization">
+      <Comment>机构/医院/学校</Comment>
+      <Position>4</Position>
+      <StoredType>varchar(100)|0s</StoredType>
+    </column>
+    <column id="417" parent="316" name="title">
+      <Comment>职称/头衔</Comment>
+      <Position>5</Position>
+      <StoredType>varchar(100)|0s</StoredType>
+    </column>
+    <column id="418" parent="316" name="expertise">
+      <Comment>擅长领域</Comment>
+      <Position>6</Position>
+      <StoredType>varchar(255)|0s</StoredType>
+    </column>
+    <column id="419" parent="316" name="proof_urls">
+      <Comment>证明材料URL列表（JSON数组，如[&quot;url1&quot;,&quot;url2&quot;]）</Comment>
+      <Position>7</Position>
+      <StoredType>json|0s</StoredType>
+    </column>
+    <column id="420" parent="316" name="status">
+      <Comment>申请状态：1-待审，2-通过，3-驳回</Comment>
+      <DefaultExpression>1</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>8</Position>
+      <StoredType>tinyint|0s</StoredType>
+    </column>
+    <column id="421" parent="316" name="reject_reason">
+      <Comment>驳回原因（status=3时填写）</Comment>
+      <Position>9</Position>
+      <StoredType>varchar(255)|0s</StoredType>
+    </column>
+    <column id="422" parent="316" name="reviewer_id">
+      <Comment>审核人ID → user.id（运营/管理员）</Comment>
+      <Position>10</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="423" parent="316" name="review_at">
+      <Comment>审核时间</Comment>
+      <Position>11</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <column id="424" parent="316" name="created_at">
+      <Comment>申请时间</Comment>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>12</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <column id="425" parent="316" name="updated_at">
+      <Comment>更新时间</Comment>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <OnUpdate>CURRENT_TIMESTAMP</OnUpdate>
+      <Position>13</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <foreign-key id="426" parent="316" name="fk_expert_apply_user">
+      <ColNames>user_id</ColNames>
+      <OnDelete>cascade</OnDelete>
+      <RefColNames>id</RefColNames>
+      <RefTableName>user</RefTableName>
+    </foreign-key>
+    <foreign-key id="427" parent="316" name="fk_expert_apply_reviewer">
+      <ColNames>reviewer_id</ColNames>
+      <OnDelete>set-null</OnDelete>
+      <RefColNames>id</RefColNames>
+      <RefTableName>user</RefTableName>
+    </foreign-key>
+    <index id="428" parent="316" name="PRIMARY">
+      <ColNames>id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="429" parent="316" name="idx_expert_apply_user">
+      <ColNames>user_id</ColNames>
+      <Type>btree</Type>
+    </index>
+    <index id="430" parent="316" name="idx_expert_apply_status">
+      <ColNames>status</ColNames>
+      <Type>btree</Type>
+    </index>
+    <index id="431" parent="316" name="fk_expert_apply_reviewer">
+      <ColNames>reviewer_id</ColNames>
+      <Type>btree</Type>
+    </index>
+    <key id="432" parent="316" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
+    <column id="433" parent="317" name="id">
+      <AutoIncrement>2</AutoIncrement>
+      <Comment>主键</Comment>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="434" parent="317" name="user_id">
+      <Comment>用户ID → user.id（专家本人）</Comment>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="435" parent="317" name="real_name">
+      <Comment>真实姓名</Comment>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StoredType>varchar(50)|0s</StoredType>
+    </column>
+    <column id="436" parent="317" name="organization">
+      <Comment>机构/医院/学校</Comment>
+      <Position>4</Position>
+      <StoredType>varchar(100)|0s</StoredType>
+    </column>
+    <column id="437" parent="317" name="title">
+      <Comment>职称/头衔</Comment>
+      <Position>5</Position>
+      <StoredType>varchar(100)|0s</StoredType>
+    </column>
+    <column id="438" parent="317" name="expertise">
+      <Comment>擅长领域（可用于搜索/推荐）</Comment>
+      <Position>6</Position>
+      <StoredType>varchar(255)|0s</StoredType>
+    </column>
+    <column id="439" parent="317" name="verified_at">
+      <Comment>认证通过时间</Comment>
+      <Position>7</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <column id="440" parent="317" name="created_at">
+      <Comment>创建时间</Comment>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>8</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <column id="441" parent="317" name="updated_at">
+      <Comment>更新时间</Comment>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <OnUpdate>CURRENT_TIMESTAMP</OnUpdate>
+      <Position>9</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <foreign-key id="442" parent="317" name="fk_expert_profile_user">
+      <ColNames>user_id</ColNames>
+      <OnDelete>cascade</OnDelete>
+      <RefColNames>id</RefColNames>
+      <RefTableName>user</RefTableName>
+    </foreign-key>
+    <index id="443" parent="317" name="PRIMARY">
+      <ColNames>id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="444" parent="317" name="uk_expert_profile_user">
+      <ColNames>user_id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <key id="445" parent="317" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
+    <key id="446" parent="317" name="uk_expert_profile_user">
+      <UnderlyingIndexName>uk_expert_profile_user</UnderlyingIndexName>
+    </key>
+    <column id="447" parent="318" name="id">
+      <AutoIncrement>1</AutoIncrement>
+      <Comment>知识库分类ID（主键）</Comment>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="448" parent="318" name="parent_id">
+      <Comment>父分类ID（支持二级分类）</Comment>
+      <Position>2</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="449" parent="318" name="name">
+      <Comment>分类名称</Comment>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StoredType>varchar(64)|0s</StoredType>
+    </column>
+    <column id="450" parent="318" name="description">
+      <Comment>分类描述</Comment>
+      <Position>4</Position>
+      <StoredType>varchar(255)|0s</StoredType>
+    </column>
+    <column id="451" parent="318" name="icon">
+      <Comment>图标/图片URL</Comment>
+      <Position>5</Position>
+      <StoredType>varchar(255)|0s</StoredType>
+    </column>
+    <column id="452" parent="318" name="sort">
+      <Comment>排序（越小越靠前）</Comment>
+      <DefaultExpression>0</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>6</Position>
+      <StoredType>int|0s</StoredType>
+    </column>
+    <column id="453" parent="318" name="status">
+      <Comment>状态：1-启用，0-禁用</Comment>
+      <DefaultExpression>1</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>7</Position>
+      <StoredType>tinyint|0s</StoredType>
+    </column>
+    <column id="454" parent="318" name="created_at">
+      <Comment>创建时间</Comment>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>8</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <column id="455" parent="318" name="updated_at">
+      <Comment>更新时间</Comment>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <OnUpdate>CURRENT_TIMESTAMP</OnUpdate>
+      <Position>9</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <index id="456" parent="318" name="PRIMARY">
+      <ColNames>id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="457" parent="318" name="idx_kb_category_parent">
+      <ColNames>parent_id</ColNames>
+      <Type>btree</Type>
+    </index>
+    <key id="458" parent="318" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
+    <column id="459" parent="319" name="id">
+      <AutoIncrement>1</AutoIncrement>
+      <Comment>知识库条目ID（主键）</Comment>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="460" parent="319" name="category_id">
+      <Comment>分类ID → kb_category.id</Comment>
+      <Position>2</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="461" parent="319" name="title">
+      <Comment>标题</Comment>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StoredType>varchar(200)|0s</StoredType>
+    </column>
+    <column id="462" parent="319" name="summary">
+      <Comment>摘要</Comment>
+      <Position>4</Position>
+      <StoredType>varchar(500)|0s</StoredType>
+    </column>
+    <column id="463" parent="319" name="content">
+      <Comment>正文（用于ES全文索引）</Comment>
+      <NotNull>1</NotNull>
+      <Position>5</Position>
+      <StoredType>mediumtext|0s</StoredType>
+    </column>
+    <column id="464" parent="319" name="content_ref">
+      <Comment>外部正文引用（为后期MongoDB/对象存储预留）</Comment>
+      <Position>6</Position>
+      <StoredType>varchar(64)|0s</StoredType>
+    </column>
+    <column id="465" parent="319" name="source">
+      <Comment>来源/引用</Comment>
+      <Position>7</Position>
+      <StoredType>varchar(200)|0s</StoredType>
+    </column>
+    <column id="466" parent="319" name="author_user_id">
+      <Comment>作者/创建人ID → user.id</Comment>
+      <Position>8</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="467" parent="319" name="status">
+      <Comment>内容状态：1-已发布，2-待审核，3-驳回，4-下架</Comment>
+      <DefaultExpression>2</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>9</Position>
+      <StoredType>tinyint|0s</StoredType>
+    </column>
+    <column id="468" parent="319" name="view_count">
+      <Comment>浏览数（冗余统计）</Comment>
+      <DefaultExpression>0</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>10</Position>
+      <StoredType>int|0s</StoredType>
+    </column>
+    <column id="469" parent="319" name="like_count">
+      <Comment>点赞数（冗余统计）</Comment>
+      <DefaultExpression>0</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>11</Position>
+      <StoredType>int|0s</StoredType>
+    </column>
+    <column id="470" parent="319" name="favorite_count">
+      <Comment>收藏数（冗余统计）</Comment>
+      <DefaultExpression>0</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>12</Position>
+      <StoredType>int|0s</StoredType>
+    </column>
+    <column id="471" parent="319" name="created_at">
+      <Comment>创建时间</Comment>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>13</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <column id="472" parent="319" name="updated_at">
+      <Comment>更新时间</Comment>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <OnUpdate>CURRENT_TIMESTAMP</OnUpdate>
+      <Position>14</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <foreign-key id="473" parent="319" name="fk_kb_entry_category">
+      <ColNames>category_id</ColNames>
+      <OnDelete>set-null</OnDelete>
+      <RefColNames>id</RefColNames>
+      <RefTableName>kb_category</RefTableName>
+    </foreign-key>
+    <foreign-key id="474" parent="319" name="fk_kb_entry_author">
+      <ColNames>author_user_id</ColNames>
+      <OnDelete>set-null</OnDelete>
+      <RefColNames>id</RefColNames>
+      <RefTableName>user</RefTableName>
+    </foreign-key>
+    <index id="475" parent="319" name="PRIMARY">
+      <ColNames>id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="476" parent="319" name="idx_kb_entry_category">
+      <ColNames>category_id</ColNames>
+      <Type>btree</Type>
+    </index>
+    <index id="477" parent="319" name="idx_kb_entry_author">
+      <ColNames>author_user_id</ColNames>
+      <Type>btree</Type>
+    </index>
+    <index id="478" parent="319" name="idx_kb_entry_status">
+      <ColNames>status</ColNames>
+      <Type>btree</Type>
+    </index>
+    <key id="479" parent="319" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
+    <column id="480" parent="320" name="id">
+      <AutoIncrement>1</AutoIncrement>
+      <Comment>主键</Comment>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="481" parent="320" name="entry_id">
+      <Comment>知识库条目ID → kb_entry.id</Comment>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="482" parent="320" name="tag_id">
+      <Comment>标签ID → qa_tag.id（复用标签体系）</Comment>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="483" parent="320" name="created_at">
+      <Comment>创建时间</Comment>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>4</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <foreign-key id="484" parent="320" name="fk_kb_entry_tag_entry">
+      <ColNames>entry_id</ColNames>
+      <OnDelete>cascade</OnDelete>
+      <RefColNames>id</RefColNames>
+      <RefTableName>kb_entry</RefTableName>
+    </foreign-key>
+    <foreign-key id="485" parent="320" name="fk_kb_entry_tag_tag">
+      <ColNames>tag_id</ColNames>
+      <RefColNames>id</RefColNames>
+      <RefTableName>qa_tag</RefTableName>
+    </foreign-key>
+    <index id="486" parent="320" name="PRIMARY">
+      <ColNames>id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="487" parent="320" name="uk_kb_entry_tag">
+      <ColNames>entry_id
+tag_id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="488" parent="320" name="idx_kb_entry_tag_tag">
+      <ColNames>tag_id</ColNames>
+      <Type>btree</Type>
+    </index>
+    <key id="489" parent="320" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
+    <key id="490" parent="320" name="uk_kb_entry_tag">
+      <UnderlyingIndexName>uk_kb_entry_tag</UnderlyingIndexName>
+    </key>
+    <column id="491" parent="321" name="id">
+      <AutoIncrement>1</AutoIncrement>
+      <Comment>通知ID（主键）</Comment>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="492" parent="321" name="receiver_id">
+      <Comment>接收者ID → user.id</Comment>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="493" parent="321" name="type">
+      <Comment>通知类型：1-系统，2-点赞，3-收藏，4-关注，5-评论，6-回答，7-审核结果</Comment>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StoredType>tinyint|0s</StoredType>
+    </column>
+    <column id="494" parent="321" name="biz_type">
+      <Comment>业务类型：1问题2回答3评论4知识库5专题6专家认证</Comment>
+      <Position>4</Position>
+      <StoredType>tinyint|0s</StoredType>
+    </column>
+    <column id="495" parent="321" name="biz_id">
+      <Comment>业务ID（对应实体ID）</Comment>
+      <Position>5</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="496" parent="321" name="title">
+      <Comment>通知标题</Comment>
+      <NotNull>1</NotNull>
+      <Position>6</Position>
+      <StoredType>varchar(100)|0s</StoredType>
+    </column>
+    <column id="497" parent="321" name="content">
+      <Comment>通知内容/摘要</Comment>
+      <Position>7</Position>
+      <StoredType>varchar(500)|0s</StoredType>
+    </column>
+    <column id="498" parent="321" name="is_read">
+      <Comment>是否已读：0-未读，1-已读</Comment>
+      <DefaultExpression>0</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>8</Position>
+      <StoredType>tinyint|0s</StoredType>
+    </column>
+    <column id="499" parent="321" name="created_at">
+      <Comment>创建时间</Comment>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>9</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <column id="500" parent="321" name="read_at">
+      <Comment>阅读时间</Comment>
+      <Position>10</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <foreign-key id="501" parent="321" name="fk_notify_receiver">
+      <ColNames>receiver_id</ColNames>
+      <OnDelete>cascade</OnDelete>
+      <RefColNames>id</RefColNames>
+      <RefTableName>user</RefTableName>
+    </foreign-key>
+    <index id="502" parent="321" name="PRIMARY">
+      <ColNames>id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="503" parent="321" name="idx_notify_receiver_read">
+      <ColNames>receiver_id
+is_read
+created_at</ColNames>
+      <Type>btree</Type>
+    </index>
+    <key id="504" parent="321" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
+    <column id="505" parent="322" name="id">
+      <AutoIncrement>29</AutoIncrement>
+      <Comment>权限ID（主键）</Comment>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="506" parent="322" name="code">
+      <Comment>权限编码（后端鉴权标识）</Comment>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StoredType>varchar(100)|0s</StoredType>
+    </column>
+    <column id="507" parent="322" name="name">
+      <Comment>权限名称（展示用）</Comment>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StoredType>varchar(128)|0s</StoredType>
+    </column>
+    <column id="508" parent="322" name="type">
+      <Comment>权限类型（建议：menu/button/api）</Comment>
+      <NotNull>1</NotNull>
+      <Position>4</Position>
+      <StoredType>varchar(16)|0s</StoredType>
+    </column>
+    <column id="509" parent="322" name="parent_id">
+      <Comment>父权限ID（用于菜单树）</Comment>
+      <Position>5</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="510" parent="322" name="path_or_api">
+      <Comment>菜单路由或API路径（与type相关）</Comment>
+      <Position>6</Position>
+      <StoredType>varchar(255)|0s</StoredType>
+    </column>
+    <column id="511" parent="322" name="method">
+      <Comment>HTTP方法（type=api时使用，如GET/POST/PUT/DELETE）</Comment>
+      <Position>7</Position>
+      <StoredType>varchar(16)|0s</StoredType>
+    </column>
+    <column id="512" parent="322" name="sort">
+      <Comment>排序（越小越靠前）</Comment>
+      <DefaultExpression>0</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>8</Position>
+      <StoredType>int|0s</StoredType>
+    </column>
+    <column id="513" parent="322" name="icon">
+      <Comment>菜单图标（前端用，可选）</Comment>
+      <Position>9</Position>
+      <StoredType>varchar(128)|0s</StoredType>
+    </column>
+    <column id="514" parent="322" name="component">
+      <Comment>前端组件路径（可选）</Comment>
+      <Position>10</Position>
+      <StoredType>varchar(255)|0s</StoredType>
+    </column>
+    <column id="515" parent="322" name="visible">
+      <Comment>是否可见：1可见0隐藏</Comment>
+      <DefaultExpression>1</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>11</Position>
+      <StoredType>tinyint|0s</StoredType>
+    </column>
+    <column id="516" parent="322" name="created_at">
+      <Comment>创建时间</Comment>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>12</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <index id="517" parent="322" name="PRIMARY">
+      <ColNames>id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="518" parent="322" name="uk_permission_code">
+      <ColNames>code</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="519" parent="322" name="idx_permission_type">
+      <ColNames>type</ColNames>
+      <Type>btree</Type>
+    </index>
+    <index id="520" parent="322" name="idx_permission_parent">
+      <ColNames>parent_id</ColNames>
+      <Type>btree</Type>
+    </index>
+    <index id="521" parent="322" name="idx_permission_sort">
+      <ColNames>sort</ColNames>
+      <Type>btree</Type>
+    </index>
+    <key id="522" parent="322" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
+    <key id="523" parent="322" name="uk_permission_code">
+      <UnderlyingIndexName>uk_permission_code</UnderlyingIndexName>
+    </key>
+    <column id="524" parent="323" name="id">
+      <AutoIncrement>1</AutoIncrement>
+      <Comment>回答ID（主键）</Comment>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="525" parent="323" name="question_id">
+      <Comment>问题ID → qa_question.id</Comment>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="526" parent="323" name="user_id">
+      <Comment>回答用户ID → user.id</Comment>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="527" parent="323" name="content">
+      <Comment>回答内容</Comment>
+      <NotNull>1</NotNull>
+      <Position>4</Position>
+      <StoredType>text|0s</StoredType>
+    </column>
+    <column id="528" parent="323" name="status">
+      <Comment>内容状态：1-已发布，2-待审核，3-驳回，4-下架</Comment>
+      <DefaultExpression>2</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>5</Position>
+      <StoredType>tinyint|0s</StoredType>
+    </column>
+    <column id="529" parent="323" name="reject_reason">
+      <Comment>驳回原因（status=3时填写）</Comment>
+      <Position>6</Position>
+      <StoredType>varchar(255)|0s</StoredType>
+    </column>
+    <column id="530" parent="323" name="like_count">
+      <Comment>点赞数（冗余统计）</Comment>
+      <DefaultExpression>0</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>7</Position>
+      <StoredType>int|0s</StoredType>
+    </column>
+    <column id="531" parent="323" name="is_anonymous">
+      <Comment>是否匿名发布：1-匿名，0-不匿名</Comment>
+      <DefaultExpression>0</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>8</Position>
+      <StoredType>tinyint|0s</StoredType>
+    </column>
+    <column id="532" parent="323" name="delete_flag">
+      <Comment>逻辑删除：0-正常，1-删除</Comment>
+      <DefaultExpression>0</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>9</Position>
+      <StoredType>tinyint|0s</StoredType>
+    </column>
+    <column id="533" parent="323" name="created_at">
+      <Comment>创建时间</Comment>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>10</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <column id="534" parent="323" name="updated_at">
+      <Comment>更新时间</Comment>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <OnUpdate>CURRENT_TIMESTAMP</OnUpdate>
+      <Position>11</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <foreign-key id="535" parent="323" name="fk_qa_answer_question">
+      <ColNames>question_id</ColNames>
+      <OnDelete>cascade</OnDelete>
+      <RefColNames>id</RefColNames>
+      <RefTableName>qa_question</RefTableName>
+    </foreign-key>
+    <foreign-key id="536" parent="323" name="fk_qa_answer_user">
+      <ColNames>user_id</ColNames>
+      <RefColNames>id</RefColNames>
+      <RefTableName>user</RefTableName>
+    </foreign-key>
+    <index id="537" parent="323" name="PRIMARY">
+      <ColNames>id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="538" parent="323" name="idx_qa_answer_question">
+      <ColNames>question_id</ColNames>
+      <Type>btree</Type>
+    </index>
+    <index id="539" parent="323" name="idx_qa_answer_user">
+      <ColNames>user_id</ColNames>
+      <Type>btree</Type>
+    </index>
+    <index id="540" parent="323" name="idx_qa_answer_status">
+      <ColNames>status</ColNames>
+      <Type>btree</Type>
+    </index>
+    <key id="541" parent="323" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
+    <column id="542" parent="324" name="id">
+      <AutoIncrement>1</AutoIncrement>
+      <Comment>分类ID（主键）</Comment>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="543" parent="324" name="name">
+      <Comment>分类名称（如：疾病问答/养生保健）</Comment>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StoredType>varchar(50)|0s</StoredType>
+    </column>
+    <column id="544" parent="324" name="parent_id">
+      <Comment>父分类ID（用于二级分类）</Comment>
+      <Position>3</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="545" parent="324" name="icon">
+      <Comment>图标URL</Comment>
+      <Position>4</Position>
+      <StoredType>varchar(255)|0s</StoredType>
+    </column>
+    <column id="546" parent="324" name="description">
+      <Comment>分类描述</Comment>
+      <Position>5</Position>
+      <StoredType>varchar(255)|0s</StoredType>
+    </column>
+    <column id="547" parent="324" name="status">
+      <Comment>状态：1-启用，0-禁用</Comment>
+      <DefaultExpression>1</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>6</Position>
+      <StoredType>tinyint|0s</StoredType>
+    </column>
+    <column id="548" parent="324" name="sort">
+      <Comment>排序（越小越靠前）</Comment>
+      <DefaultExpression>0</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>7</Position>
+      <StoredType>int|0s</StoredType>
+    </column>
+    <column id="549" parent="324" name="delete_flag">
+      <Comment>逻辑删除：0-正常，1-删除</Comment>
+      <DefaultExpression>0</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>8</Position>
+      <StoredType>tinyint|0s</StoredType>
+    </column>
+    <column id="550" parent="324" name="created_at">
+      <Comment>创建时间</Comment>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>9</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <column id="551" parent="324" name="updated_at">
+      <Comment>更新时间</Comment>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <OnUpdate>CURRENT_TIMESTAMP</OnUpdate>
+      <Position>10</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <index id="552" parent="324" name="PRIMARY">
+      <ColNames>id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="553" parent="324" name="idx_qa_category_parent">
+      <ColNames>parent_id</ColNames>
+      <Type>btree</Type>
+    </index>
+    <key id="554" parent="324" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
+    <column id="555" parent="325" name="id">
+      <AutoIncrement>1</AutoIncrement>
+      <Comment>评论ID（主键）</Comment>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="556" parent="325" name="biz_type">
+      <Comment>目标类型：1-问题，2-回答</Comment>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StoredType>tinyint|0s</StoredType>
+    </column>
+    <column id="557" parent="325" name="biz_id">
+      <Comment>目标ID（对应qa_question/qa_answer）</Comment>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="558" parent="325" name="user_id">
+      <Comment>评论用户ID → user.id</Comment>
+      <NotNull>1</NotNull>
+      <Position>4</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="559" parent="325" name="parent_id">
+      <Comment>父评论ID（楼中楼；为空表示一级评论）</Comment>
+      <Position>5</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="560" parent="325" name="content">
+      <Comment>评论内容</Comment>
+      <NotNull>1</NotNull>
+      <Position>6</Position>
+      <StoredType>varchar(1000)|0s</StoredType>
+    </column>
+    <column id="561" parent="325" name="status">
+      <Comment>内容状态：1-已发布，2-待审核，3-驳回，4-下架</Comment>
+      <DefaultExpression>2</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>7</Position>
+      <StoredType>tinyint|0s</StoredType>
+    </column>
+    <column id="562" parent="325" name="reject_reason">
+      <Comment>驳回原因（status=3时填写）</Comment>
+      <Position>8</Position>
+      <StoredType>varchar(255)|0s</StoredType>
+    </column>
+    <column id="563" parent="325" name="delete_flag">
+      <Comment>逻辑删除：0-正常，1-删除</Comment>
+      <DefaultExpression>0</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>9</Position>
+      <StoredType>tinyint|0s</StoredType>
+    </column>
+    <column id="564" parent="325" name="created_at">
+      <Comment>创建时间</Comment>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>10</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <column id="565" parent="325" name="updated_at">
+      <Comment>更新时间</Comment>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <OnUpdate>CURRENT_TIMESTAMP</OnUpdate>
+      <Position>11</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <foreign-key id="566" parent="325" name="fk_qa_comment_user">
+      <ColNames>user_id</ColNames>
+      <RefColNames>id</RefColNames>
+      <RefTableName>user</RefTableName>
+    </foreign-key>
+    <index id="567" parent="325" name="PRIMARY">
+      <ColNames>id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="568" parent="325" name="idx_qa_comment_biz">
+      <ColNames>biz_type
+biz_id</ColNames>
+      <Type>btree</Type>
+    </index>
+    <index id="569" parent="325" name="idx_qa_comment_user">
+      <ColNames>user_id</ColNames>
+      <Type>btree</Type>
+    </index>
+    <index id="570" parent="325" name="idx_qa_comment_parent">
+      <ColNames>parent_id</ColNames>
+      <Type>btree</Type>
+    </index>
+    <index id="571" parent="325" name="idx_qa_comment_status">
+      <ColNames>status</ColNames>
+      <Type>btree</Type>
+    </index>
+    <key id="572" parent="325" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
+    <column id="573" parent="326" name="id">
+      <AutoIncrement>1</AutoIncrement>
+      <Comment>收藏ID（主键）</Comment>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="574" parent="326" name="question_id">
+      <Comment>问题ID → qa_question.id</Comment>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="575" parent="326" name="user_id">
+      <Comment>收藏用户ID → user.id</Comment>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="576" parent="326" name="created_at">
+      <Comment>收藏时间</Comment>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>4</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <foreign-key id="577" parent="326" name="fk_fav_question">
+      <ColNames>question_id</ColNames>
+      <OnDelete>cascade</OnDelete>
+      <RefColNames>id</RefColNames>
+      <RefTableName>qa_question</RefTableName>
+    </foreign-key>
+    <foreign-key id="578" parent="326" name="fk_fav_user">
+      <ColNames>user_id</ColNames>
+      <OnDelete>cascade</OnDelete>
+      <RefColNames>id</RefColNames>
+      <RefTableName>user</RefTableName>
+    </foreign-key>
+    <index id="579" parent="326" name="PRIMARY">
+      <ColNames>id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="580" parent="326" name="uk_fav_question_user">
+      <ColNames>question_id
+user_id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="581" parent="326" name="idx_fav_user">
+      <ColNames>user_id</ColNames>
+      <Type>btree</Type>
+    </index>
+    <key id="582" parent="326" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
+    <key id="583" parent="326" name="uk_fav_question_user">
+      <UnderlyingIndexName>uk_fav_question_user</UnderlyingIndexName>
+    </key>
+    <column id="584" parent="327" name="id">
+      <AutoIncrement>1</AutoIncrement>
+      <Comment>问题ID（主键）</Comment>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="585" parent="327" name="user_id">
+      <Comment>提问用户ID → user.id</Comment>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="586" parent="327" name="category_id">
+      <Comment>分类ID → qa_category.id</Comment>
+      <Position>3</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="587" parent="327" name="topic_id">
+      <Comment>专题ID → qa_topic.id（可为空）</Comment>
+      <Position>4</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="588" parent="327" name="title">
+      <Comment>问题标题</Comment>
+      <NotNull>1</NotNull>
+      <Position>5</Position>
+      <StoredType>varchar(200)|0s</StoredType>
+    </column>
+    <column id="589" parent="327" name="content">
+      <Comment>问题详情（可选）</Comment>
+      <Position>6</Position>
+      <StoredType>text|0s</StoredType>
+    </column>
+    <column id="590" parent="327" name="status">
+      <Comment>内容状态：1-已发布，2-待审核，3-驳回，4-下架</Comment>
+      <DefaultExpression>2</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>7</Position>
+      <StoredType>tinyint|0s</StoredType>
+    </column>
+    <column id="591" parent="327" name="reject_reason">
+      <Comment>驳回原因（status=3时填写）</Comment>
+      <Position>8</Position>
+      <StoredType>varchar(255)|0s</StoredType>
+    </column>
+    <column id="592" parent="327" name="view_count">
+      <Comment>浏览量（冗余统计）</Comment>
+      <DefaultExpression>0</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>9</Position>
+      <StoredType>int|0s</StoredType>
+    </column>
+    <column id="593" parent="327" name="answer_count">
+      <Comment>回答数（冗余统计）</Comment>
+      <DefaultExpression>0</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>10</Position>
+      <StoredType>int|0s</StoredType>
+    </column>
+    <column id="594" parent="327" name="like_count">
+      <Comment>点赞数（冗余统计）</Comment>
+      <DefaultExpression>0</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>11</Position>
+      <StoredType>int|0s</StoredType>
+    </column>
+    <column id="595" parent="327" name="favorite_count">
+      <Comment>收藏数（冗余统计）</Comment>
+      <DefaultExpression>0</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>12</Position>
+      <StoredType>int|0s</StoredType>
+    </column>
+    <column id="596" parent="327" name="accepted_answer_id">
+      <Comment>采纳回答ID（可选，不做采纳可忽略）</Comment>
+      <Position>13</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="597" parent="327" name="accepted_at">
+      <Comment>采纳时间</Comment>
+      <Position>14</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <column id="598" parent="327" name="last_active_at">
+      <Comment>最后活跃时间（用于“最新/最热”排序）</Comment>
+      <Position>15</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <column id="599" parent="327" name="delete_flag">
+      <Comment>逻辑删除：0-正常，1-删除</Comment>
+      <DefaultExpression>0</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>16</Position>
+      <StoredType>tinyint|0s</StoredType>
+    </column>
+    <column id="600" parent="327" name="created_at">
+      <Comment>创建时间</Comment>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>17</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <column id="601" parent="327" name="updated_at">
+      <Comment>更新时间</Comment>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <OnUpdate>CURRENT_TIMESTAMP</OnUpdate>
+      <Position>18</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <foreign-key id="602" parent="327" name="fk_qa_question_user">
+      <ColNames>user_id</ColNames>
+      <RefColNames>id</RefColNames>
+      <RefTableName>user</RefTableName>
+    </foreign-key>
+    <index id="603" parent="327" name="PRIMARY">
+      <ColNames>id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="604" parent="327" name="idx_qa_question_user">
+      <ColNames>user_id</ColNames>
+      <Type>btree</Type>
+    </index>
+    <index id="605" parent="327" name="idx_qa_question_category">
+      <ColNames>category_id</ColNames>
+      <Type>btree</Type>
+    </index>
+    <index id="606" parent="327" name="idx_qa_question_status">
+      <ColNames>status</ColNames>
+      <Type>btree</Type>
+    </index>
+    <index id="607" parent="327" name="idx_qa_question_last_active">
+      <ColNames>last_active_at</ColNames>
+      <Type>btree</Type>
+    </index>
+    <key id="608" parent="327" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
+    <column id="609" parent="328" name="id">
+      <AutoIncrement>1</AutoIncrement>
+      <Comment>主键</Comment>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="610" parent="328" name="question_id">
+      <Comment>问题ID → qa_question.id</Comment>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="611" parent="328" name="tag_id">
+      <Comment>标签ID → qa_tag.id</Comment>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="612" parent="328" name="created_at">
+      <Comment>创建时间</Comment>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>4</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <foreign-key id="613" parent="328" name="fk_question_tag_question">
+      <ColNames>question_id</ColNames>
+      <OnDelete>cascade</OnDelete>
+      <RefColNames>id</RefColNames>
+      <RefTableName>qa_question</RefTableName>
+    </foreign-key>
+    <foreign-key id="614" parent="328" name="fk_question_tag_tag">
+      <ColNames>tag_id</ColNames>
+      <RefColNames>id</RefColNames>
+      <RefTableName>qa_tag</RefTableName>
+    </foreign-key>
+    <index id="615" parent="328" name="PRIMARY">
+      <ColNames>id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="616" parent="328" name="uk_question_tag">
+      <ColNames>question_id
+tag_id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="617" parent="328" name="idx_question_tag_tag">
+      <ColNames>tag_id</ColNames>
+      <Type>btree</Type>
+    </index>
+    <key id="618" parent="328" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
+    <key id="619" parent="328" name="uk_question_tag">
+      <UnderlyingIndexName>uk_question_tag</UnderlyingIndexName>
+    </key>
+    <column id="620" parent="329" name="id">
+      <AutoIncrement>1</AutoIncrement>
+      <Comment>标签ID（主键）</Comment>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="621" parent="329" name="name">
+      <Comment>标签名称（如：失眠/压力调节）</Comment>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StoredType>varchar(50)|0s</StoredType>
+    </column>
+    <column id="622" parent="329" name="source">
+      <Comment>来源：1-系统创建，2-用户创建</Comment>
+      <DefaultExpression>2</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StoredType>tinyint|0s</StoredType>
+    </column>
+    <column id="623" parent="329" name="status">
+      <Comment>状态：1-启用，0-禁用</Comment>
+      <DefaultExpression>1</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>4</Position>
+      <StoredType>tinyint|0s</StoredType>
+    </column>
+    <column id="624" parent="329" name="use_count">
+      <Comment>使用次数（冗余统计）</Comment>
+      <DefaultExpression>0</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>5</Position>
+      <StoredType>int|0s</StoredType>
+    </column>
+    <column id="625" parent="329" name="created_at">
+      <Comment>创建时间</Comment>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>6</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <index id="626" parent="329" name="PRIMARY">
+      <ColNames>id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="627" parent="329" name="uk_qa_tag_name">
+      <ColNames>name</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="628" parent="329" name="idx_qa_tag_source">
+      <ColNames>source</ColNames>
+      <Type>btree</Type>
+    </index>
+    <key id="629" parent="329" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
+    <key id="630" parent="329" name="uk_qa_tag_name">
+      <UnderlyingIndexName>uk_qa_tag_name</UnderlyingIndexName>
+    </key>
+    <column id="631" parent="330" name="id">
+      <AutoIncrement>1</AutoIncrement>
+      <Comment>专题ID（主键）</Comment>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="632" parent="330" name="title">
+      <Comment>专题标题</Comment>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StoredType>varchar(100)|0s</StoredType>
+    </column>
+    <column id="633" parent="330" name="subtitle">
+      <Comment>专题副标题（原subtutle已修正）</Comment>
+      <Position>3</Position>
+      <StoredType>varchar(200)|0s</StoredType>
+    </column>
+    <column id="634" parent="330" name="cover_img">
+      <Comment>封面图URL</Comment>
+      <Position>4</Position>
+      <StoredType>varchar(255)|0s</StoredType>
+    </column>
+    <column id="635" parent="330" name="intro">
+      <Comment>专题介绍</Comment>
+      <Position>5</Position>
+      <StoredType>text|0s</StoredType>
+    </column>
+    <column id="636" parent="330" name="status">
+      <Comment>内容状态：1-已发布，2-待审核，3-驳回，4-下架</Comment>
+      <DefaultExpression>1</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>6</Position>
+      <StoredType>tinyint|0s</StoredType>
+    </column>
+    <column id="637" parent="330" name="follow_count">
+      <Comment>关注数（冗余统计）</Comment>
+      <DefaultExpression>0</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>7</Position>
+      <StoredType>int|0s</StoredType>
+    </column>
+    <column id="638" parent="330" name="question_count">
+      <Comment>专题内问题数（冗余统计）</Comment>
+      <DefaultExpression>0</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>8</Position>
+      <StoredType>int|0s</StoredType>
+    </column>
+    <column id="639" parent="330" name="today_new_count">
+      <Comment>今日新增数量（可选冗余）</Comment>
+      <DefaultExpression>0</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>9</Position>
+      <StoredType>int|0s</StoredType>
+    </column>
+    <column id="640" parent="330" name="created_by">
+      <Comment>创建人ID → user.id（运营/管理员）</Comment>
+      <Position>10</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="641" parent="330" name="created_at">
+      <Comment>创建时间</Comment>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>11</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <column id="642" parent="330" name="updated_at">
+      <Comment>更新时间</Comment>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <OnUpdate>CURRENT_TIMESTAMP</OnUpdate>
+      <Position>12</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <foreign-key id="643" parent="330" name="fk_topic_created_by">
+      <ColNames>created_by</ColNames>
+      <OnDelete>set-null</OnDelete>
+      <RefColNames>id</RefColNames>
+      <RefTableName>user</RefTableName>
+    </foreign-key>
+    <index id="644" parent="330" name="PRIMARY">
+      <ColNames>id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="645" parent="330" name="idx_topic_status">
+      <ColNames>status</ColNames>
+      <Type>btree</Type>
+    </index>
+    <index id="646" parent="330" name="idx_topic_created_by">
+      <ColNames>created_by</ColNames>
+      <Type>btree</Type>
+    </index>
+    <key id="647" parent="330" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
+    <column id="648" parent="331" name="id">
+      <AutoIncrement>1</AutoIncrement>
+      <Comment>主键</Comment>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="649" parent="331" name="topic_id">
+      <Comment>专题ID → qa_topic.id</Comment>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="650" parent="331" name="category_id">
+      <Comment>分类ID → qa_category.id</Comment>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="651" parent="331" name="created_at">
+      <Comment>创建时间</Comment>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>4</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <foreign-key id="652" parent="331" name="fk_topic_category_topic">
+      <ColNames>topic_id</ColNames>
+      <OnDelete>cascade</OnDelete>
+      <RefColNames>id</RefColNames>
+      <RefTableName>qa_topic</RefTableName>
+    </foreign-key>
+    <foreign-key id="653" parent="331" name="fk_topic_category_category">
+      <ColNames>category_id</ColNames>
+      <RefColNames>id</RefColNames>
+      <RefTableName>qa_category</RefTableName>
+    </foreign-key>
+    <index id="654" parent="331" name="PRIMARY">
+      <ColNames>id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="655" parent="331" name="uk_topic_category">
+      <ColNames>topic_id
+category_id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="656" parent="331" name="idx_topic_category_category">
+      <ColNames>category_id</ColNames>
+      <Type>btree</Type>
+    </index>
+    <key id="657" parent="331" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
+    <key id="658" parent="331" name="uk_topic_category">
+      <UnderlyingIndexName>uk_topic_category</UnderlyingIndexName>
+    </key>
+    <column id="659" parent="332" name="id">
+      <AutoIncrement>1</AutoIncrement>
+      <Comment>主键</Comment>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="660" parent="332" name="topic_id">
+      <Comment>专题ID → qa_topic.id</Comment>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="661" parent="332" name="user_id">
+      <Comment>关注用户ID → user.id</Comment>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="662" parent="332" name="created_at">
+      <Comment>关注时间</Comment>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>4</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <foreign-key id="663" parent="332" name="fk_topic_follow_topic">
+      <ColNames>topic_id</ColNames>
+      <OnDelete>cascade</OnDelete>
+      <RefColNames>id</RefColNames>
+      <RefTableName>qa_topic</RefTableName>
+    </foreign-key>
+    <foreign-key id="664" parent="332" name="fk_topic_follow_user">
+      <ColNames>user_id</ColNames>
+      <OnDelete>cascade</OnDelete>
+      <RefColNames>id</RefColNames>
+      <RefTableName>user</RefTableName>
+    </foreign-key>
+    <index id="665" parent="332" name="PRIMARY">
+      <ColNames>id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="666" parent="332" name="uk_topic_follow">
+      <ColNames>topic_id
+user_id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="667" parent="332" name="idx_topic_follow_user">
+      <ColNames>user_id</ColNames>
+      <Type>btree</Type>
+    </index>
+    <key id="668" parent="332" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
+    <key id="669" parent="332" name="uk_topic_follow">
+      <UnderlyingIndexName>uk_topic_follow</UnderlyingIndexName>
+    </key>
+    <column id="670" parent="333" name="id">
+      <AutoIncrement>1</AutoIncrement>
+      <Comment>点赞ID（主键）</Comment>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="671" parent="333" name="biz_type">
+      <Comment>目标类型：1-问题，2-回答，3-评论</Comment>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StoredType>tinyint|0s</StoredType>
+    </column>
+    <column id="672" parent="333" name="biz_id">
+      <Comment>目标ID（对应qa_question/qa_answer/qa_comment）</Comment>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="673" parent="333" name="user_id">
+      <Comment>点赞用户ID → user.id</Comment>
+      <NotNull>1</NotNull>
+      <Position>4</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="674" parent="333" name="vote_type">
+      <Comment>投票类型：1-点赞（后续可扩展2-点踩）</Comment>
+      <DefaultExpression>1</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>5</Position>
+      <StoredType>tinyint|0s</StoredType>
+    </column>
+    <column id="675" parent="333" name="created_at">
+      <Comment>创建时间</Comment>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>6</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <foreign-key id="676" parent="333" name="fk_vote_user">
+      <ColNames>user_id</ColNames>
+      <OnDelete>cascade</OnDelete>
+      <RefColNames>id</RefColNames>
+      <RefTableName>user</RefTableName>
+    </foreign-key>
+    <index id="677" parent="333" name="PRIMARY">
+      <ColNames>id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="678" parent="333" name="uk_vote_unique">
+      <ColNames>biz_type
+biz_id
+user_id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="679" parent="333" name="idx_vote_biz">
+      <ColNames>biz_type
+biz_id</ColNames>
+      <Type>btree</Type>
+    </index>
+    <index id="680" parent="333" name="idx_vote_user">
+      <ColNames>user_id</ColNames>
+      <Type>btree</Type>
+    </index>
+    <key id="681" parent="333" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
+    <key id="682" parent="333" name="uk_vote_unique">
+      <UnderlyingIndexName>uk_vote_unique</UnderlyingIndexName>
+    </key>
+    <column id="683" parent="334" name="id">
+      <AutoIncrement>1</AutoIncrement>
+      <Comment>主键</Comment>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="684" parent="334" name="user_id">
+      <Comment>用户ID → user.id</Comment>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="685" parent="334" name="action_type">
+      <Comment>行为类型：1-浏览，2-点赞，3-收藏，4-关注，5-搜索，6-点击</Comment>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StoredType>tinyint|0s</StoredType>
+    </column>
+    <column id="686" parent="334" name="target_id">
+      <Comment>目标ID（对应内容ID）</Comment>
+      <NotNull>1</NotNull>
+      <Position>4</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="687" parent="334" name="category_id">
+      <Comment>分类ID（问答分类，用于兴趣建模）</Comment>
+      <Position>5</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="688" parent="334" name="weight">
+      <Comment>行为权重（用于推荐打分）</Comment>
+      <DefaultExpression>1.00</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>6</Position>
+      <StoredType>decimal(6,2 digit)|0s</StoredType>
+    </column>
+    <column id="689" parent="334" name="created_at">
+      <Comment>行为时间</Comment>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>7</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <foreign-key id="690" parent="334" name="fk_behavior_user">
+      <ColNames>user_id</ColNames>
+      <OnDelete>cascade</OnDelete>
+      <RefColNames>id</RefColNames>
+      <RefTableName>user</RefTableName>
+    </foreign-key>
+    <index id="691" parent="334" name="PRIMARY">
+      <ColNames>id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="692" parent="334" name="idx_behavior_user_time">
+      <ColNames>user_id
+created_at</ColNames>
+      <Type>btree</Type>
+    </index>
+    <index id="693" parent="334" name="idx_behavior_action">
+      <ColNames>action_type</ColNames>
+      <Type>btree</Type>
+    </index>
+    <key id="694" parent="334" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
+    <column id="695" parent="335" name="id">
+      <AutoIncrement>1</AutoIncrement>
+      <Comment>主键</Comment>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="696" parent="335" name="user_id">
+      <Comment>用户ID → user.id</Comment>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="697" parent="335" name="category_id">
+      <Comment>分类ID → qa_category.id（兴趣维度）</Comment>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="698" parent="335" name="score">
+      <Comment>兴趣分数（越大越偏好）</Comment>
+      <DefaultExpression>0.0000</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>4</Position>
+      <StoredType>decimal(10,4 digit)|0s</StoredType>
+    </column>
+    <column id="699" parent="335" name="updated_at">
+      <Comment>更新时间</Comment>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <OnUpdate>CURRENT_TIMESTAMP</OnUpdate>
+      <Position>5</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <foreign-key id="700" parent="335" name="fk_interest_user">
+      <ColNames>user_id</ColNames>
+      <OnDelete>cascade</OnDelete>
+      <RefColNames>id</RefColNames>
+      <RefTableName>user</RefTableName>
+    </foreign-key>
+    <foreign-key id="701" parent="335" name="fk_interest_category">
+      <ColNames>category_id</ColNames>
+      <OnDelete>cascade</OnDelete>
+      <RefColNames>id</RefColNames>
+      <RefTableName>qa_category</RefTableName>
+    </foreign-key>
+    <index id="702" parent="335" name="PRIMARY">
+      <ColNames>id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="703" parent="335" name="uk_interest_user_category">
+      <ColNames>user_id
+category_id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="704" parent="335" name="fk_interest_category">
+      <ColNames>category_id</ColNames>
+      <Type>btree</Type>
+    </index>
+    <key id="705" parent="335" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
+    <key id="706" parent="335" name="uk_interest_user_category">
+      <UnderlyingIndexName>uk_interest_user_category</UnderlyingIndexName>
+    </key>
+    <column id="707" parent="336" name="id">
+      <AutoIncrement>6</AutoIncrement>
+      <Comment>角色ID（主键）</Comment>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="708" parent="336" name="code">
+      <Comment>角色编码（如：admin/ops/user/expert）</Comment>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StoredType>varchar(50)|0s</StoredType>
+    </column>
+    <column id="709" parent="336" name="name">
+      <Comment>角色名称（展示用）</Comment>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StoredType>varchar(64)|0s</StoredType>
+    </column>
+    <column id="710" parent="336" name="description">
+      <Comment>角色描述/备注</Comment>
+      <Position>4</Position>
+      <StoredType>varchar(255)|0s</StoredType>
+    </column>
+    <column id="711" parent="336" name="created_at">
+      <Comment>创建时间</Comment>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>5</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <index id="712" parent="336" name="PRIMARY">
+      <ColNames>id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="713" parent="336" name="uk_role_code">
+      <ColNames>code</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <key id="714" parent="336" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
+    <key id="715" parent="336" name="uk_role_code">
+      <UnderlyingIndexName>uk_role_code</UnderlyingIndexName>
+    </key>
+    <column id="716" parent="337" name="role_id">
+      <Comment>角色ID</Comment>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="717" parent="337" name="permission_id">
+      <Comment>权限ID</Comment>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="718" parent="337" name="created_at">
+      <Comment>创建时间</Comment>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <foreign-key id="719" parent="337" name="fk_role_permission_role">
+      <ColNames>role_id</ColNames>
+      <OnDelete>cascade</OnDelete>
+      <RefColNames>id</RefColNames>
+      <RefTableName>role</RefTableName>
+    </foreign-key>
+    <foreign-key id="720" parent="337" name="fk_role_permission_permission">
+      <ColNames>permission_id</ColNames>
+      <OnDelete>cascade</OnDelete>
+      <RefColNames>id</RefColNames>
+      <RefTableName>permission</RefTableName>
+    </foreign-key>
+    <index id="721" parent="337" name="PRIMARY">
+      <ColNames>role_id
+permission_id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="722" parent="337" name="idx_role_perm_perm">
+      <ColNames>permission_id</ColNames>
+      <Type>btree</Type>
+    </index>
+    <key id="723" parent="337" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
+    <column id="724" parent="338" name="id">
+      <AutoIncrement>1</AutoIncrement>
+      <Comment>主键</Comment>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="725" parent="338" name="user_id">
+      <Comment>用户ID（可为空表示匿名搜索）</Comment>
+      <Position>2</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="726" parent="338" name="query_text">
+      <Comment>搜索词</Comment>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StoredType>varchar(300)|0s</StoredType>
+    </column>
+    <column id="727" parent="338" name="search_type">
+      <Comment>搜索类型：1-混合，2-仅问题，3-仅知识库，4-仅专题（可选）</Comment>
+      <DefaultExpression>1</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>4</Position>
+      <StoredType>tinyint|0s</StoredType>
+    </column>
+    <column id="728" parent="338" name="hit_count">
+      <Comment>命中数量（结果条数）</Comment>
+      <DefaultExpression>0</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>5</Position>
+      <StoredType>int|0s</StoredType>
+    </column>
+    <column id="729" parent="338" name="created_at">
+      <Comment>搜索时间</Comment>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>6</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <index id="730" parent="338" name="PRIMARY">
+      <ColNames>id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="731" parent="338" name="idx_search_user_time">
+      <ColNames>user_id
+created_at</ColNames>
+      <Type>btree</Type>
+    </index>
+    <index id="732" parent="338" name="idx_search_query">
+      <ColNames>query_text</ColNames>
+      <Type>btree</Type>
+    </index>
+    <key id="733" parent="338" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
+    <column id="734" parent="339" name="id">
+      <AutoIncrement>1</AutoIncrement>
+      <Comment>主键</Comment>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="735" parent="339" name="stat_date">
+      <Comment>统计日期</Comment>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StoredType>date|0s</StoredType>
+    </column>
+    <column id="736" parent="339" name="question_cnt">
+      <Comment>新增问题数</Comment>
+      <DefaultExpression>0</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StoredType>int|0s</StoredType>
+    </column>
+    <column id="737" parent="339" name="answer_cnt">
+      <Comment>新增回答数</Comment>
+      <DefaultExpression>0</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>4</Position>
+      <StoredType>int|0s</StoredType>
+    </column>
+    <column id="738" parent="339" name="comment_cnt">
+      <Comment>新增评论数</Comment>
+      <DefaultExpression>0</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>5</Position>
+      <StoredType>int|0s</StoredType>
+    </column>
+    <column id="739" parent="339" name="active_user_cnt">
+      <Comment>活跃用户数</Comment>
+      <DefaultExpression>0</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>6</Position>
+      <StoredType>int|0s</StoredType>
+    </column>
+    <column id="740" parent="339" name="search_cnt">
+      <Comment>搜索次数</Comment>
+      <DefaultExpression>0</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>7</Position>
+      <StoredType>int|0s</StoredType>
+    </column>
+    <column id="741" parent="339" name="pending_audit_cnt">
+      <Comment>待审核数量（人工队列）</Comment>
+      <DefaultExpression>0</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>8</Position>
+      <StoredType>int|0s</StoredType>
+    </column>
+    <column id="742" parent="339" name="created_at">
+      <Comment>生成时间</Comment>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>9</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <index id="743" parent="339" name="PRIMARY">
+      <ColNames>id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="744" parent="339" name="uk_stat_date">
+      <ColNames>stat_date</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <key id="745" parent="339" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
+    <key id="746" parent="339" name="uk_stat_date">
+      <UnderlyingIndexName>uk_stat_date</UnderlyingIndexName>
+    </key>
+    <column id="747" parent="340" name="id">
+      <AutoIncrement>11</AutoIncrement>
+      <Comment>用户ID（主键）</Comment>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="748" parent="340" name="username">
+      <Comment>用户名（登录名，可用于后台账号）</Comment>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StoredType>varchar(64)|0s</StoredType>
+    </column>
+    <column id="749" parent="340" name="phone">
+      <Comment>手机号（可为空；可加唯一约束）</Comment>
+      <Position>3</Position>
+      <StoredType>varchar(20)|0s</StoredType>
+    </column>
+    <column id="750" parent="340" name="password">
+      <Comment>密码哈希（不可明文）</Comment>
+      <NotNull>1</NotNull>
+      <Position>4</Position>
+      <StoredType>varchar(100)|0s</StoredType>
+    </column>
+    <column id="751" parent="340" name="status">
+      <Comment>用户状态：1-启用，0-禁用</Comment>
+      <DefaultExpression>1</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>5</Position>
+      <StoredType>tinyint|0s</StoredType>
+    </column>
+    <column id="752" parent="340" name="nickname">
+      <Comment>昵称（前台展示）</Comment>
+      <Position>6</Position>
+      <StoredType>varchar(64)|0s</StoredType>
+    </column>
+    <column id="753" parent="340" name="avatar">
+      <Comment>头像URL</Comment>
+      <Position>7</Position>
+      <StoredType>varchar(255)|0s</StoredType>
+    </column>
+    <column id="754" parent="340" name="email">
+      <Comment>邮箱</Comment>
+      <Position>8</Position>
+      <StoredType>varchar(100)|0s</StoredType>
+    </column>
+    <column id="755" parent="340" name="following_count">
+      <Comment>关注数（冗余统计，可由user_follow聚合/定时写入）</Comment>
+      <DefaultExpression>0</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>9</Position>
+      <StoredType>int|0s</StoredType>
+    </column>
+    <column id="756" parent="340" name="follower_count">
+      <Comment>粉丝数（冗余统计）</Comment>
+      <DefaultExpression>0</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>10</Position>
+      <StoredType>int|0s</StoredType>
+    </column>
+    <column id="757" parent="340" name="like_received_count">
+      <Comment>获赞数（冗余统计，来自内容点赞累计）</Comment>
+      <DefaultExpression>0</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>11</Position>
+      <StoredType>int|0s</StoredType>
+    </column>
+    <column id="758" parent="340" name="expert_status">
+      <Comment>专家状态：1-未认证，2-审核中，3-已认证，4-驳回，5-停用/取消认证</Comment>
+      <DefaultExpression>1</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>12</Position>
+      <StoredType>tinyint|0s</StoredType>
+    </column>
+    <column id="759" parent="340" name="expert_verified_at">
+      <Comment>专家认证通过时间（expert_status=3时写入）</Comment>
+      <Position>13</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <column id="760" parent="340" name="created_at">
+      <Comment>创建时间</Comment>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>14</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <column id="761" parent="340" name="updated_at">
+      <Comment>更新时间</Comment>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <OnUpdate>CURRENT_TIMESTAMP</OnUpdate>
+      <Position>15</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <index id="762" parent="340" name="PRIMARY">
+      <ColNames>id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="763" parent="340" name="uk_user_username">
+      <ColNames>username</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="764" parent="340" name="user_pk">
+      <ColNames>phone</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="765" parent="340" name="idx_user_phone">
+      <ColNames>phone</ColNames>
+      <Type>btree</Type>
+    </index>
+    <index id="766" parent="340" name="idx_user_expert_status">
+      <ColNames>expert_status</ColNames>
+      <Type>btree</Type>
+    </index>
+    <key id="767" parent="340" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
+    <key id="768" parent="340" name="uk_user_username">
+      <UnderlyingIndexName>uk_user_username</UnderlyingIndexName>
+    </key>
+    <key id="769" parent="340" name="user_pk">
+      <UnderlyingIndexName>user_pk</UnderlyingIndexName>
+    </key>
+    <column id="770" parent="341" name="id">
+      <AutoIncrement>1</AutoIncrement>
+      <Comment>主键</Comment>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="771" parent="341" name="user_id">
+      <Comment>用户ID → user.id</Comment>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="772" parent="341" name="biz_type">
+      <Comment>目标类型：1-问题，2-知识库，3-专题</Comment>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StoredType>tinyint|0s</StoredType>
+    </column>
+    <column id="773" parent="341" name="biz_id">
+      <Comment>目标ID（对应实体ID）</Comment>
+      <NotNull>1</NotNull>
+      <Position>4</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="774" parent="341" name="created_at">
+      <Comment>浏览时间</Comment>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>5</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <foreign-key id="775" parent="341" name="fk_browse_user">
+      <ColNames>user_id</ColNames>
+      <OnDelete>cascade</OnDelete>
+      <RefColNames>id</RefColNames>
+      <RefTableName>user</RefTableName>
+    </foreign-key>
+    <index id="776" parent="341" name="PRIMARY">
+      <ColNames>id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="777" parent="341" name="idx_browse_user_time">
+      <ColNames>user_id
+created_at</ColNames>
+      <Type>btree</Type>
+    </index>
+    <index id="778" parent="341" name="idx_browse_biz">
+      <ColNames>biz_type
+biz_id</ColNames>
+      <Type>btree</Type>
+    </index>
+    <key id="779" parent="341" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
+    <column id="780" parent="342" name="id">
+      <AutoIncrement>1</AutoIncrement>
+      <Comment>主键</Comment>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="781" parent="342" name="follower_id">
+      <Comment>关注者ID → user.id</Comment>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="782" parent="342" name="followee_id">
+      <Comment>被关注者ID → user.id</Comment>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="783" parent="342" name="created_at">
+      <Comment>关注时间</Comment>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>4</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <foreign-key id="784" parent="342" name="fk_follow_follower">
+      <ColNames>follower_id</ColNames>
+      <OnDelete>cascade</OnDelete>
+      <RefColNames>id</RefColNames>
+      <RefTableName>user</RefTableName>
+    </foreign-key>
+    <foreign-key id="785" parent="342" name="fk_follow_followee">
+      <ColNames>followee_id</ColNames>
+      <OnDelete>cascade</OnDelete>
+      <RefColNames>id</RefColNames>
+      <RefTableName>user</RefTableName>
+    </foreign-key>
+    <index id="786" parent="342" name="PRIMARY">
+      <ColNames>id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="787" parent="342" name="uk_user_follow">
+      <ColNames>follower_id
+followee_id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="788" parent="342" name="idx_follow_followee">
+      <ColNames>followee_id</ColNames>
+      <Type>btree</Type>
+    </index>
+    <key id="789" parent="342" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
+    <key id="790" parent="342" name="uk_user_follow">
+      <UnderlyingIndexName>uk_user_follow</UnderlyingIndexName>
+    </key>
+    <column id="791" parent="343" name="user_id">
+      <Comment>用户ID</Comment>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="792" parent="343" name="role_id">
+      <Comment>角色ID</Comment>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="793" parent="343" name="created_at">
+      <Comment>创建时间</Comment>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <foreign-key id="794" parent="343" name="fk_user_role_user">
+      <ColNames>user_id</ColNames>
+      <OnDelete>cascade</OnDelete>
+      <RefColNames>id</RefColNames>
+      <RefTableName>user</RefTableName>
+    </foreign-key>
+    <foreign-key id="795" parent="343" name="fk_user_role_role">
+      <ColNames>role_id</ColNames>
+      <OnDelete>cascade</OnDelete>
+      <RefColNames>id</RefColNames>
+      <RefTableName>role</RefTableName>
+    </foreign-key>
+    <index id="796" parent="343" name="PRIMARY">
+      <ColNames>user_id
+role_id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="797" parent="343" name="idx_user_role_role">
+      <ColNames>role_id</ColNames>
+      <Type>btree</Type>
+    </index>
+    <key id="798" parent="343" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
+    <column id="799" parent="344" name="user_id">
+      <Comment>用户ID（主键） → user.id</Comment>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>bigint unsigned|0s</StoredType>
+    </column>
+    <column id="800" parent="344" name="question_count">
+      <Comment>提问数</Comment>
+      <DefaultExpression>0</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StoredType>int|0s</StoredType>
+    </column>
+    <column id="801" parent="344" name="answer_count">
+      <Comment>回答数</Comment>
+      <DefaultExpression>0</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StoredType>int|0s</StoredType>
+    </column>
+    <column id="802" parent="344" name="like_received_count">
+      <Comment>获赞数（累计）</Comment>
+      <DefaultExpression>0</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>4</Position>
+      <StoredType>int|0s</StoredType>
+    </column>
+    <column id="803" parent="344" name="follower_count">
+      <Comment>粉丝数</Comment>
+      <DefaultExpression>0</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>5</Position>
+      <StoredType>int|0s</StoredType>
+    </column>
+    <column id="804" parent="344" name="following_count">
+      <Comment>关注数</Comment>
+      <DefaultExpression>0</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>6</Position>
+      <StoredType>int|0s</StoredType>
+    </column>
+    <column id="805" parent="344" name="updated_at">
+      <Comment>更新时间</Comment>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <OnUpdate>CURRENT_TIMESTAMP</OnUpdate>
+      <Position>7</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <foreign-key id="806" parent="344" name="fk_user_stat_user">
+      <ColNames>user_id</ColNames>
+      <OnDelete>cascade</OnDelete>
+      <RefColNames>id</RefColNames>
+      <RefTableName>user</RefTableName>
+    </foreign-key>
+    <index id="807" parent="344" name="PRIMARY">
+      <ColNames>user_id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <key id="808" parent="344" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
+    <column id="809" parent="345" name="installed_rank">
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>int|0s</StoredType>
+    </column>
+    <column id="810" parent="345" name="version">
+      <Position>2</Position>
+      <StoredType>varchar(50)|0s</StoredType>
+    </column>
+    <column id="811" parent="345" name="description">
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StoredType>varchar(200)|0s</StoredType>
+    </column>
+    <column id="812" parent="345" name="type">
+      <NotNull>1</NotNull>
+      <Position>4</Position>
+      <StoredType>varchar(20)|0s</StoredType>
+    </column>
+    <column id="813" parent="345" name="script">
+      <NotNull>1</NotNull>
+      <Position>5</Position>
+      <StoredType>varchar(1000)|0s</StoredType>
+    </column>
+    <column id="814" parent="345" name="checksum">
+      <Position>6</Position>
+      <StoredType>int|0s</StoredType>
+    </column>
+    <column id="815" parent="345" name="installed_by">
+      <NotNull>1</NotNull>
+      <Position>7</Position>
+      <StoredType>varchar(100)|0s</StoredType>
+    </column>
+    <column id="816" parent="345" name="installed_on">
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>8</Position>
+      <StoredType>timestamp|0s</StoredType>
+    </column>
+    <column id="817" parent="345" name="execution_time">
+      <NotNull>1</NotNull>
+      <Position>9</Position>
+      <StoredType>int|0s</StoredType>
+    </column>
+    <column id="818" parent="345" name="success">
+      <NotNull>1</NotNull>
+      <Position>10</Position>
+      <StoredType>tinyint(1)|0s</StoredType>
+    </column>
+    <index id="819" parent="345" name="PRIMARY">
+      <ColNames>installed_rank</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="820" parent="345" name="flyway_schema_history_s_idx">
+      <ColNames>success</ColNames>
+      <Type>btree</Type>
+    </index>
+    <key id="821" parent="345" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
+    <column id="822" parent="346" name="id">
+      <AutoIncrement>20</AutoIncrement>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>bigint|0s</StoredType>
+    </column>
+    <column id="823" parent="346" name="code">
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StoredType>varchar(100)|0s</StoredType>
+    </column>
+    <column id="824" parent="346" name="name">
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StoredType>varchar(128)|0s</StoredType>
+    </column>
+    <column id="825" parent="346" name="type">
+      <Comment>MENU/API/BUTTON</Comment>
+      <NotNull>1</NotNull>
+      <Position>4</Position>
+      <StoredType>varchar(16)|0s</StoredType>
+    </column>
+    <column id="826" parent="346" name="path_or_api">
+      <Position>5</Position>
+      <StoredType>varchar(255)|0s</StoredType>
+    </column>
+    <column id="827" parent="346" name="method">
+      <Position>6</Position>
+      <StoredType>varchar(16)|0s</StoredType>
+    </column>
+    <column id="828" parent="346" name="created_at">
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>7</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <index id="829" parent="346" name="PRIMARY">
+      <ColNames>id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="830" parent="346" name="uk_permission_code">
+      <ColNames>code</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <key id="831" parent="346" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
+    <key id="832" parent="346" name="uk_permission_code">
+      <UnderlyingIndexName>uk_permission_code</UnderlyingIndexName>
+    </key>
+    <column id="833" parent="347" name="id">
+      <AutoIncrement>6</AutoIncrement>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>bigint|0s</StoredType>
+    </column>
+    <column id="834" parent="347" name="code">
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StoredType>varchar(50)|0s</StoredType>
+    </column>
+    <column id="835" parent="347" name="name">
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StoredType>varchar(64)|0s</StoredType>
+    </column>
+    <column id="836" parent="347" name="description">
+      <Position>4</Position>
+      <StoredType>varchar(255)|0s</StoredType>
+    </column>
+    <column id="837" parent="347" name="created_at">
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>5</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <index id="838" parent="347" name="PRIMARY">
+      <ColNames>id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="839" parent="347" name="uk_role_code">
+      <ColNames>code</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <key id="840" parent="347" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
+    <key id="841" parent="347" name="uk_role_code">
+      <UnderlyingIndexName>uk_role_code</UnderlyingIndexName>
+    </key>
+    <column id="842" parent="348" name="role_id">
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>bigint|0s</StoredType>
+    </column>
+    <column id="843" parent="348" name="permission_id">
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StoredType>bigint|0s</StoredType>
+    </column>
+    <column id="844" parent="348" name="created_at">
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <index id="845" parent="348" name="PRIMARY">
+      <ColNames>role_id
+permission_id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <key id="846" parent="348" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
+    <column id="847" parent="349" name="id">
+      <AutoIncrement>1</AutoIncrement>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>bigint|0s</StoredType>
+    </column>
+    <column id="848" parent="349" name="name">
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StoredType>varchar(50)|0s</StoredType>
+    </column>
+    <index id="849" parent="349" name="PRIMARY">
+      <ColNames>id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <key id="850" parent="349" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
+    <column id="851" parent="350" name="id">
+      <AutoIncrement>6</AutoIncrement>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>bigint|0s</StoredType>
+    </column>
+    <column id="852" parent="350" name="username">
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StoredType>varchar(64)|0s</StoredType>
+    </column>
+    <column id="853" parent="350" name="phone">
+      <Position>3</Position>
+      <StoredType>varchar(20)|0s</StoredType>
+    </column>
+    <column id="854" parent="350" name="password">
+      <NotNull>1</NotNull>
+      <Position>4</Position>
+      <StoredType>varchar(100)|0s</StoredType>
+    </column>
+    <column id="855" parent="350" name="status">
+      <Comment>1=enabled,0=disabled</Comment>
+      <DefaultExpression>1</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>5</Position>
+      <StoredType>tinyint|0s</StoredType>
+    </column>
+    <column id="856" parent="350" name="created_at">
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>6</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <column id="857" parent="350" name="updated_at">
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <OnUpdate>CURRENT_TIMESTAMP</OnUpdate>
+      <Position>7</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <column id="858" parent="350" name="nickname">
+      <Position>8</Position>
+      <StoredType>varchar(64)|0s</StoredType>
+    </column>
+    <index id="859" parent="350" name="PRIMARY">
+      <ColNames>id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="860" parent="350" name="uk_user_username">
+      <ColNames>username</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="861" parent="350" name="uk_user_phone">
+      <ColNames>phone</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <index id="862" parent="350" name="idx_user_status">
+      <ColNames>status</ColNames>
+      <Type>btree</Type>
+    </index>
+    <key id="863" parent="350" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
+    <key id="864" parent="350" name="uk_user_username">
+      <UnderlyingIndexName>uk_user_username</UnderlyingIndexName>
+    </key>
+    <key id="865" parent="350" name="uk_user_phone">
+      <UnderlyingIndexName>uk_user_phone</UnderlyingIndexName>
+    </key>
+    <column id="866" parent="351" name="user_id">
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StoredType>bigint|0s</StoredType>
+    </column>
+    <column id="867" parent="351" name="role_id">
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StoredType>bigint|0s</StoredType>
+    </column>
+    <column id="868" parent="351" name="created_at">
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StoredType>datetime|0s</StoredType>
+    </column>
+    <index id="869" parent="351" name="PRIMARY">
+      <ColNames>user_id
+role_id</ColNames>
+      <Type>btree</Type>
+      <Unique>1</Unique>
+    </index>
+    <key id="870" parent="351" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
+    </key>
+  </database-model>
+</dataSource>

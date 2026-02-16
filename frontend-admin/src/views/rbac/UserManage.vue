@@ -59,8 +59,10 @@
           <el-pagination
             :current-page="staffQuery.pageNum"
             :page-size="staffQuery.pageSize"
+            :page-sizes="pageSizes"
             :total="staffTotal"
-            layout="total, prev, pager, next"
+            layout="total, sizes, prev, pager, next"
+            @size-change="(s: number) => handleStaffSizeChange(s)"
             @current-change="(p: number) => handleStaffPage(p)"
           />
         </div>
@@ -121,8 +123,10 @@
           <el-pagination
             :current-page="customerQuery.pageNum"
             :page-size="customerQuery.pageSize"
+            :page-sizes="pageSizes"
             :total="customerTotal"
-            layout="total, prev, pager, next"
+            layout="total, sizes, prev, pager, next"
+            @size-change="(s: number) => handleCustomerSizeChange(s)"
             @current-change="(p: number) => handleCustomerPage(p)"
           />
         </div>
@@ -178,8 +182,10 @@
             <el-pagination
               :current-page="expertQuery.pageNum"
               :page-size="expertQuery.pageSize"
+              :page-sizes="pageSizes"
               :total="expertTotal"
-              layout="total, prev, pager, next"
+              layout="total, sizes, prev, pager, next"
+              @size-change="(s: number) => handleExpertSizeChange(s)"
               @current-change="(p: number) => handleExpertPage(p)"
             />
           </div>
@@ -236,8 +242,10 @@
             <el-pagination
               :current-page="applyQuery.pageNum"
               :page-size="applyQuery.pageSize"
+              :page-sizes="pageSizes"
               :total="applyTotal"
-              layout="total, prev, pager, next"
+              layout="total, sizes, prev, pager, next"
+              @size-change="(s: number) => handleApplySizeChange(s)"
               @current-change="(p: number) => handleApplyPage(p)"
             />
           </div>
@@ -423,6 +431,7 @@ import type {
 } from "../../types/adminUser";
 
 const activeTab = ref("staff");
+const pageSizes = [10, 20, 50, 100];
 
 const staffQuery = reactive<UserQueryDTO>({ pageNum: 1, pageSize: 10, roleCode: "staff" });
 const customerQuery = reactive<UserQueryDTO>({ pageNum: 1, pageSize: 10, roleCode: "customer" });
@@ -680,8 +689,20 @@ const handleStaffPage = (page: number) => {
   loadStaff();
 };
 
+const handleStaffSizeChange = (size: number) => {
+  staffQuery.pageSize = size;
+  staffQuery.pageNum = 1;
+  loadStaff();
+};
+
 const handleCustomerPage = (page: number) => {
   customerQuery.pageNum = page;
+  loadCustomer();
+};
+
+const handleCustomerSizeChange = (size: number) => {
+  customerQuery.pageSize = size;
+  customerQuery.pageNum = 1;
   loadCustomer();
 };
 
@@ -690,8 +711,20 @@ const handleExpertPage = (page: number) => {
   loadExpert();
 };
 
+const handleExpertSizeChange = (size: number) => {
+  expertQuery.pageSize = size;
+  expertQuery.pageNum = 1;
+  loadExpert();
+};
+
 const handleApplyPage = (page: number) => {
   applyQuery.pageNum = page;
+  loadApplies();
+};
+
+const handleApplySizeChange = (size: number) => {
+  applyQuery.pageSize = size;
+  applyQuery.pageNum = 1;
   loadApplies();
 };
 

@@ -4,11 +4,18 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="aa5f3f12-7cf3-407a-bba2-f4fa29dbf84b" name="Changes" comment="后端：用户管理的所有内容（补充版）">
+    <list default="true" id="aa5f3f12-7cf3-407a-bba2-f4fa29dbf84b" name="Changes" comment="后端：分类管理和标签管理的相关内容。删除时的关联方式可能还需要修改一下。">
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/agent.md" beforeDir="false" afterPath="$PROJECT_DIR$/agent.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/community/interceptor/JwtAuthenticationFilter.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/database.sql" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/database.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend-admin/src/views/operation/CategoryManage.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend-admin/src/views/operation/CategoryManage.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend-admin/src/views/operation/TagManage.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend-admin/src/views/operation/TagManage.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend-admin/src/views/rbac/PermManage.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend-admin/src/views/rbac/PermManage.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend-admin/src/views/rbac/RoleManage.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend-admin/src/views/rbac/RoleManage.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend-admin/src/views/rbac/UserManage.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend-admin/src/views/rbac/UserManage.vue" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -97,7 +104,7 @@
     ]
   }
 }</component>
-  <component name="RunManager" selected="Application.CommunityApplication">
+  <component name="RunManager" selected="Spring Boot.CommunityApplication">
     <configuration name="CommunityApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.community.CommunityApplication" />
       <module name="Smart-community" />
@@ -172,6 +179,7 @@
       <workItem from="1770632493709" duration="11731000" />
       <workItem from="1770864448231" duration="5631000" />
       <workItem from="1770945584482" duration="4452000" />
+      <workItem from="1771208150428" duration="9601000" />
     </task>
     <task id="LOCAL-00001" summary="返回统一响应体和全局异常处理">
       <option name="closed" value="true" />
@@ -301,7 +309,23 @@
       <option name="project" value="LOCAL" />
       <updated>1771161035821</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="前端：权限管理的所有内容，待补充：细节点">
+      <option name="closed" value="true" />
+      <created>1771161308959</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1771161308959</updated>
+    </task>
+    <task id="LOCAL-00018" summary="后端：分类管理和标签管理的相关内容。删除时的关联方式可能还需要修改一下。">
+      <option name="closed" value="true" />
+      <created>1771224371691</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1771224371691</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -336,6 +360,8 @@
     <MESSAGE value="动态菜单的查看，我的内容返回" />
     <MESSAGE value="后端：用户管理的所有内容" />
     <MESSAGE value="后端：用户管理的所有内容（补充版）" />
-    <option name="LAST_COMMIT_MESSAGE" value="后端：用户管理的所有内容（补充版）" />
+    <MESSAGE value="前端：权限管理的所有内容，待补充：细节点" />
+    <MESSAGE value="后端：分类管理和标签管理的相关内容。删除时的关联方式可能还需要修改一下。" />
+    <option name="LAST_COMMIT_MESSAGE" value="后端：分类管理和标签管理的相关内容。删除时的关联方式可能还需要修改一下。" />
   </component>
 </project>
