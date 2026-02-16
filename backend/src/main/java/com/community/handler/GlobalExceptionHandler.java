@@ -4,6 +4,7 @@ import com.community.common.BizException;
 import com.community.common.Result;
 import com.community.common.ResultCode;
 import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.DisabledException;
@@ -15,11 +16,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(BizException.class)
     public Result<Void> handleBizException(BizException ex) {
+        log.warn("Business exception: code={}, message={}", ex.getCode(), ex.getMessage());
         return Result.error(ex.getCode(), ex.getMessage());
     }
 
@@ -35,38 +38,45 @@ public class GlobalExceptionHandler {
                 .map(err -> err.getField() + ": " + err.getDefaultMessage())
                 .collect(Collectors.joining(", "));
         } else {
-            message = "参数错误";
+            message = "invalid request parameters";
         }
+        log.warn("Validation exception: {}", message);
         return Result.error(ResultCode.BAD_REQUEST, message);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
     public Result<Void> handleConstraintViolation(ConstraintViolationException ex) {
-        return Result.error(ResultCode.BAD_REQUEST, "参数校验失败");
+        log.warn("Constraint violation: {}", ex.getMessage());
+        return Result.error(ResultCode.BAD_REQUEST, "constraint validation failed");
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public Result<Void> handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {
-        return Result.error(ResultCode.BAD_REQUEST, "请求体格式错误");
+        log.warn("Http message not readable: {}", ex.getMessage());
+        return Result.error(ResultCode.BAD_REQUEST, "request body format is invalid");
     }
 
     @ExceptionHandler(DisabledException.class)
     public Result<Void> handleDisabledException(DisabledException ex) {
-        return Result.error(ResultCode.UNAUTHORIZED, "你的账号已被冻结，如有疑问联系管理员777@gmail.com");
+        log.warn("Disabled account login attempt: {}", ex.getMessage());
+        return Result.error(ResultCode.UNAUTHORIZED, "account is disabled");
     }
 
     @ExceptionHandler(AuthenticationException.class)
     public Result<Void> handleAuthenticationException(AuthenticationException ex) {
-        return Result.error(ResultCode.UNAUTHORIZED, "认证失败");
+        log.warn("Authentication exception: {}", ex.getMessage());
+        return Result.error(ResultCode.UNAUTHORIZED, "authentication failed");
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     public Result<Void> handleAccessDeniedException(AccessDeniedException ex) {
-        return Result.error(ResultCode.FORBIDDEN, "没有访问权限");
+        log.warn("Access denied: {}", ex.getMessage());
+        return Result.error(ResultCode.FORBIDDEN, "access denied");
     }
 
     @ExceptionHandler(Exception.class)
     public Result<Void> handleGenericException(Exception ex) {
-        return Result.error(ResultCode.SERVER_ERROR, "服务器内部错误");
+        log.error("Unhandled exception", ex);
+        return Result.error(ResultCode.SERVER_ERROR, "internal server error");
     }
 }

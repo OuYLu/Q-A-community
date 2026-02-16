@@ -15,6 +15,8 @@ public class QaTag {
 
     private String name;
 
+    private Integer source;
+
     private Integer status;
 
     private Integer useCount;
