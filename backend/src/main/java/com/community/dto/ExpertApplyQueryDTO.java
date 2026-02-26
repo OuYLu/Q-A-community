@@ -4,23 +4,23 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 @Data
-@Schema(description = "Expert apply query")
+@Schema(description = "专家申请查询")
 public class ExpertApplyQueryDTO {
-    @Schema(description = "Status")
+    @Schema(description = "状态")
     private Integer status;
 
-    @Schema(description = "Real name")
+    @Schema(description = "真实姓名")
     private String realName;
 
-    @Schema(description = "Organization")
+    @Schema(description = "机构")
     private String organization;
 
-    @Schema(description = "Expertise")
+    @Schema(description = "擅长领域")
     private String expertise;
 
-    @Schema(description = "Page number")
+    @Schema(description = "页码")
     private Integer pageNum = 1;
 
-    @Schema(description = "Page size")
+    @Schema(description = "每页条数")
     private Integer pageSize = 10;
 }

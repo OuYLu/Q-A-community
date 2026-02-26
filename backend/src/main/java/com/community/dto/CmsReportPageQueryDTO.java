@@ -7,7 +7,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
 
 @Data
-@Schema(description = "CMS report page query")
+@Schema(description = "内容举报分页查询")
 public class CmsReportPageQueryDTO {
     private Integer bizType;
     private Integer status = 1;

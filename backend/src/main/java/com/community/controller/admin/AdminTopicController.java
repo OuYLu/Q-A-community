@@ -37,34 +37,34 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/admin/qa/topic")
 @RequiredArgsConstructor
-@Tag(name = "Admin Topic")
+@Tag(name = "后台话题管理")
 public class AdminTopicController {
     private final QaTopicAdminService qaTopicAdminService;
 
     @GetMapping("/page")
     @PreAuthorize("hasAuthority('op:topic:manage')")
-    @Operation(summary = "Topic page")
+    @Operation(summary = "话题分页")
     public Result<PageInfo<AdminTopicListItemVO>> page(@ModelAttribute QaTopicPageQueryDTO query) {
         return Result.success(qaTopicAdminService.page(query));
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('op:topic:manage')")
-    @Operation(summary = "Topic detail")
+    @Operation(summary = "话题详情")
     public Result<AdminTopicDetailVO> detail(@PathVariable Long id) {
         return Result.success(qaTopicAdminService.detail(id));
     }
 
     @PostMapping
     @PreAuthorize("hasAuthority('op:topic:manage')")
-    @Operation(summary = "Create topic")
+    @Operation(summary = "创建话题")
     public Result<Map<String, Long>> create(@Valid @RequestBody QaTopicSaveDTO dto) {
         return Result.success(Map.of("id", qaTopicAdminService.create(dto)));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('op:topic:manage')")
-    @Operation(summary = "Update topic")
+    @Operation(summary = "更新话题")
     public Result<Void> update(@PathVariable Long id, @Valid @RequestBody QaTopicSaveDTO dto) {
         qaTopicAdminService.update(id, dto);
         return Result.success(null);
@@ -72,7 +72,7 @@ public class AdminTopicController {
 
     @PutMapping("/{id}/status")
     @PreAuthorize("hasAuthority('op:topic:manage')")
-    @Operation(summary = "Update topic status")
+    @Operation(summary = "更新话题状态")
     public Result<Void> updateStatus(@PathVariable Long id, @Valid @RequestBody QaTopicStatusUpdateDTO dto) {
         qaTopicAdminService.updateStatus(id, dto);
         return Result.success(null);
@@ -80,7 +80,7 @@ public class AdminTopicController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('op:topic:manage')")
-    @Operation(summary = "Delete topic (soft by status)")
+    @Operation(summary = "删除话题（按状态软删除）")
     public Result<Void> delete(@PathVariable Long id) {
         qaTopicAdminService.delete(id);
         return Result.success(null);
@@ -88,14 +88,14 @@ public class AdminTopicController {
 
     @GetMapping("/{id}/categories")
     @PreAuthorize("hasAuthority('op:topic:manage')")
-    @Operation(summary = "Topic categories")
+    @Operation(summary = "话题分类")
     public Result<List<TopicCategoryVO>> categories(@PathVariable Long id) {
         return Result.success(qaTopicAdminService.listCategories(id));
     }
 
     @PutMapping("/{id}/categories")
     @PreAuthorize("hasAuthority('op:topic:manage')")
-    @Operation(summary = "Update topic categories")
+    @Operation(summary = "更新话题分类")
     public Result<Void> updateCategories(@PathVariable Long id, @RequestBody QaTopicCategoryUpdateDTO dto) {
         qaTopicAdminService.updateCategories(id, dto);
         return Result.success(null);
@@ -103,7 +103,7 @@ public class AdminTopicController {
 
     @GetMapping("/{id}/recent-questions")
     @PreAuthorize("hasAuthority('op:topic:manage')")
-    @Operation(summary = "Recent questions in topic")
+    @Operation(summary = "话题下最近问题")
     public Result<List<TopicRecentQuestionVO>> recentQuestions(@PathVariable Long id,
                                                                @RequestParam(required = false) Integer limit) {
         return Result.success(qaTopicAdminService.recentQuestions(id, limit));
@@ -111,7 +111,7 @@ public class AdminTopicController {
 
     @GetMapping("/{id}/question/page")
     @PreAuthorize("hasAuthority('op:topic:manage')")
-    @Operation(summary = "Topic question page")
+    @Operation(summary = "话题问题分页")
     public Result<PageInfo<TopicQuestionPageItemVO>> questionPage(@PathVariable Long id,
                                                                   @ModelAttribute QaTopicQuestionPageQueryDTO query) {
         return Result.success(qaTopicAdminService.questionPage(id, query));
@@ -119,7 +119,7 @@ public class AdminTopicController {
 
     @GetMapping("/{id}/trend")
     @PreAuthorize("hasAuthority('op:topic:manage')")
-    @Operation(summary = "Topic trend")
+    @Operation(summary = "话题趋势")
     public Result<List<TopicTrendPointVO>> trend(@PathVariable Long id,
                                                  @RequestParam(required = false) Integer days) {
         return Result.success(qaTopicAdminService.trend(id, days));
@@ -127,7 +127,7 @@ public class AdminTopicController {
 
     @GetMapping("/{id}/stats")
     @PreAuthorize("hasAuthority('op:topic:manage')")
-    @Operation(summary = "Topic stats")
+    @Operation(summary = "话题统计")
     public Result<TopicStatsVO> stats(@PathVariable Long id) {
         return Result.success(qaTopicAdminService.stats(id));
     }

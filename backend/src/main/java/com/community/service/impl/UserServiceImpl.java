@@ -10,9 +10,11 @@ import com.community.dto.CustomerRegisterDTO;
 import com.community.entity.Role;
 import com.community.entity.User;
 import com.community.entity.UserRole;
+import com.community.entity.UserStat;
 import com.community.mapper.RoleMapper;
 import com.community.mapper.UserMapper;
 import com.community.mapper.UserRoleMapper;
+import com.community.mapper.UserStatMapper;
 import com.community.service.UserService;
 import com.community.vo.UserVO;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +34,7 @@ import java.util.List;
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
     private final RoleMapper roleMapper;
     private final UserRoleMapper userRoleMapper;
+    private final UserStatMapper userStatMapper;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -83,7 +86,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         Role role = roleMapper.selectOne(new LambdaQueryWrapper<Role>().eq(Role::getCode, "customer"));
         if (role == null) {
-            throw new BizException(ResultCode.SERVER_ERROR, "角色 customer 未配置");
+            throw new BizException(ResultCode.SERVER_ERROR, "客户角色未配置");
         }
 
         UserRole userRole = new UserRole();
@@ -91,6 +94,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         userRole.setRoleId(role.getId());
         userRole.setCreatedAt(LocalDateTime.now());
         userRoleMapper.insert(userRole);
+        initUserStat(user.getId());
 
         return new UserVO(user.getId(), user.getUsername(), user.getNickname(), List.of("customer"));
     }
@@ -129,7 +133,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         Role role = roleMapper.selectOne(new LambdaQueryWrapper<Role>().eq(Role::getCode, "staff"));
         if (role == null) {
-            throw new BizException(ResultCode.SERVER_ERROR, "角色 staff 未配置");
+            throw new BizException(ResultCode.SERVER_ERROR, "员工角色未配置");
         }
 
         UserRole userRole = new UserRole();
@@ -137,6 +141,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         userRole.setRoleId(role.getId());
         userRole.setCreatedAt(LocalDateTime.now());
         userRoleMapper.insert(userRole);
+        initUserStat(user.getId());
 
         return new UserVO(user.getId(), user.getUsername(), user.getNickname(), List.of("staff"));
     }
@@ -163,5 +168,23 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public List<String> getPermCodes(Long id) {
         return this.baseMapper.selectPermCodesByUserId(id);
+    }
+
+    private void initUserStat(Long userId) {
+        if (userId == null) {
+            return;
+        }
+        if (userStatMapper.selectById(userId) != null) {
+            return;
+        }
+        UserStat stat = new UserStat();
+        stat.setUserId(userId);
+        stat.setQuestionCount(0);
+        stat.setAnswerCount(0);
+        stat.setLikeReceivedCount(0);
+        stat.setFollowerCount(0);
+        stat.setFollowingCount(0);
+        stat.setUpdatedAt(LocalDateTime.now());
+        userStatMapper.insert(stat);
     }
 }

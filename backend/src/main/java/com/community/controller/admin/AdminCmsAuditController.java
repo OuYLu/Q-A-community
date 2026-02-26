@@ -24,27 +24,27 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/admin/cms/audit")
 @RequiredArgsConstructor
-@Tag(name = "Admin CMS Audit")
+@Tag(name = "后台内容审核")
 public class AdminCmsAuditController {
     private final CmsAuditAdminService cmsAuditAdminService;
 
     @GetMapping("/page")
     @PreAuthorize("hasAnyAuthority('menu:content:audit','content:audit:manage','op:audit:manage')")
-    @Operation(summary = "CMS audit page")
+    @Operation(summary = "内容审核分页")
     public Result<PageInfo<CmsAuditPageItemVO>> page(@ModelAttribute CmsAuditPageQueryDTO query) {
         return Result.success(cmsAuditAdminService.page(query));
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('menu:content:audit','content:audit:manage','op:audit:manage')")
-    @Operation(summary = "CMS audit detail")
+    @Operation(summary = "内容审核详情")
     public Result<CmsAuditDetailVO> detail(@PathVariable Long id) {
         return Result.success(cmsAuditAdminService.detail(id));
     }
 
     @PostMapping("/{id}/review")
     @PreAuthorize("hasAnyAuthority('menu:content:audit','content:audit:manage','op:audit:manage')")
-    @Operation(summary = "CMS audit review")
+    @Operation(summary = "内容审核处理")
     public Result<Void> review(@PathVariable Long id, @Valid @RequestBody CmsAuditReviewDTO dto) {
         cmsAuditAdminService.review(id, dto);
         return Result.success(null);
@@ -52,7 +52,7 @@ public class AdminCmsAuditController {
 
     @PostMapping("/batch-review")
     @PreAuthorize("hasAnyAuthority('menu:content:audit','content:audit:manage','op:audit:manage')")
-    @Operation(summary = "CMS audit batch review")
+    @Operation(summary = "内容审核批量处理")
     public Result<Void> batchReview(@Valid @RequestBody CmsAuditBatchReviewDTO dto) {
         cmsAuditAdminService.batchReview(dto);
         return Result.success(null);
@@ -60,7 +60,7 @@ public class AdminCmsAuditController {
 
     @PostMapping("/{id}/reopen")
     @PreAuthorize("hasAnyAuthority('menu:content:audit','content:audit:manage','op:audit:manage')")
-    @Operation(summary = "CMS audit reopen")
+    @Operation(summary = "重开审核")
     public Result<Void> reopen(@PathVariable Long id) {
         cmsAuditAdminService.reopen(id);
         return Result.success(null);

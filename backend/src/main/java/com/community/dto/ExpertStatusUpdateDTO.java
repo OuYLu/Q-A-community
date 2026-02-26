@@ -5,9 +5,9 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-@Schema(description = "Expert status update")
+@Schema(description = "专家状态更新")
 public class ExpertStatusUpdateDTO {
-    @NotNull(message = "expertStatus is required")
-    @Schema(description = "Expert status: 3-certified, 0-disabled", example = "0")
+    @NotNull(message = "专家状态不能为空")
+    @Schema(description = "专家状态：3-认证，0-禁用", example = "0")
     private Integer expertStatus;
 }

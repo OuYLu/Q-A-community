@@ -6,35 +6,35 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-@Schema(description = "Category list item")
+@Schema(description = "分类列表项")
 public class CategoryListVO {
-    @Schema(description = "Category id")
+    @Schema(description = "分类编号")
     private Long id;
 
-    @Schema(description = "Category name")
+    @Schema(description = "分类名称")
     private String name;
 
-    @Schema(description = "Parent category id")
+    @Schema(description = "父分类编号")
     private Long parentId;
 
-    @Schema(description = "Category icon")
+    @Schema(description = "分类图标")
     private String icon;
 
-    @Schema(description = "Category description")
+    @Schema(description = "分类描述")
     private String description;
 
-    @Schema(description = "Status")
+    @Schema(description = "状态")
     private Integer status;
 
-    @Schema(description = "Sort")
+    @Schema(description = "排序")
     private Integer sort;
 
-    @Schema(description = "Question count under this category")
+    @Schema(description = "该分类下问题数量")
     private Long questionCount;
 
-    @Schema(description = "Created time")
+    @Schema(description = "创建时间")
     private LocalDateTime createdAt;
 
-    @Schema(description = "Updated time")
+    @Schema(description = "更新时间")
     private LocalDateTime updatedAt;
 }

@@ -102,7 +102,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     @Override
     public PageInfo<Permission> listRolePermissions(Long roleId, int pageNum, int pageSize) {
         if (roleId == null) {
-            throw new BizException(ResultCode.BAD_REQUEST, "roleId is required");
+            throw new BizException(ResultCode.BAD_REQUEST, "角色编号不能为空");
         }
         PageHelper.startPage(pageNum, pageSize);
         return new PageInfo<>(permissionMapper.selectByRoleId(roleId));
@@ -112,7 +112,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     @Transactional
     public void updateRolePermissions(RolePermUpdateDTO dto) {
         if (dto.getRoleId() == null) {
-            throw new BizException(ResultCode.BAD_REQUEST, "roleId is required");
+            throw new BizException(ResultCode.BAD_REQUEST, "角色编号不能为空");
         }
         Role role = this.getById(dto.getRoleId());
         if (role == null) {

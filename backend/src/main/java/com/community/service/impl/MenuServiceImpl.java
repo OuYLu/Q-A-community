@@ -26,7 +26,7 @@ public class MenuServiceImpl implements MenuService {
     public List<AdminMenuVO> listCurrentUserMenus() {
         SecurityUser securityUser = getCurrentSecurityUser();
         if (securityUser == null) {
-            throw new BizException(ResultCode.UNAUTHORIZED, "Login required");
+            throw new BizException(ResultCode.UNAUTHORIZED, "请先登录");
         }
 
         List<Permission> menus = permissionMapper.selectMenusByUserId(securityUser.getId());

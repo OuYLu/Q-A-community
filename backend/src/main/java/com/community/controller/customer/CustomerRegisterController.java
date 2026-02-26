@@ -21,7 +21,7 @@ public class CustomerRegisterController {
     private final UserService userService;
 
     @PostMapping("/register")
-    @Operation(summary = "客户注册", description = "仅客户注册入口，默认分配 customer 角色")
+    @Operation(summary = "客户注册", description = "仅客户注册入口，默认分配客户角色")
     public Result<UserVO> register(@Valid @RequestBody CustomerRegisterDTO dto) {
         return Result.success(userService.registerCustomer(dto));
     }

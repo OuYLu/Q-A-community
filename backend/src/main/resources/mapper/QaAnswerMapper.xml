@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.community.mapper.QaAnswerMapper">
+  <select id="selectMyAnswers" resultType="com.community.vo.AppMyAnswerItemVO">
+    SELECT
+      a.id AS answerId,
+      a.question_id AS questionId,
+      q.title AS questionTitle,
+      a.like_count AS likeCount,
+      LEFT(a.content, 100) AS contentPreview,
+      a.created_at AS createdAt
+    FROM qa_answer a
+    JOIN qa_question q ON q.id = a.question_id
+    WHERE a.user_id = #{userId}
+      AND a.delete_flag = 0
+      AND q.delete_flag = 0
+    ORDER BY a.created_at DESC, a.id DESC
+  </select>
+
+  <select id="selectAppQuestionAnswers" resultType="com.community.vo.AppQuestionAnswerVO">
+    SELECT
+      a.id,
+      a.question_id AS questionId,
+      a.content,
+      a.image_urls AS imageUrlsRaw,
+      a.user_id AS authorId,
+      CASE WHEN a.is_anonymous = 1 THEN '匿名用户' ELSE u.nickname END AS authorName,
+      CASE WHEN a.is_anonymous = 1 THEN NULL ELSE u.avatar END AS authorAvatar,
+      a.is_anonymous AS isAnonymous,
+      a.like_count AS likeCount,
+      a.created_at AS createdAt
+    FROM qa_answer a
+    LEFT JOIN user u ON u.id = a.user_id
+    WHERE a.question_id = #{questionId}
+      AND a.delete_flag = 0
+      AND a.status = 1
+    ORDER BY a.created_at ASC, a.id ASC
+  </select>
+
+  <select id="selectAppAnswerById" resultType="com.community.vo.AppQuestionAnswerVO">
+    SELECT
+      a.id,
+      a.question_id AS questionId,
+      a.content,
+      a.image_urls AS imageUrlsRaw,
+      a.user_id AS authorId,
+      CASE WHEN a.is_anonymous = 1 THEN '匿名用户' ELSE u.nickname END AS authorName,
+      CASE WHEN a.is_anonymous = 1 THEN NULL ELSE u.avatar END AS authorAvatar,
+      a.is_anonymous AS isAnonymous,
+      a.like_count AS likeCount,
+      a.created_at AS createdAt
+    FROM qa_answer a
+    LEFT JOIN user u ON u.id = a.user_id
+    WHERE a.id = #{answerId}
+      AND a.delete_flag = 0
+      AND a.status = 1
+    LIMIT 1
+  </select>
+</mapper>

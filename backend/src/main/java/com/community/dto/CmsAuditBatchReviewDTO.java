@@ -9,14 +9,14 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-@Schema(description = "CMS audit batch review")
+@Schema(description = "内容审核批量处理")
 public class CmsAuditBatchReviewDTO {
-    @NotNull(message = "ids is required")
-    @NotEmpty(message = "ids cannot be empty")
+    @NotNull(message = "编号列表不能为空")
+    @NotEmpty(message = "编号列表不能为空")
     private List<Long> ids;
 
-    @NotBlank(message = "action is required")
-    @Schema(description = "pass/reject")
+    @NotBlank(message = "操作不能为空")
+    @Schema(description = "通过/驳回")
     private String action;
 
     private String rejectReason;

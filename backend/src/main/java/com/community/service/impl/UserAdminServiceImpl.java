@@ -50,14 +50,14 @@ public class UserAdminServiceImpl extends ServiceImpl<UserMapper, User> implemen
     public void updateUser(Long id, UserUpdateDTO dto) {
         User user = this.getById(id);
         if (user == null) {
-            throw new BizException(ResultCode.BAD_REQUEST, "User not found");
+            throw new BizException(ResultCode.BAD_REQUEST, "用户不存在");
         }
         ensureNotAdmin(user.getId());
 
         if (StringUtils.hasText(dto.getPhone())) {
             User phoneExist = this.getOne(new LambdaQueryWrapper<User>().eq(User::getPhone, dto.getPhone()));
             if (phoneExist != null && !phoneExist.getId().equals(user.getId())) {
-                throw new BizException(ResultCode.BAD_REQUEST, "Phone already used");
+                throw new BizException(ResultCode.BAD_REQUEST, "手机号已被使用");
             }
         }
 
@@ -74,7 +74,7 @@ public class UserAdminServiceImpl extends ServiceImpl<UserMapper, User> implemen
     public void updateStatus(Long id, UserStatusDTO dto) {
         User user = this.getById(id);
         if (user == null) {
-            throw new BizException(ResultCode.BAD_REQUEST, "User not found");
+            throw new BizException(ResultCode.BAD_REQUEST, "用户不存在");
         }
         ensureNotAdmin(user.getId());
 
@@ -97,7 +97,7 @@ public class UserAdminServiceImpl extends ServiceImpl<UserMapper, User> implemen
     public void deleteUser(Long id) {
         User user = this.getById(id);
         if (user == null) {
-            throw new BizException(ResultCode.BAD_REQUEST, "User not found");
+            throw new BizException(ResultCode.BAD_REQUEST, "用户不存在");
         }
         ensureNotAdmin(user.getId());
         this.removeById(id);
@@ -107,7 +107,7 @@ public class UserAdminServiceImpl extends ServiceImpl<UserMapper, User> implemen
     public UserManageVO getUserDetail(Long id) {
         User user = this.getById(id);
         if (user == null) {
-            throw new BizException(ResultCode.BAD_REQUEST, "User not found");
+            throw new BizException(ResultCode.BAD_REQUEST, "用户不存在");
         }
         ensureNotAdmin(user.getId());
         List<String> roleCodes = this.baseMapper.selectRoleCodesByUserId(user.getId());
@@ -117,7 +117,7 @@ public class UserAdminServiceImpl extends ServiceImpl<UserMapper, User> implemen
     private void ensureNotAdmin(Long userId) {
         List<String> roles = this.baseMapper.selectRoleCodesByUserId(userId);
         if (roles.stream().anyMatch(role -> "admin".equalsIgnoreCase(role))) {
-            throw new BizException(ResultCode.BAD_REQUEST, "Admin user cannot be modified");
+            throw new BizException(ResultCode.BAD_REQUEST, "管理员用户不可修改");
         }
     }
 

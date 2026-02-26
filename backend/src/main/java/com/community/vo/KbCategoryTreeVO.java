@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-@Schema(description = "KB category tree")
+@Schema(description = "知识库分类树")
 public class KbCategoryTreeVO {
     private Long id;
     private Long parentId;

@@ -5,9 +5,9 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-@Schema(description = "Role update request")
+@Schema(description = "角色更新请求")
 public class RoleUpdateDTO {
-    @NotBlank(message = "name is required")
-    @Schema(description = "Role name", example = "Expert")
+    @NotBlank(message = "名称不能为空")
+    @Schema(description = "角色名称", example = "Expert")
     private String name;
 }

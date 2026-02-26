@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.community.mapper.SearchQueryLogMapper">
+  <select id="selectHotQueries" resultType="com.community.vo.AppSearchHotVO">
+    SELECT
+      query_text AS queryText,
+      COUNT(1) AS hitCount
+    FROM search_query_log
+    WHERE query_text IS NOT NULL AND query_text &lt;&gt; ''
+    GROUP BY query_text
+    ORDER BY COUNT(1) DESC, MAX(created_at) DESC
+    LIMIT #{limit}
+  </select>
+
+  <select id="selectHistory" resultType="com.community.vo.AppSearchHistoryVO">
+    SELECT
+      query_text AS queryText,
+      MAX(created_at) AS lastTime
+    FROM search_query_log
+    WHERE user_id = #{userId}
+      AND query_text IS NOT NULL AND query_text &lt;&gt; ''
+    GROUP BY query_text
+    ORDER BY MAX(created_at) DESC
+    LIMIT #{limit}
+  </select>
+
+  <delete id="deleteByUserId">
+    DELETE FROM search_query_log WHERE user_id = #{userId}
+  </delete>
+</mapper>

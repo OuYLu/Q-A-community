@@ -5,16 +5,16 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-@Schema(description = "Role create request")
+@Schema(description = "角色创建请求")
 public class RoleCreateDTO {
-    @NotBlank(message = "code is required")
-    @Schema(description = "Role code", example = "expert")
+    @NotBlank(message = "编码不能为空")
+    @Schema(description = "角色编码", example = "expert")
     private String code;
 
-    @NotBlank(message = "name is required")
-    @Schema(description = "Role name", example = "Expert")
+    @NotBlank(message = "名称不能为空")
+    @Schema(description = "角色名称", example = "Expert")
     private String name;
 
-    @Schema(description = "Role description")
+    @Schema(description = "角色描述")
     private String description;
 }

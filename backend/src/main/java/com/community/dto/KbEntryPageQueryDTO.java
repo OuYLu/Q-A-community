@@ -7,7 +7,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
 
 @Data
-@Schema(description = "KB entry page query")
+@Schema(description = "知识库条目分页查询")
 public class KbEntryPageQueryDTO {
     private String keyword;
     private Integer status;

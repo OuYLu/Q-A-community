@@ -29,46 +29,46 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor
-@Tag(name = "Admin Category")
+@Tag(name = "后台分类管理")
 public class AdminCategoryController {
     private final QaCategoryAdminService qaCategoryAdminService;
 
     @GetMapping("/category/list")
-    @Operation(summary = "Category list", description = "Operation category management")
+    @Operation(summary = "分类列表", description = "分类管理操作")
     public Result<PageInfo<CategoryListVO>> list(@ModelAttribute QaCategoryQueryDTO query) {
         return Result.success(qaCategoryAdminService.list(query));
     }
 
     @GetMapping("/category/tree")
-    @Operation(summary = "Category tree lazy list", description = "Lazy load category tree by parent id")
+    @Operation(summary = "分类树懒加载列表", description = "按父级ID懒加载分类树")
     public Result<List<CategoryTreeVO>> tree(@RequestParam(required = false) Long parentId) {
         return Result.success(qaCategoryAdminService.listTreeLazy(parentId));
     }
 
     @PostMapping("/category")
     @PreAuthorize("hasAuthority('op:category:manage')")
-    @Operation(summary = "Create category", description = "Operation category management")
+    @Operation(summary = "创建分类", description = "分类管理操作")
     public Result<QaCategory> create(@Valid @RequestBody QaCategorySaveDTO dto) {
         return Result.success(qaCategoryAdminService.create(dto));
     }
 
     @GetMapping("/category/{id}")
     @PreAuthorize("hasAuthority('op:category:manage')")
-    @Operation(summary = "Category detail", description = "Operation category management")
+    @Operation(summary = "分类详情", description = "分类管理操作")
     public Result<QaCategory> get(@PathVariable Long id) {
         return Result.success(qaCategoryAdminService.getById(id));
     }
 
     @PutMapping("/category/{id}")
     @PreAuthorize("hasAuthority('op:category:manage')")
-    @Operation(summary = "Update category", description = "Operation category management")
+    @Operation(summary = "更新分类", description = "分类管理操作")
     public Result<QaCategory> update(@PathVariable Long id, @Valid @RequestBody QaCategorySaveDTO dto) {
         return Result.success(qaCategoryAdminService.update(id, dto));
     }
 
     @DeleteMapping("/category/{id}")
     @PreAuthorize("hasAuthority('op:category:manage')")
-    @Operation(summary = "Delete category", description = "Operation category management")
+    @Operation(summary = "删除分类", description = "分类管理操作")
     public Result<Void> delete(@PathVariable Long id) {
         qaCategoryAdminService.delete(id);
         return Result.success(null);

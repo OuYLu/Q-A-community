@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-@Schema(description = "QA topic categories update")
+@Schema(description = "问答话题分类更新")
 public class QaTopicCategoryUpdateDTO {
     private List<Long> categoryIds;
 }

@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 @Data
-@Schema(description = "Topic question page query")
+@Schema(description = "话题问题分页查询")
 public class QaTopicQuestionPageQueryDTO {
     private Integer status;
     private String title;

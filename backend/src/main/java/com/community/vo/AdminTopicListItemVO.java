@@ -6,7 +6,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-@Schema(description = "Admin topic list item")
+@Schema(description = "后台话题列表项")
 public class AdminTopicListItemVO {
     private Long id;
     private String title;

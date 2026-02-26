@@ -5,16 +5,16 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-@Schema(description = "Expert apply review request")
+@Schema(description = "专家申请审核请求")
 public class ExpertReviewDTO {
-    @NotNull(message = "applyId is required")
-    @Schema(description = "Application id")
+    @NotNull(message = "申请编号不能为空")
+    @Schema(description = "申请编号")
     private Long applyId;
 
-    @NotNull(message = "status is required")
-    @Schema(description = "Review result: 2-pass, 3-reject", example = "2")
+    @NotNull(message = "状态不能为空")
+    @Schema(description = "审核结果：2-通过，3-驳回", example = "2")
     private Integer status;
 
-    @Schema(description = "Reject reason (required when status=3)")
+    @Schema(description = "驳回原因（状态为3时必填）")
     private String rejectReason;
 }

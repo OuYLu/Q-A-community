@@ -70,7 +70,7 @@ public class CmsReportAdminServiceImpl implements CmsReportAdminService {
     public CmsReportDetailVO detail(Long id) {
         CmsReportDetailRowVO row = cmsReportMapper.selectAdminReportDetail(id);
         if (row == null) {
-            throw new BizException(ResultCode.BAD_REQUEST, "report not found");
+            throw new BizException(ResultCode.BAD_REQUEST, "举报记录不存在");
         }
         CmsReportDetailVO vo = new CmsReportDetailVO();
         CmsReport report = new CmsReport();
@@ -114,7 +114,7 @@ public class CmsReportAdminServiceImpl implements CmsReportAdminService {
     public void handle(Long id, CmsReportHandleDTO dto) {
         CmsReport report = getReportOrThrow(id);
         if (report.getStatus() == null || report.getStatus() != 1) {
-            throw new BizException(ResultCode.BAD_REQUEST, "only pending report can be handled");
+            throw new BizException(ResultCode.BAD_REQUEST, "仅待处理举报可处理");
         }
         Integer action = dto.getHandleAction();
         Long operatorId = currentUserId();
@@ -137,14 +137,14 @@ public class CmsReportAdminServiceImpl implements CmsReportAdminService {
                 Long authorId = resolveContentAuthorId(report.getBizType(), report.getBizId());
                 User author = userMapper.selectById(authorId);
                 if (author == null) {
-                    throw new BizException(ResultCode.BAD_REQUEST, "target author not found");
+                    throw new BizException(ResultCode.BAD_REQUEST, "目标作者不存在");
                 }
                 author.setStatus(0);
                 userMapper.updateById(author);
                 report.setStatus(2);
             }
             case 4 -> report.setStatus(3);
-            default -> throw new BizException(ResultCode.BAD_REQUEST, "unsupported handleAction");
+            default -> throw new BizException(ResultCode.BAD_REQUEST, "不支持的处理动作");
         }
         cmsReportMapper.updateById(report);
     }
@@ -176,7 +176,7 @@ public class CmsReportAdminServiceImpl implements CmsReportAdminService {
     private CmsReport getReportOrThrow(Long id) {
         CmsReport report = cmsReportMapper.selectById(id);
         if (report == null) {
-            throw new BizException(ResultCode.BAD_REQUEST, "report not found");
+            throw new BizException(ResultCode.BAD_REQUEST, "举报记录不存在");
         }
         return report;
     }
@@ -186,7 +186,7 @@ public class CmsReportAdminServiceImpl implements CmsReportAdminService {
             case 1 -> {
                 QaQuestion q = qaQuestionMapper.selectById(bizId);
                 if (q == null) {
-                    throw new BizException(ResultCode.BAD_REQUEST, "target question not found");
+                    throw new BizException(ResultCode.BAD_REQUEST, "目标问题不存在");
                 }
                 q.setStatus(status);
                 qaQuestionMapper.updateById(q);
@@ -194,7 +194,7 @@ public class CmsReportAdminServiceImpl implements CmsReportAdminService {
             case 2 -> {
                 QaAnswer a = qaAnswerMapper.selectById(bizId);
                 if (a == null) {
-                    throw new BizException(ResultCode.BAD_REQUEST, "target answer not found");
+                    throw new BizException(ResultCode.BAD_REQUEST, "目标回答不存在");
                 }
                 a.setStatus(status);
                 qaAnswerMapper.updateById(a);
@@ -202,7 +202,7 @@ public class CmsReportAdminServiceImpl implements CmsReportAdminService {
             case 3 -> {
                 QaComment c = qaCommentMapper.selectById(bizId);
                 if (c == null) {
-                    throw new BizException(ResultCode.BAD_REQUEST, "target comment not found");
+                    throw new BizException(ResultCode.BAD_REQUEST, "目标评论不存在");
                 }
                 c.setStatus(status);
                 qaCommentMapper.updateById(c);
@@ -210,12 +210,12 @@ public class CmsReportAdminServiceImpl implements CmsReportAdminService {
             case 4 -> {
                 KbEntry e = kbEntryMapper.selectById(bizId);
                 if (e == null) {
-                    throw new BizException(ResultCode.BAD_REQUEST, "target kb entry not found");
+                    throw new BizException(ResultCode.BAD_REQUEST, "目标知识库条目不存在");
                 }
                 e.setStatus(status);
                 kbEntryMapper.updateById(e);
             }
-            default -> throw new BizException(ResultCode.BAD_REQUEST, "unsupported bizType");
+            default -> throw new BizException(ResultCode.BAD_REQUEST, "不支持的业务类型");
         }
     }
 
@@ -224,32 +224,32 @@ public class CmsReportAdminServiceImpl implements CmsReportAdminService {
             case 1 -> {
                 QaQuestion q = qaQuestionMapper.selectById(bizId);
                 if (q == null) {
-                    throw new BizException(ResultCode.BAD_REQUEST, "target question not found");
+                    throw new BizException(ResultCode.BAD_REQUEST, "目标问题不存在");
                 }
                 yield q.getUserId();
             }
             case 2 -> {
                 QaAnswer a = qaAnswerMapper.selectById(bizId);
                 if (a == null) {
-                    throw new BizException(ResultCode.BAD_REQUEST, "target answer not found");
+                    throw new BizException(ResultCode.BAD_REQUEST, "目标回答不存在");
                 }
                 yield a.getUserId();
             }
             case 3 -> {
                 QaComment c = qaCommentMapper.selectById(bizId);
                 if (c == null) {
-                    throw new BizException(ResultCode.BAD_REQUEST, "target comment not found");
+                    throw new BizException(ResultCode.BAD_REQUEST, "目标评论不存在");
                 }
                 yield c.getUserId();
             }
             case 4 -> {
                 KbEntry e = kbEntryMapper.selectById(bizId);
                 if (e == null) {
-                    throw new BizException(ResultCode.BAD_REQUEST, "target kb entry not found");
+                    throw new BizException(ResultCode.BAD_REQUEST, "目标知识库条目不存在");
                 }
                 yield e.getAuthorUserId();
             }
-            default -> throw new BizException(ResultCode.BAD_REQUEST, "unsupported bizType");
+            default -> throw new BizException(ResultCode.BAD_REQUEST, "不支持的业务类型");
         };
     }
 

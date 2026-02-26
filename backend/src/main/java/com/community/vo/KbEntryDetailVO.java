@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-@Schema(description = "KB entry detail")
+@Schema(description = "知识库条目详情")
 public class KbEntryDetailVO {
     private Long id;
     private Long categoryId;

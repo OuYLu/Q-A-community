@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.community.mapper.QaQuestionTagMapper">
+  <select id="selectTagNamesByQuestionId" resultType="string">
+    SELECT t.name
+    FROM qa_question_tag qt
+    JOIN qa_tag t ON t.id = qt.tag_id
+    WHERE qt.question_id = #{questionId}
+    ORDER BY t.id ASC
+  </select>
+</mapper>

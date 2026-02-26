@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-@Schema(description = "Admin topic detail")
+@Schema(description = "后台话题详情")
 public class AdminTopicDetailVO {
     private Long id;
     private String title;

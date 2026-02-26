@@ -7,27 +7,27 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-@Schema(description = "QA category save")
+@Schema(description = "问答分类保存")
 public class QaCategorySaveDTO {
-    @NotBlank(message = "name is required")
-    @Schema(description = "Category name")
+    @NotBlank(message = "名称不能为空")
+    @Schema(description = "分类名称")
     private String name;
 
-    @Schema(description = "Parent category id")
+    @Schema(description = "父分类编号")
     private Long parentId;
 
-    @Schema(description = "Category icon url")
+    @Schema(description = "分类图标链接")
     private String icon;
 
-    @Schema(description = "Category description")
+    @Schema(description = "分类描述")
     private String description;
 
-    @Min(value = 0, message = "status must be 0 or 1")
-    @Max(value = 1, message = "status must be 0 or 1")
-    @Schema(description = "Status, 1 enabled, 0 disabled")
+    @Min(value = 0, message = "状态必须为0或1")
+    @Max(value = 1, message = "状态必须为0或1")
+    @Schema(description = "状态，1启用，0禁用")
     private Integer status;
 
-    @Min(value = 0, message = "sort must be >= 0")
-    @Schema(description = "Sort order")
+    @Min(value = 0, message = "排序值必须大于等于0")
+    @Schema(description = "排序顺序")
     private Integer sort;
 }

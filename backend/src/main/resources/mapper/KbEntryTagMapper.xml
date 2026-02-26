@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.community.mapper.KbEntryTagMapper">
+  <select id="selectTagsByEntryId" resultType="com.community.vo.KbTagSimpleVO">
+    SELECT t.id, t.name
+    FROM kb_entry_tag ket
+    JOIN qa_tag t ON t.id = ket.tag_id
+    WHERE ket.entry_id = #{entryId}
+    ORDER BY t.id ASC
+  </select>
+</mapper>

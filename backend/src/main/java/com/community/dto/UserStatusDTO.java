@@ -5,9 +5,9 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-@Schema(description = "User status update request")
+@Schema(description = "用户状态更新请求")
 public class UserStatusDTO {
-    @NotNull(message = "status is required")
-    @Schema(description = "Status: 1-enabled, 0-disabled", example = "1")
+    @NotNull(message = "状态不能为空")
+    @Schema(description = "状态：1-启用，0-禁用", example = "1")
     private Integer status;
 }

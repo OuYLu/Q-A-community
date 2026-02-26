@@ -15,12 +15,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor
-@Tag(name = "Admin Menu")
+@Tag(name = "后台菜单管理")
 public class AdminMenuController {
     private final MenuService menuService;
 
     @GetMapping("/menu/list")
-    @Operation(summary = "Admin menu list", description = "Dynamic menu list for current user")
+    @Operation(summary = "后台菜单列表", description = "当前用户动态菜单列表")
     public Result<List<AdminMenuVO>> listMenus() {
         return Result.success(menuService.listCurrentUserMenus());
     }

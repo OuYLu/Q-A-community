@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.community.mapper.QaQuestionMapper">
+  <select id="selectAppHotQuestions" resultType="com.community.vo.AppQuestionHotItemVO">
+    SELECT
+      q.id,
+      q.title,
+      q.view_count AS viewCount,
+      q.answer_count AS answerCount,
+      q.like_count AS likeCount,
+      q.user_id AS authorId,
+      u.nickname AS authorName,
+      u.avatar AS authorAvatar,
+      q.created_at AS createdAt
+    FROM qa_question q
+    LEFT JOIN user u ON u.id = q.user_id
+    WHERE q.delete_flag = 0
+      AND q.status = 1
+    ORDER BY q.view_count DESC, q.answer_count DESC, q.like_count DESC, q.created_at DESC
+    LIMIT #{limit}
+  </select>
+
+  <select id="selectAppTopicQuestions" resultType="com.community.vo.AppTopicQuestionItemVO">
+    SELECT
+      q.id,
+      q.title,
+      q.view_count AS viewCount,
+      q.answer_count AS answerCount,
+      q.like_count AS likeCount,
+      q.user_id AS authorId,
+      u.nickname AS authorName,
+      u.avatar AS authorAvatar,
+      q.created_at AS createdAt
+    FROM qa_question q
+    LEFT JOIN user u ON u.id = q.user_id
+    WHERE q.delete_flag = 0
+      AND q.status = 1
+      AND q.topic_id = #{topicId}
+    <if test="onlyUnsolved">
+      AND q.answer_count = 0
+    </if>
+    ORDER BY
+      <choose>
+        <when test="sortBy == 'latest'">q.created_at</when>
+        <otherwise>q.view_count</otherwise>
+      </choose> DESC,
+      q.answer_count DESC,
+      q.like_count DESC,
+      q.id DESC
+  </select>
+
+  <select id="selectAppSearchQuestions" resultType="com.community.vo.AppSearchQuestionVO">
+    SELECT
+      q.id,
+      q.title,
+      SUBSTRING(q.content, 1, 120) AS summary,
+      q.answer_count AS answerCount,
+      q.view_count AS viewCount,
+      q.like_count AS likeCount,
+      q.created_at AS createdAt
+    FROM qa_question q
+    WHERE q.delete_flag = 0
+      AND q.status = 1
+      AND (q.title LIKE CONCAT('%', #{query}, '%')
+        OR q.content LIKE CONCAT('%', #{query}, '%'))
+    ORDER BY q.created_at DESC, q.id DESC
+    LIMIT #{limit} OFFSET #{offset}
+  </select>
+
+  <select id="selectMyQuestions" resultType="com.community.vo.AppMyQuestionItemVO">
+    SELECT
+      q.id,
+      q.title,
+      c.name AS categoryName,
+      q.image_urls AS imageUrlsRaw,
+      q.status,
+      q.answer_count AS answerCount,
+      q.like_count AS likeCount,
+      q.view_count AS viewCount,
+      q.accepted_answer_id AS acceptedAnswerId,
+      q.created_at AS createdAt
+    FROM qa_question q
+    LEFT JOIN qa_category c ON c.id = q.category_id
+    WHERE q.user_id = #{userId}
+      AND q.delete_flag = 0
+    ORDER BY q.created_at DESC, q.id DESC
+  </select>
+
+  <select id="selectAppQuestionPage" resultType="com.community.vo.AppQuestionListItemVO">
+    SELECT
+      q.id,
+      q.title,
+      LEFT(COALESCE(q.content, ''), 120) AS summary,
+      q.image_urls AS imageUrlsRaw,
+      q.category_id AS categoryId,
+      c.name AS categoryName,
+      q.topic_id AS topicId,
+      t.title AS topicTitle,
+      q.user_id AS authorId,
+      u.nickname AS authorName,
+      u.avatar AS authorAvatar,
+      q.view_count AS viewCount,
+      q.answer_count AS answerCount,
+      q.like_count AS likeCount,
+      q.favorite_count AS favoriteCount,
+      q.created_at AS createdAt,
+      q.last_active_at AS lastActiveAt
+    FROM qa_question q
+    LEFT JOIN qa_category c ON c.id = q.category_id
+    LEFT JOIN qa_topic t ON t.id = q.topic_id
+    LEFT JOIN user u ON u.id = q.user_id
+    WHERE q.delete_flag = 0
+      AND q.status = 1
+    <if test="keyword != null and keyword != ''">
+      AND (q.title LIKE CONCAT('%', #{keyword}, '%')
+        OR q.content LIKE CONCAT('%', #{keyword}, '%'))
+    </if>
+    <if test="categoryId != null">
+      AND q.category_id = #{categoryId}
+    </if>
+    <if test="topicId != null">
+      AND q.topic_id = #{topicId}
+    </if>
+    <if test="onlyUnsolved != null and onlyUnsolved">
+      AND q.answer_count = 0
+    </if>
+    ORDER BY
+    <choose>
+      <when test="sortBy == 'latest'">q.created_at DESC, q.id DESC</when>
+      <otherwise>q.view_count DESC, q.answer_count DESC, q.like_count DESC, q.id DESC</otherwise>
+    </choose>
+  </select>
+
+  <select id="selectAppQuestionDetail" resultType="com.community.vo.AppQuestionDetailVO">
+    SELECT
+      q.id,
+      q.title,
+      q.content,
+      q.image_urls AS imageUrlsRaw,
+      q.category_id AS categoryId,
+      c.name AS categoryName,
+      q.topic_id AS topicId,
+      t.title AS topicTitle,
+      q.user_id AS authorId,
+      u.nickname AS authorName,
+      u.avatar AS authorAvatar,
+      q.view_count AS viewCount,
+      q.answer_count AS answerCount,
+      q.like_count AS likeCount,
+      q.favorite_count AS favoriteCount,
+      q.created_at AS createdAt,
+      q.last_active_at AS lastActiveAt
+    FROM qa_question q
+    LEFT JOIN qa_category c ON c.id = q.category_id
+    LEFT JOIN qa_topic t ON t.id = q.topic_id
+    LEFT JOIN user u ON u.id = q.user_id
+    WHERE q.id = #{id}
+      AND q.delete_flag = 0
+    LIMIT 1
+  </select>
+
+  <update id="incrementViewCount">
+    UPDATE qa_question
+    SET view_count = view_count + 1
+    WHERE id = #{id}
+      AND delete_flag = 0
+  </update>
+
+  <update id="updateAnswerCount">
+    UPDATE qa_question
+    SET answer_count = CASE
+      WHEN answer_count + #{delta} &lt; 0 THEN 0
+      ELSE answer_count + #{delta}
+    END
+    WHERE id = #{id}
+      AND delete_flag = 0
+  </update>
+</mapper>

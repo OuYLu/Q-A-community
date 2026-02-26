@@ -7,10 +7,10 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-@Schema(description = "QA topic status update")
+@Schema(description = "问答话题状态更新")
 public class QaTopicStatusUpdateDTO {
-    @NotNull(message = "status is required")
-    @Min(value = 1, message = "status must be between 1 and 4")
-    @Max(value = 4, message = "status must be between 1 and 4")
+    @NotNull(message = "状态不能为空")
+    @Min(value = 1, message = "状态必须在1到4之间")
+    @Max(value = 4, message = "状态必须在1到4之间")
     private Integer status;
 }

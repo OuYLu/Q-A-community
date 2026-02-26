@@ -8,10 +8,10 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-@Schema(description = "QA tag batch status update")
+@Schema(description = "问答标签批量状态更新")
 public class QaTagBatchStatusDTO {
-    @NotNull(message = "ids is required")
-    @NotEmpty(message = "ids cannot be empty")
-    @Schema(description = "Tag ids")
+    @NotNull(message = "编号列表不能为空")
+    @NotEmpty(message = "编号列表不能为空")
+    @Schema(description = "标签编号列表")
     private List<Long> ids;
 }

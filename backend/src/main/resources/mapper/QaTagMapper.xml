@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.community.mapper.QaTagMapper">
+  <select id="selectRecentQuestions" resultType="com.community.vo.TagRecentQuestionVO">
+    SELECT
+      q.id,
+      q.title,
+      q.status,
+      q.created_at AS createdAt
+    FROM qa_question_tag qt
+    JOIN qa_question q ON q.id = qt.question_id
+    WHERE qt.tag_id = #{tagId}
+      AND q.delete_flag = 0
+    ORDER BY q.created_at DESC, q.id DESC
+    LIMIT 10
+  </select>
+
+  <select id="selectUsageTrend" resultType="com.community.vo.TagUsageTrendPointVO">
+    WITH RECURSIVE date_series AS (
+      SELECT DATE_SUB(CURDATE(), INTERVAL #{daysMinusOne} DAY) AS d
+      UNION ALL
+      SELECT DATE_ADD(d, INTERVAL 1 DAY)
+      FROM date_series
+      WHERE d &lt; CURDATE()
+    ),
+    ref_stat AS (
+      SELECT DATE(qt.created_at) AS d, COUNT(1) AS ref_count
+      FROM qa_question_tag qt
+      JOIN qa_question q ON q.id = qt.question_id
+      WHERE qt.tag_id = #{tagId}
+        AND q.delete_flag = 0
+        AND qt.created_at &gt;= DATE_SUB(CURDATE(), INTERVAL #{daysMinusOne} DAY)
+        AND qt.created_at &lt; DATE_ADD(CURDATE(), INTERVAL 1 DAY)
+      GROUP BY DATE(qt.created_at)
+    )
+    SELECT
+      DATE_FORMAT(ds.d, '%Y-%m-%d') AS statDate,
+      COALESCE(rs.ref_count, 0) AS refCount
+    FROM date_series ds
+    LEFT JOIN ref_stat rs ON rs.d = ds.d
+    ORDER BY ds.d ASC
+  </select>
+
+  <select id="selectAppSearchTags" resultType="com.community.vo.AppSearchTagVO">
+    SELECT
+      t.id,
+      t.name,
+      t.use_count AS useCount
+    FROM qa_tag t
+    WHERE t.status = 1
+      AND t.name LIKE CONCAT('%', #{query}, '%')
+    ORDER BY t.use_count DESC, t.id DESC
+    LIMIT #{limit}
+  </select>
+</mapper>

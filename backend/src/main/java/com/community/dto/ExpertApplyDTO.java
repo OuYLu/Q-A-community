@@ -10,76 +10,76 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-@Schema(description = "Expert certification apply request")
+@Schema(description = "专家认证申请请求")
 public class ExpertApplyDTO {
-    @NotBlank(message = "realName is required")
-    @Schema(description = "Real name", example = "Li Hua")
+    @NotBlank(message = "真实姓名不能为空")
+    @Schema(description = "真实姓名", example = "Li Hua")
     private String realName;
 
-    @Schema(description = "Organization", example = "City Hospital")
+    @Schema(description = "机构", example = "City Hospital")
     private String organization;
 
-    @Schema(description = "Title", example = "Chief Physician")
+    @Schema(description = "职称", example = "Chief Physician")
     private String title;
 
-    @NotBlank(message = "expertise is required")
-    @Schema(description = "Expertise", example = "Cardiology")
+    @NotBlank(message = "擅长领域不能为空")
+    @Schema(description = "擅长领域", example = "Cardiology")
     private String expertise;
 
-    @NotNull(message = "proofUrls is required")
+    @NotNull(message = "证明材料不能为空")
     @Valid
-    @Schema(description = "Proof materials grouped by type")
+    @Schema(description = "按类型分组的证明材料")
     private ProofMaterialsDTO proofUrls;
 
     @Data
-    @Schema(description = "Proof materials groups")
+    @Schema(description = "证明材料分组")
     public static class ProofMaterialsDTO {
-        @NotNull(message = "LICENSE is required")
+        @NotNull(message = "执业资质材料不能为空")
         @Valid
-        @Schema(description = "LICENSE materials")
+        @Schema(description = "执业资质材料")
         @com.fasterxml.jackson.annotation.JsonProperty("LICENSE")
         private List<ProofFileDTO> license;
 
-        @NotNull(message = "EMPLOYMENT is required")
+        @NotNull(message = "在职证明材料不能为空")
         @Valid
-        @Schema(description = "EMPLOYMENT materials")
+        @Schema(description = "在职证明材料")
         @com.fasterxml.jackson.annotation.JsonProperty("EMPLOYMENT")
         private List<ProofFileDTO> employment;
 
         @Valid
-        @Schema(description = "TITLE materials")
+        @Schema(description = "职称材料")
         @com.fasterxml.jackson.annotation.JsonProperty("TITLE")
         private List<ProofFileDTO> title;
 
         @Valid
-        @Schema(description = "EDUCATION materials")
+        @Schema(description = "教育材料")
         @com.fasterxml.jackson.annotation.JsonProperty("EDUCATION")
         private List<ProofFileDTO> education;
 
         @Valid
-        @Schema(description = "OTHER materials")
+        @Schema(description = "其他材料")
         @com.fasterxml.jackson.annotation.JsonProperty("OTHER")
         private List<ProofFileDTO> other;
     }
 
     @Data
-    @Schema(description = "Single proof file item")
+    @Schema(description = "单个证明文件项")
     public static class ProofFileDTO {
-        @NotBlank(message = "url is required")
-        @Schema(description = "File URL", example = "https://xx/1.jpg")
+        @NotBlank(message = "URL不能为空")
+        @Schema(description = "文件链接", example = "https://xx/1.jpg")
         private String url;
 
-        @NotBlank(message = "name is required")
-        @Schema(description = "Original file name", example = "执业证.jpg")
+        @NotBlank(message = "名称不能为空")
+        @Schema(description = "原始文件名", example = "执业证.jpg")
         private String name;
 
-        @NotNull(message = "size is required")
+        @NotNull(message = "大小不能为空")
         @PositiveOrZero(message = "size must be >= 0")
-        @Schema(description = "File size", example = "123456")
+        @Schema(description = "文件大小", example = "123456")
         private Long size;
 
-        @NotBlank(message = "mime is required")
-        @Schema(description = "MIME type", example = "image/jpeg")
+        @NotBlank(message = "MIME类型不能为空")
+        @Schema(description = "媒体类型", example = "image/jpeg")
         private String mime;
     }
 }

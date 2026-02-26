@@ -122,7 +122,7 @@ public class QaCategoryAdminServiceImpl extends ServiceImpl<QaCategoryMapper, Qa
             .eq(QaCategory::getParentId, id)
             .eq(QaCategory::getDeleteFlag, 0));
         if (childCount > 0) {
-            throw new BizException(ResultCode.BAD_REQUEST, "category has child categories, cannot delete");
+            throw new BizException(ResultCode.BAD_REQUEST, "分类存在子分类，不能删除");
         }
 
         long questionRefs = baseMapper.countQuestionRefs(id);
@@ -144,7 +144,7 @@ public class QaCategoryAdminServiceImpl extends ServiceImpl<QaCategoryMapper, Qa
     public QaCategory getById(Long id) {
         QaCategory category = super.getById(id);
         if (category == null || Integer.valueOf(1).equals(category.getDeleteFlag())) {
-            throw new BizException(ResultCode.BAD_REQUEST, "category not found");
+            throw new BizException(ResultCode.BAD_REQUEST, "分类不存在");
         }
         return category;
     }
@@ -154,11 +154,11 @@ public class QaCategoryAdminServiceImpl extends ServiceImpl<QaCategoryMapper, Qa
             return;
         }
         if (selfId != null && selfId.equals(parentId)) {
-            throw new BizException(ResultCode.BAD_REQUEST, "parent category cannot be itself");
+            throw new BizException(ResultCode.BAD_REQUEST, "父分类不能是自己");
         }
         QaCategory parent = super.getById(parentId);
         if (parent == null || Integer.valueOf(1).equals(parent.getDeleteFlag())) {
-            throw new BizException(ResultCode.BAD_REQUEST, "parent category not found");
+            throw new BizException(ResultCode.BAD_REQUEST, "父分类不存在");
         }
     }
 
@@ -177,7 +177,7 @@ public class QaCategoryAdminServiceImpl extends ServiceImpl<QaCategoryMapper, Qa
         }
         QaCategory exist = this.getOne(wrapper.last("LIMIT 1"));
         if (exist != null) {
-            throw new BizException(ResultCode.BAD_REQUEST, "category name already exists under same parent");
+            throw new BizException(ResultCode.BAD_REQUEST, "同级下分类名称已存在");
         }
     }
 }

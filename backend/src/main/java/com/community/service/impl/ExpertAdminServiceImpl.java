@@ -165,7 +165,7 @@ public class ExpertAdminServiceImpl extends ServiceImpl<ExpertApplyMapper, Exper
             .orderByDesc(ExpertApply::getCreatedAt)
             .last("LIMIT 1"));
         if (apply == null) {
-            throw new BizException(ResultCode.BAD_REQUEST, "Expert apply detail not found");
+            throw new BizException(ResultCode.BAD_REQUEST, "专家申请详情不存在");
         }
 
         ExpertApplyDetailVO vo = new ExpertApplyDetailVO();

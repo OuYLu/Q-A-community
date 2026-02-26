@@ -4,17 +4,17 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 @Data
-@Schema(description = "User update request")
+@Schema(description = "用户更新请求")
 public class UserUpdateDTO {
-    @Schema(description = "Nickname")
+    @Schema(description = "昵称")
     private String nickname;
 
-    @Schema(description = "Phone")
+    @Schema(description = "手机号")
     private String phone;
 
-    @Schema(description = "Email")
+    @Schema(description = "邮箱")
     private String email;
 
-    @Schema(description = "Avatar")
+    @Schema(description = "头像")
     private String avatar;
 }

@@ -5,10 +5,10 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-@Schema(description = "CMS audit review")
+@Schema(description = "内容审核处理")
 public class CmsAuditReviewDTO {
-    @NotBlank(message = "action is required")
-    @Schema(description = "pass/reject")
+    @NotBlank(message = "操作不能为空")
+    @Schema(description = "通过/驳回")
     private String action;
 
     private String rejectReason;

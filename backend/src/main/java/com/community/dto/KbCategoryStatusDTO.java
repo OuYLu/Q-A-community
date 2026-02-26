@@ -7,10 +7,10 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-@Schema(description = "KB category status update")
+@Schema(description = "知识库分类状态更新请求")
 public class KbCategoryStatusDTO {
-    @NotNull(message = "status is required")
-    @Min(value = 0, message = "status must be 0 or 1")
-    @Max(value = 1, message = "status must be 0 or 1")
+    @NotNull(message = "状态不能为空")
+    @Min(value = 0, message = "状态必须为0或1")
+    @Max(value = 1, message = "状态必须为0或1")
     private Integer status;
 }

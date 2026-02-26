@@ -31,27 +31,27 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/admin/kb")
 @RequiredArgsConstructor
-@Tag(name = "Admin KB")
+@Tag(name = "后台知识库管理")
 public class AdminKbController {
     private final KbAdminService kbAdminService;
 
     @GetMapping("/category/tree")
     @PreAuthorize("hasAuthority('op:kb:manage')")
-    @Operation(summary = "KB category tree")
+    @Operation(summary = "知识库分类树")
     public Result<List<KbCategoryTreeVO>> categoryTree() {
         return Result.success(kbAdminService.categoryTree());
     }
 
     @PostMapping("/category")
     @PreAuthorize("hasAuthority('op:kb:manage')")
-    @Operation(summary = "Create KB category")
+    @Operation(summary = "创建知识库分类")
     public Result<Map<String, Long>> createCategory(@Valid @RequestBody KbCategorySaveDTO dto) {
         return Result.success(Map.of("id", kbAdminService.createCategory(dto)));
     }
 
     @PutMapping("/category/{id}")
     @PreAuthorize("hasAuthority('op:kb:manage')")
-    @Operation(summary = "Update KB category")
+    @Operation(summary = "更新知识库分类")
     public Result<Void> updateCategory(@PathVariable Long id, @Valid @RequestBody KbCategorySaveDTO dto) {
         kbAdminService.updateCategory(id, dto);
         return Result.success(null);
@@ -59,7 +59,7 @@ public class AdminKbController {
 
     @PutMapping("/category/{id}/status")
     @PreAuthorize("hasAuthority('op:kb:manage')")
-    @Operation(summary = "Update KB category status")
+    @Operation(summary = "更新知识库分类状态")
     public Result<Void> updateCategoryStatus(@PathVariable Long id, @Valid @RequestBody KbCategoryStatusDTO dto) {
         kbAdminService.updateCategoryStatus(id, dto);
         return Result.success(null);
@@ -67,28 +67,28 @@ public class AdminKbController {
 
     @GetMapping("/entry/page")
     @PreAuthorize("hasAuthority('op:kb:manage')")
-    @Operation(summary = "KB entry page")
+    @Operation(summary = "知识库条目分页")
     public Result<PageInfo<KbEntryPageItemVO>> entryPage(@ModelAttribute KbEntryPageQueryDTO query) {
         return Result.success(kbAdminService.entryPage(query));
     }
 
     @GetMapping("/entry/{id}")
     @PreAuthorize("hasAuthority('op:kb:manage')")
-    @Operation(summary = "KB entry detail")
+    @Operation(summary = "知识库条目详情")
     public Result<KbEntryDetailVO> entryDetail(@PathVariable Long id) {
         return Result.success(kbAdminService.entryDetail(id));
     }
 
     @PostMapping("/entry")
     @PreAuthorize("hasAuthority('op:kb:manage')")
-    @Operation(summary = "Create KB entry")
+    @Operation(summary = "创建知识库条目")
     public Result<Map<String, Long>> createEntry(@Valid @RequestBody KbEntrySaveDTO dto) {
         return Result.success(Map.of("id", kbAdminService.createEntry(dto)));
     }
 
     @PutMapping("/entry/{id}")
     @PreAuthorize("hasAuthority('op:kb:manage')")
-    @Operation(summary = "Update KB entry")
+    @Operation(summary = "更新知识库条目")
     public Result<Void> updateEntry(@PathVariable Long id, @Valid @RequestBody KbEntrySaveDTO dto) {
         kbAdminService.updateEntry(id, dto);
         return Result.success(null);
@@ -96,7 +96,7 @@ public class AdminKbController {
 
     @PutMapping("/entry/{id}/status")
     @PreAuthorize("hasAuthority('op:kb:manage')")
-    @Operation(summary = "Update KB entry status")
+    @Operation(summary = "更新知识库条目状态")
     public Result<Void> updateEntryStatus(@PathVariable Long id, @Valid @RequestBody KbEntryStatusDTO dto) {
         kbAdminService.updateEntryStatus(id, dto);
         return Result.success(null);

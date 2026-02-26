@@ -45,16 +45,16 @@ public class ExpertUserServiceImpl extends ServiceImpl<UserMapper, User> impleme
     public void updateExpertStatus(Long userId, ExpertStatusUpdateDTO dto) {
         User user = this.getById(userId);
         if (user == null) {
-            throw new BizException(ResultCode.BAD_REQUEST, "User not found");
+            throw new BizException(ResultCode.BAD_REQUEST, "用户不存在");
         }
 
         Integer status = dto == null ? null : dto.getExpertStatus();
         if (status == null || (status != 0 && status != 3)) {
-            throw new BizException(ResultCode.BAD_REQUEST, "Invalid expert status");
+            throw new BizException(ResultCode.BAD_REQUEST, "专家状态不合法");
         }
 
         if (user.getExpertStatus() == null || (user.getExpertStatus() != 3 && user.getExpertStatus() != 0)) {
-            throw new BizException(ResultCode.BAD_REQUEST, "User is not a certified expert");
+            throw new BizException(ResultCode.BAD_REQUEST, "该用户不是认证专家");
         }
 
         user.setExpertStatus(status);
@@ -66,7 +66,7 @@ public class ExpertUserServiceImpl extends ServiceImpl<UserMapper, User> impleme
     public ExpertManageVO getExpertDetail(Long userId) {
         ExpertManageVO vo = expertProfileMapper.selectExpertManageByUserId(userId);
         if (vo == null) {
-            throw new BizException(ResultCode.BAD_REQUEST, "Expert not found");
+            throw new BizException(ResultCode.BAD_REQUEST, "专家不存在");
         }
         return vo;
     }

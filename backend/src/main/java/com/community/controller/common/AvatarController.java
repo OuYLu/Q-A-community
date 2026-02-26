@@ -32,17 +32,17 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/common/avatar")
 @RequiredArgsConstructor
-@Tag(name = "Common Avatar")
+@Tag(name = "通用头像服务")
 public class AvatarController {
 
     @Value("${app.avatar-dir:uploads/avatar}")
     private String avatarDir;
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "Upload avatar", description = "Store avatar locally and return access path")
+    @Operation(summary = "上传头像", description = "头像本地存储并返回访问路径")
     public Result<String> upload(@RequestPart("file") MultipartFile file) {
         if (file == null || file.isEmpty()) {
-            throw new BizException(ResultCode.BAD_REQUEST, "File is required");
+            throw new BizException(ResultCode.BAD_REQUEST, "文件不能为空");
         }
 
         String original = file.getOriginalFilename();
@@ -59,14 +59,14 @@ public class AvatarController {
             Files.createDirectories(dir);
             Files.copy(file.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
-            throw new BizException(ResultCode.SERVER_ERROR, "Upload failed: " + e.getMessage());
+            throw new BizException(ResultCode.SERVER_ERROR, "上传失败：" + e.getMessage());
         }
 
         return Result.success("/api/common/avatar/" + filename);
     }
 
     @GetMapping("/{filename}")
-    @Operation(summary = "Get avatar", description = "Return avatar resource")
+    @Operation(summary = "获取头像", description = "返回头像资源")
     public ResponseEntity<Resource> get(@PathVariable String filename) {
         if (!StringUtils.hasText(filename) || filename.contains("..") || filename.contains("/") || filename.contains("\\")) {
             return ResponseEntity.badRequest().build();

@@ -180,7 +180,7 @@ public class QaTopicAdminServiceImpl extends ServiceImpl<QaTopicMapper, QaTopic>
     private QaTopic getTopicOrThrow(Long id) {
         QaTopic topic = this.getById(id);
         if (topic == null) {
-            throw new BizException(ResultCode.BAD_REQUEST, "topic not found");
+            throw new BizException(ResultCode.BAD_REQUEST, "话题不存在");
         }
         return topic;
     }
@@ -234,7 +234,7 @@ public class QaTopicAdminServiceImpl extends ServiceImpl<QaTopicMapper, QaTopic>
             .in(QaCategory::getId, distinctIds)
             .eq(QaCategory::getDeleteFlag, 0));
         if (validCount != distinctIds.size()) {
-            throw new BizException(ResultCode.BAD_REQUEST, "contains invalid category id");
+            throw new BizException(ResultCode.BAD_REQUEST, "包含无效分类编号");
         }
 
         List<QaTopicCategory> rows = new ArrayList<>(distinctIds.size());

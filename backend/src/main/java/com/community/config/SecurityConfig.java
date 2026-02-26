@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -38,11 +39,14 @@ public class SecurityConfig {
 
         // Define which endpoints are public and which require authentication
         http.authorizeHttpRequests(auth -> auth
+            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+            .requestMatchers(HttpMethod.GET, "/api/common/upload/**").permitAll()
             .requestMatchers(
                 "/api/health",
                 "/api/common/avatar/**",
-                "/api/auth/login",
+                "/api/auth/**",
                 "/api/customer/register",
+                "/api/customer/discover/**",
                 "/error",
                 "/swagger-ui.html",
                 "/swagger-ui/**",

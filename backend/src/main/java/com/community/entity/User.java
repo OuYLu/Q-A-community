@@ -19,6 +19,8 @@ public class User {
 
     private String password;
 
+    private Integer passwordSet;
+
     private Integer status;
 
     private String nickname;
@@ -26,6 +28,8 @@ public class User {
     private String avatar;
 
     private String email;
+
+    private String slogan;
 
     private Integer followingCount;
 

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.community.mapper.QaFavoriteMapper">
+  <select id="selectMyFavorites" resultType="com.community.vo.AppMyFavoriteItemVO">
+    SELECT
+      f.question_id AS questionId,
+      q.title AS title,
+      q.answer_count AS answerCount,
+      q.like_count AS likeCount,
+      q.favorite_count AS favoriteCount,
+      f.created_at AS favoriteAt
+    FROM qa_favorite f
+    JOIN qa_question q ON q.id = f.question_id
+    WHERE f.user_id = #{userId}
+      AND q.delete_flag = 0
+    ORDER BY f.created_at DESC, f.id DESC
+  </select>
+</mapper>

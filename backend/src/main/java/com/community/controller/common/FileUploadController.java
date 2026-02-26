@@ -38,6 +38,8 @@ public class FileUploadController {
 
     private static final String BIZ_AVATAR = "avatar";
     private static final String BIZ_EXPERT_PROOF = "expert-proof";
+    private static final String BIZ_QUESTION = "question";
+    private static final String BIZ_ANSWER = "answer";
 
     private static final Set<String> IMAGE_EXTENSIONS = Set.of("jpg", "jpeg", "png", "gif", "webp", "bmp");
     private static final Set<String> EXPERT_EXTENSIONS = Set.of(
@@ -48,19 +50,22 @@ public class FileUploadController {
     private String uploadDir;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "Upload file", description = "bizType: avatar/expert-proof")
+    @Operation(summary = "Upload file", description = "bizType: avatar/expert-proof/question/answer")
     public Result<UploadFileVO> upload(@RequestPart("file") MultipartFile file,
                                        @RequestParam("bizType") String bizType) {
         if (file == null || file.isEmpty()) {
-            throw new BizException(ResultCode.BAD_REQUEST, "File is required");
+            throw new BizException(ResultCode.BAD_REQUEST, "file is required");
         }
         if (!StringUtils.hasText(bizType)) {
             throw new BizException(ResultCode.BAD_REQUEST, "bizType is required");
         }
 
         String normalizedBizType = bizType.trim().toLowerCase(Locale.ROOT);
-        if (!BIZ_AVATAR.equals(normalizedBizType) && !BIZ_EXPERT_PROOF.equals(normalizedBizType)) {
-            throw new BizException(ResultCode.BAD_REQUEST, "Unsupported bizType");
+        if (!BIZ_AVATAR.equals(normalizedBizType)
+            && !BIZ_EXPERT_PROOF.equals(normalizedBizType)
+            && !BIZ_QUESTION.equals(normalizedBizType)
+            && !BIZ_ANSWER.equals(normalizedBizType)) {
+            throw new BizException(ResultCode.BAD_REQUEST, "unsupported bizType");
         }
 
         String originalFilename = file.getOriginalFilename();
@@ -76,7 +81,7 @@ public class FileUploadController {
             Files.createDirectories(baseDir);
             Files.copy(file.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
-            throw new BizException(ResultCode.SERVER_ERROR, "Upload failed: " + e.getMessage());
+            throw new BizException(ResultCode.SERVER_ERROR, "upload failed: " + e.getMessage());
         }
 
         String contentType = file.getContentType();
@@ -96,13 +101,17 @@ public class FileUploadController {
     }
 
     @GetMapping("/{bizType}/{filename}")
-    @Operation(summary = "Get uploaded file", description = "Read local uploaded file")
+    @Operation(summary = "Get uploaded file")
     public ResponseEntity<Resource> get(@PathVariable String bizType, @PathVariable String filename) {
         if (!StringUtils.hasText(bizType) || !StringUtils.hasText(filename)) {
             return ResponseEntity.badRequest().build();
         }
+
         String normalizedBizType = bizType.trim().toLowerCase(Locale.ROOT);
-        if (!BIZ_AVATAR.equals(normalizedBizType) && !BIZ_EXPERT_PROOF.equals(normalizedBizType)) {
+        if (!BIZ_AVATAR.equals(normalizedBizType)
+            && !BIZ_EXPERT_PROOF.equals(normalizedBizType)
+            && !BIZ_QUESTION.equals(normalizedBizType)
+            && !BIZ_ANSWER.equals(normalizedBizType)) {
             return ResponseEntity.badRequest().build();
         }
         if (filename.contains("..") || filename.contains("/") || filename.contains("\\")) {
@@ -138,7 +147,13 @@ public class FileUploadController {
 
     private void validateExtension(String bizType, String extension) {
         if (BIZ_AVATAR.equals(bizType) && !IMAGE_EXTENSIONS.contains(extension)) {
-            throw new BizException(ResultCode.BAD_REQUEST, "Avatar only supports image files");
+            throw new BizException(ResultCode.BAD_REQUEST, "avatar only supports image files");
+        }
+        if (BIZ_QUESTION.equals(bizType) && !IMAGE_EXTENSIONS.contains(extension)) {
+            throw new BizException(ResultCode.BAD_REQUEST, "question image only supports jpg/jpeg/png/gif/webp/bmp");
+        }
+        if (BIZ_ANSWER.equals(bizType) && !IMAGE_EXTENSIONS.contains(extension)) {
+            throw new BizException(ResultCode.BAD_REQUEST, "answer image only supports jpg/jpeg/png/gif/webp/bmp");
         }
         if (BIZ_EXPERT_PROOF.equals(bizType) && !EXPERT_EXTENSIONS.contains(extension)) {
             throw new BizException(ResultCode.BAD_REQUEST, "expert-proof only supports image/doc/pdf/txt");

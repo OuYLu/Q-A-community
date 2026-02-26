@@ -8,20 +8,20 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-@Schema(description = "QA tag save")
+@Schema(description = "问答标签保存")
 public class QaTagSaveDTO {
-    @NotBlank(message = "name is required")
-    @Schema(description = "Tag name")
+    @NotBlank(message = "名称不能为空")
+    @Schema(description = "标签名称")
     private String name;
 
-    @NotNull(message = "source is required")
-    @Min(value = 1, message = "source must be 1 or 2")
-    @Max(value = 2, message = "source must be 1 or 2")
-    @Schema(description = "Source: 1 system, 2 user")
+    @NotNull(message = "来源不能为空")
+    @Min(value = 1, message = "来源必须为1或2")
+    @Max(value = 2, message = "来源必须为1或2")
+    @Schema(description = "来源：1系统，2用户")
     private Integer source;
 
-    @Min(value = 0, message = "status must be 0 or 1")
-    @Max(value = 1, message = "status must be 0 or 1")
-    @Schema(description = "Status: 1 enabled, 0 disabled")
+    @Min(value = 0, message = "状态必须为0或1")
+    @Max(value = 1, message = "状态必须为0或1")
+    @Schema(description = "状态：1启用，0禁用")
     private Integer status;
 }

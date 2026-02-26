@@ -30,41 +30,41 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor
-@Tag(name = "Admin Tag")
+@Tag(name = "后台标签管理")
 public class AdminTagController {
     private final QaTagAdminService qaTagAdminService;
 
     @GetMapping("/tag/list")
     @PreAuthorize("hasAuthority('op:tag:manage')")
-    @Operation(summary = "Tag list", description = "Operation tag management")
+    @Operation(summary = "标签列表", description = "标签管理操作")
     public Result<PageInfo<QaTag>> list(@ModelAttribute QaTagQueryDTO query) {
         return Result.success(qaTagAdminService.list(query));
     }
 
     @PostMapping("/tag")
     @PreAuthorize("hasAuthority('op:tag:manage')")
-    @Operation(summary = "Create tag", description = "Operation tag management")
+    @Operation(summary = "创建标签", description = "标签管理操作")
     public Result<QaTag> create(@Valid @RequestBody QaTagSaveDTO dto) {
         return Result.success(qaTagAdminService.create(dto));
     }
 
     @GetMapping("/tag/{id}")
     @PreAuthorize("hasAuthority('op:tag:manage')")
-    @Operation(summary = "Tag detail", description = "Operation tag management")
+    @Operation(summary = "标签详情", description = "标签管理操作")
     public Result<QaTag> get(@PathVariable Long id) {
         return Result.success(qaTagAdminService.getById(id));
     }
 
     @GetMapping("/tag/{id}/detail-extra")
     @PreAuthorize("hasAuthority('op:tag:manage')")
-    @Operation(summary = "Tag detail extra", description = "Recent 10 questions and question manage link")
+    @Operation(summary = "标签扩展信息", description = "最近10条问题及问题管理链接")
     public Result<TagDetailExtraVO> detailExtra(@PathVariable Long id) {
         return Result.success(qaTagAdminService.getDetailExtra(id));
     }
 
     @GetMapping("/tag/{id}/usage-trend")
     @PreAuthorize("hasAuthority('op:tag:manage')")
-    @Operation(summary = "Tag usage trend", description = "Reference trend in recent days")
+    @Operation(summary = "标签使用趋势", description = "近一段时间引用趋势")
     public Result<List<TagUsageTrendPointVO>> usageTrend(@PathVariable Long id,
                                                          @RequestParam(required = false) Integer days) {
         return Result.success(qaTagAdminService.usageTrend(id, days));
@@ -72,14 +72,14 @@ public class AdminTagController {
 
     @PutMapping("/tag/{id}")
     @PreAuthorize("hasAuthority('op:tag:manage')")
-    @Operation(summary = "Update tag", description = "Operation tag management")
+    @Operation(summary = "更新标签", description = "标签管理操作")
     public Result<QaTag> update(@PathVariable Long id, @Valid @RequestBody QaTagSaveDTO dto) {
         return Result.success(qaTagAdminService.update(id, dto));
     }
 
     @DeleteMapping("/tag/{id}")
     @PreAuthorize("hasAuthority('op:tag:manage')")
-    @Operation(summary = "Delete tag", description = "Operation tag management")
+    @Operation(summary = "删除标签", description = "标签管理操作")
     public Result<Void> delete(@PathVariable Long id) {
         qaTagAdminService.delete(id);
         return Result.success(null);
@@ -87,7 +87,7 @@ public class AdminTagController {
 
     @PutMapping("/tag/enable/batch")
     @PreAuthorize("hasAuthority('op:tag:manage')")
-    @Operation(summary = "Batch enable tags", description = "Operation tag management")
+    @Operation(summary = "批量启用标签", description = "标签管理操作")
     public Result<Void> batchEnable(@Valid @RequestBody QaTagBatchStatusDTO dto) {
         qaTagAdminService.batchEnable(dto.getIds());
         return Result.success(null);
@@ -95,7 +95,7 @@ public class AdminTagController {
 
     @PutMapping("/tag/disable/batch")
     @PreAuthorize("hasAuthority('op:tag:manage')")
-    @Operation(summary = "Batch disable tags", description = "Operation tag management")
+    @Operation(summary = "批量禁用标签", description = "标签管理操作")
     public Result<Void> batchDisable(@Valid @RequestBody QaTagBatchStatusDTO dto) {
         qaTagAdminService.batchDisable(dto.getIds());
         return Result.success(null);

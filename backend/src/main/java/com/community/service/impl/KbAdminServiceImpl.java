@@ -194,7 +194,7 @@ public class KbAdminServiceImpl implements KbAdminService {
     @Transactional
     public void updateEntryStatus(Long id, KbEntryStatusDTO dto) {
         if (dto.getStatus() != 1 && dto.getStatus() != 4) {
-            throw new BizException(ResultCode.BAD_REQUEST, "status must be 1 or 4");
+            throw new BizException(ResultCode.BAD_REQUEST, "状态必须为1或4");
         }
         KbEntry row = getEntryOrThrow(id);
         row.setStatus(dto.getStatus());
@@ -216,7 +216,7 @@ public class KbAdminServiceImpl implements KbAdminService {
     private KbCategory getCategoryOrThrow(Long id) {
         KbCategory row = kbCategoryMapper.selectById(id);
         if (row == null) {
-            throw new BizException(ResultCode.BAD_REQUEST, "kb category not found");
+            throw new BizException(ResultCode.BAD_REQUEST, "知识库分类不存在");
         }
         return row;
     }
@@ -224,7 +224,7 @@ public class KbAdminServiceImpl implements KbAdminService {
     private KbEntry getEntryOrThrow(Long id) {
         KbEntry row = kbEntryMapper.selectById(id);
         if (row == null) {
-            throw new BizException(ResultCode.BAD_REQUEST, "kb entry not found");
+            throw new BizException(ResultCode.BAD_REQUEST, "知识库条目不存在");
         }
         return row;
     }
@@ -234,7 +234,7 @@ public class KbAdminServiceImpl implements KbAdminService {
             return;
         }
         if (selfId != null && selfId.equals(parentId)) {
-            throw new BizException(ResultCode.BAD_REQUEST, "parent category cannot be itself");
+            throw new BizException(ResultCode.BAD_REQUEST, "父分类不能是自己");
         }
         getCategoryOrThrow(parentId);
     }
@@ -242,7 +242,7 @@ public class KbAdminServiceImpl implements KbAdminService {
     private void ensureCategoryNameUnique(String name, Long parentId, Long excludeId) {
         String normalized = name == null ? null : name.trim();
         if (!StringUtils.hasText(normalized)) {
-            throw new BizException(ResultCode.BAD_REQUEST, "name is required");
+            throw new BizException(ResultCode.BAD_REQUEST, "名称不能为空");
         }
         LambdaQueryWrapper<KbCategory> wrapper = new LambdaQueryWrapper<KbCategory>()
             .eq(KbCategory::getName, normalized);
@@ -256,14 +256,14 @@ public class KbAdminServiceImpl implements KbAdminService {
         }
         KbCategory exists = kbCategoryMapper.selectOne(wrapper.last("LIMIT 1"));
         if (exists != null) {
-            throw new BizException(ResultCode.BAD_REQUEST, "category name already exists under same parent");
+            throw new BizException(ResultCode.BAD_REQUEST, "同级下分类名称已存在");
         }
     }
 
     private void validateCategoryForEntry(Long categoryId) {
         KbCategory category = getCategoryOrThrow(categoryId);
         if (category.getStatus() == null || category.getStatus() == 0) {
-            throw new BizException(ResultCode.BAD_REQUEST, "category is disabled");
+            throw new BizException(ResultCode.BAD_REQUEST, "分类已禁用");
         }
     }
 
@@ -273,11 +273,11 @@ public class KbAdminServiceImpl implements KbAdminService {
         }
         List<Long> ids = tagIds.stream().filter(Objects::nonNull).filter(id -> id > 0).distinct().toList();
         if (ids.size() != tagIds.stream().filter(Objects::nonNull).filter(id -> id > 0).count()) {
-            throw new BizException(ResultCode.BAD_REQUEST, "tagIds contains invalid id");
+            throw new BizException(ResultCode.BAD_REQUEST, "标签编号列表包含无效编号");
         }
         long count = qaTagMapper.selectCount(new LambdaQueryWrapper<QaTag>().in(QaTag::getId, ids));
         if (count != ids.size()) {
-            throw new BizException(ResultCode.BAD_REQUEST, "tagIds contains non-existent id");
+            throw new BizException(ResultCode.BAD_REQUEST, "标签编号列表包含不存在的编号");
         }
     }
 

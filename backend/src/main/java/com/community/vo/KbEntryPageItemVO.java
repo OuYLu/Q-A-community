@@ -6,7 +6,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-@Schema(description = "KB entry page item")
+@Schema(description = "知识库条目分页项")
 public class KbEntryPageItemVO {
     private Long id;
     private String title;

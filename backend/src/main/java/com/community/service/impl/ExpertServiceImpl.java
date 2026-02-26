@@ -32,21 +32,21 @@ public class ExpertServiceImpl extends ServiceImpl<ExpertApplyMapper, ExpertAppl
     public Long applyExpert(ExpertApplyDTO dto) {
         SecurityUser securityUser = getCurrentSecurityUser();
         if (securityUser == null) {
-            throw new BizException(ResultCode.UNAUTHORIZED, "Please login first");
+            throw new BizException(ResultCode.UNAUTHORIZED, "请先登录");
         }
 
         User user = userMapper.selectById(securityUser.getId());
         if (user == null) {
-            throw new BizException(ResultCode.BAD_REQUEST, "User not found");
+            throw new BizException(ResultCode.BAD_REQUEST, "用户不存在");
         }
 
         Integer expertStatus = user.getExpertStatus();
         if (expertStatus != null) {
             if (expertStatus == 2) {
-                throw new BizException(ResultCode.BAD_REQUEST, "Expert certification is under review");
+                throw new BizException(ResultCode.BAD_REQUEST, "专家认证审核中");
             }
             if (expertStatus == 3) {
-                throw new BizException(ResultCode.BAD_REQUEST, "Expert certification already approved");
+                throw new BizException(ResultCode.BAD_REQUEST, "专家认证已通过");
             }
         }
 
@@ -55,13 +55,13 @@ public class ExpertServiceImpl extends ServiceImpl<ExpertApplyMapper, ExpertAppl
             .eq(ExpertApply::getStatus, 1)
             .last("LIMIT 1"));
         if (pending != null) {
-            throw new BizException(ResultCode.BAD_REQUEST, "You already have a pending application. Please do not submit again");
+            throw new BizException(ResultCode.BAD_REQUEST, "你已有待审核申请，请勿重复提交");
         }
 
         if (dto.getProofUrls() == null
             || CollectionUtils.isEmpty(dto.getProofUrls().getLicense())
             || CollectionUtils.isEmpty(dto.getProofUrls().getEmployment())) {
-            throw new BizException(ResultCode.BAD_REQUEST, "LICENSE and EMPLOYMENT materials are required");
+            throw new BizException(ResultCode.BAD_REQUEST, "必须提供执照和在职证明材料");
         }
 
         LocalDateTime now = LocalDateTime.now();

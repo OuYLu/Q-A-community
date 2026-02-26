@@ -7,7 +7,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDate;
 
 @Data
-@Schema(description = "QA topic page query")
+@Schema(description = "问答话题分页查询")
 public class QaTopicPageQueryDTO {
     private String title;
     private Integer status;
@@ -19,10 +19,10 @@ public class QaTopicPageQueryDTO {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate dateEnd;
 
-    @Schema(description = "followCount/questionCount/todayNewCount/createdAt")
+    @Schema(description = "关注数/问题数/今日新增/创建时间")
     private String sortBy;
 
-    @Schema(description = "asc/desc")
+    @Schema(description = "升序/降序")
     private String sortOrder;
 
     private Integer page = 1;

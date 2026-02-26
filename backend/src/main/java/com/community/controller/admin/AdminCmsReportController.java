@@ -23,27 +23,27 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/admin/cms/report")
 @RequiredArgsConstructor
-@Tag(name = "Admin CMS Report")
+@Tag(name = "后台举报管理")
 public class AdminCmsReportController {
     private final CmsReportAdminService cmsReportAdminService;
 
     @GetMapping("/page")
     @PreAuthorize("hasAnyAuthority('menu:content:report','content:report:manage','op:report:manage')")
-    @Operation(summary = "CMS report page")
+    @Operation(summary = "内容举报分页")
     public Result<PageInfo<CmsReportPageItemVO>> page(@ModelAttribute CmsReportPageQueryDTO query) {
         return Result.success(cmsReportAdminService.page(query));
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('menu:content:report','content:report:manage','op:report:manage')")
-    @Operation(summary = "CMS report detail")
+    @Operation(summary = "内容举报详情")
     public Result<CmsReportDetailVO> detail(@PathVariable Long id) {
         return Result.success(cmsReportAdminService.detail(id));
     }
 
     @PostMapping("/{id}/handle")
     @PreAuthorize("hasAnyAuthority('menu:content:report','content:report:manage','op:report:manage')")
-    @Operation(summary = "CMS report handle")
+    @Operation(summary = "内容举报处理")
     public Result<Void> handle(@PathVariable Long id, @Valid @RequestBody CmsReportHandleDTO dto) {
         cmsReportAdminService.handle(id, dto);
         return Result.success(null);
@@ -51,7 +51,7 @@ public class AdminCmsReportController {
 
     @PostMapping("/{id}/to-audit")
     @PreAuthorize("hasAnyAuthority('menu:content:report','content:report:manage','op:report:manage')")
-    @Operation(summary = "Transfer report to audit queue")
+    @Operation(summary = "举报转审核队列")
     public Result<Void> toAudit(@PathVariable Long id) {
         cmsReportAdminService.toAudit(id);
         return Result.success(null);

@@ -6,24 +6,24 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-@Schema(description = "Current user info")
+@Schema(description = "当前用户信息")
 public class UserVO {
-    @Schema(description = "User id")
+    @Schema(description = "用户编号")
     private Long id;
 
-    @Schema(description = "Username")
+    @Schema(description = "用户名")
     private String username;
 
-    @Schema(description = "Nickname")
+    @Schema(description = "昵称")
     private String nickname;
 
-    @Schema(description = "Role list")
+    @Schema(description = "角色列表")
     private List<String> roles;
 
-    @Schema(description = "Role codes")
+    @Schema(description = "角色编码列表")
     private List<String> roleCodes;
 
-    @Schema(description = "Permission codes")
+    @Schema(description = "权限编码列表")
     private List<String> permCodes;
 
     public UserVO(Long id, String username, String nickname, List<String> roles) {

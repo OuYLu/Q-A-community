@@ -4,20 +4,20 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 @Data
-@Schema(description = "QA category query")
+@Schema(description = "问答分类查询")
 public class QaCategoryQueryDTO {
-    @Schema(description = "Category name")
+    @Schema(description = "分类名称")
     private String name;
 
-    @Schema(description = "Parent category id")
+    @Schema(description = "父分类编号")
     private Long parentId;
 
-    @Schema(description = "Status")
+    @Schema(description = "状态")
     private Integer status;
 
-    @Schema(description = "Page number")
+    @Schema(description = "页码")
     private Integer pageNum = 1;
 
-    @Schema(description = "Page size")
+    @Schema(description = "每页条数")
     private Integer pageSize = 10;
 }

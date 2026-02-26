@@ -38,7 +38,7 @@ public class GlobalExceptionHandler {
                 .map(err -> err.getField() + ": " + err.getDefaultMessage())
                 .collect(Collectors.joining(", "));
         } else {
-            message = "invalid request parameters";
+            message = "请求参数不合法";
         }
         log.warn("Validation exception: {}", message);
         return Result.error(ResultCode.BAD_REQUEST, message);

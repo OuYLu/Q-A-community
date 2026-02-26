@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.community.mapper.QaCommentMapper">
+  <select id="selectAnswerComments" resultType="com.community.vo.AppAnswerCommentVO">
+    SELECT
+      c.id,
+      c.biz_id AS answerId,
+      c.parent_id AS parentId,
+      c.user_id AS authorId,
+      u.nickname AS authorName,
+      u.avatar AS authorAvatar,
+      c.content,
+      c.created_at AS createdAt
+    FROM qa_comment c
+    LEFT JOIN user u ON u.id = c.user_id
+    WHERE c.biz_type = 2
+      AND c.biz_id = #{answerId}
+      AND c.status = 1
+      AND c.delete_flag = 0
+    ORDER BY c.created_at ASC, c.id ASC
+  </select>
+</mapper>

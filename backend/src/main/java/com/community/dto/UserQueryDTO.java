@@ -4,23 +4,23 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 @Data
-@Schema(description = "User query")
+@Schema(description = "用户查询")
 public class UserQueryDTO {
-    @Schema(description = "Username")
+    @Schema(description = "用户名")
     private String username;
 
-    @Schema(description = "Nickname")
+    @Schema(description = "昵称")
     private String nickname;
 
-    @Schema(description = "Status: 1-enabled, 0-disabled")
+    @Schema(description = "状态：1-启用，0-禁用")
     private Integer status;
 
-    @Schema(description = "Role code filter (staff/customer/expert)")
+    @Schema(description = "角色编码筛选（员工/用户/专家）")
     private String roleCode;
 
-    @Schema(description = "Page number")
+    @Schema(description = "页码")
     private Integer pageNum = 1;
 
-    @Schema(description = "Page size")
+    @Schema(description = "每页条数")
     private Integer pageSize = 10;
 }

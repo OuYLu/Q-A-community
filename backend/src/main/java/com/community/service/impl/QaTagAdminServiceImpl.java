@@ -40,7 +40,7 @@ public class QaTagAdminServiceImpl extends ServiceImpl<QaTagMapper, QaTag> imple
         Integer pageSize = query == null || query.getPageSize() == null ? 10 : query.getPageSize();
 
         if (useCountMin != null && useCountMax != null && useCountMin > useCountMax) {
-            throw new BizException(ResultCode.BAD_REQUEST, "useCountMin cannot be greater than useCountMax");
+            throw new BizException(ResultCode.BAD_REQUEST, "最小使用次数不能大于最大使用次数");
         }
 
         LambdaQueryWrapper<QaTag> wrapper = new LambdaQueryWrapper<>();
@@ -122,7 +122,7 @@ public class QaTagAdminServiceImpl extends ServiceImpl<QaTagMapper, QaTag> imple
     public QaTag getById(Long id) {
         QaTag tag = super.getById(id);
         if (tag == null) {
-            throw new BizException(ResultCode.BAD_REQUEST, "tag not found");
+            throw new BizException(ResultCode.BAD_REQUEST, "标签不存在");
         }
         return tag;
     }
@@ -160,7 +160,7 @@ public class QaTagAdminServiceImpl extends ServiceImpl<QaTagMapper, QaTag> imple
         }
         QaTag existed = this.getOne(wrapper.last("LIMIT 1"));
         if (existed != null) {
-            throw new BizException(ResultCode.BAD_REQUEST, "tag name already exists");
+            throw new BizException(ResultCode.BAD_REQUEST, "标签名称已存在");
         }
     }
 
@@ -168,10 +168,10 @@ public class QaTagAdminServiceImpl extends ServiceImpl<QaTagMapper, QaTag> imple
         String value = raw == null ? "" : raw.trim().replaceAll("\\s+", " ");
         value = value.toLowerCase(Locale.ROOT);
         if (value.isEmpty()) {
-            throw new BizException(ResultCode.BAD_REQUEST, "tag name cannot be empty");
+            throw new BizException(ResultCode.BAD_REQUEST, "标签名称不能为空");
         }
         if (value.length() > 50) {
-            throw new BizException(ResultCode.BAD_REQUEST, "tag name is too long");
+            throw new BizException(ResultCode.BAD_REQUEST, "标签名称过长");
         }
         return value;
     }
@@ -185,18 +185,18 @@ public class QaTagAdminServiceImpl extends ServiceImpl<QaTagMapper, QaTag> imple
                 continue;
             }
             if (name.contains(hit)) {
-                throw new BizException(ResultCode.BAD_REQUEST, "tag contains sensitive word: " + hit);
+                throw new BizException(ResultCode.BAD_REQUEST, "标签包含敏感词：" + hit);
             }
         }
     }
 
     private void batchUpdateStatus(List<Long> ids, int status) {
         if (ids == null || ids.isEmpty()) {
-            throw new BizException(ResultCode.BAD_REQUEST, "ids cannot be empty");
+            throw new BizException(ResultCode.BAD_REQUEST, "编号列表不能为空");
         }
         List<Long> validIds = ids.stream().filter(id -> id != null && id > 0).distinct().toList();
         if (validIds.isEmpty()) {
-            throw new BizException(ResultCode.BAD_REQUEST, "ids cannot be empty");
+            throw new BizException(ResultCode.BAD_REQUEST, "编号列表不能为空");
         }
         QaTag updateEntity = new QaTag();
         updateEntity.setStatus(status);

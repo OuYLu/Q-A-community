@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.community.mapper.UserFollowMapper">
+  <select id="selectMyFollowing" resultType="com.community.vo.AppFollowUserItemVO">
+    SELECT
+      u.id AS userId,
+      u.nickname AS nickname,
+      u.avatar AS avatar,
+      u.expert_status AS expertStatus,
+      uf.created_at AS followedAt
+    FROM user_follow uf
+    JOIN user u ON u.id = uf.followee_id
+    WHERE uf.follower_id = #{userId}
+    ORDER BY uf.created_at DESC, uf.id DESC
+  </select>
+
+  <select id="selectMyFollowers" resultType="com.community.vo.AppFollowUserItemVO">
+    SELECT
+      u.id AS userId,
+      u.nickname AS nickname,
+      u.avatar AS avatar,
+      u.expert_status AS expertStatus,
+      uf.created_at AS followedAt
+    FROM user_follow uf
+    JOIN user u ON u.id = uf.follower_id
+    WHERE uf.followee_id = #{userId}
+    ORDER BY uf.created_at DESC, uf.id DESC
+  </select>
+</mapper>

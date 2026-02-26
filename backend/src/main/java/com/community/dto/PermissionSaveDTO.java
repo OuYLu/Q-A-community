@@ -7,21 +7,21 @@ import lombok.Data;
 @Data
 @Schema(description = "权限增删查改请求")
 public class PermissionSaveDTO {
-    @NotBlank(message = "code is required")
-    @Schema(description = "Permission code", example = "rbac:user:manage")
+    @NotBlank(message = "编码不能为空")
+    @Schema(description = "权限编码", example = "rbac:user:manage")
     private String code;
 
-    @NotBlank(message = "name is required")
-    @Schema(description = "Permission name", example = "User manage")
+    @NotBlank(message = "名称不能为空")
+    @Schema(description = "权限名称", example = "User manage")
     private String name;
 
-    @NotBlank(message = "type is required")
-    @Schema(description = "Type (menu/button/api)", example = "api")
+    @NotBlank(message = "类型不能为空")
+    @Schema(description = "类型（菜单/按钮/接口）", example = "api")
     private String type;
 
-    @Schema(description = "Path or API", example = "/api/admin/users")
+    @Schema(description = "路径或接口", example = "/api/admin/users")
     private String pathOrApi;
 
-    @Schema(description = "HTTP method", example = "GET")
+    @Schema(description = "请求方法", example = "GET")
     private String method;
 }

@@ -6,7 +6,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-@Schema(description = "Recent question in topic")
+@Schema(description = "话题内最近问题")
 public class TopicRecentQuestionVO {
     private Long id;
     private String title;

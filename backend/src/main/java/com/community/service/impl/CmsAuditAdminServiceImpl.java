@@ -67,7 +67,7 @@ public class CmsAuditAdminServiceImpl implements CmsAuditAdminService {
     public CmsAuditDetailVO detail(Long id) {
         CmsAuditDetailRowVO row = cmsAuditMapper.selectAdminAuditDetail(id);
         if (row == null) {
-            throw new BizException(ResultCode.BAD_REQUEST, "audit not found");
+            throw new BizException(ResultCode.BAD_REQUEST, "审核记录不存在");
         }
         CmsAuditDetailVO vo = new CmsAuditDetailVO();
         CmsAudit audit = new CmsAudit();
@@ -113,11 +113,11 @@ public class CmsAuditAdminServiceImpl implements CmsAuditAdminService {
     public void review(Long id, CmsAuditReviewDTO dto) {
         CmsAudit audit = getAuditOrThrow(id);
         if (audit.getAuditStatus() == null || audit.getAuditStatus() != 1) {
-            throw new BizException(ResultCode.BAD_REQUEST, "only pending audit can be reviewed");
+            throw new BizException(ResultCode.BAD_REQUEST, "仅待审核记录可处理");
         }
         String action = normalizeAction(dto.getAction());
         if ("reject".equals(action) && (dto.getRejectReason() == null || dto.getRejectReason().isBlank())) {
-            throw new BizException(ResultCode.BAD_REQUEST, "rejectReason is required when action=reject");
+            throw new BizException(ResultCode.BAD_REQUEST, "当操作为驳回时，驳回原因不能为空");
         }
         applyReview(audit, action, dto.getRejectReason());
     }
@@ -127,20 +127,20 @@ public class CmsAuditAdminServiceImpl implements CmsAuditAdminService {
     public void batchReview(CmsAuditBatchReviewDTO dto) {
         String action = normalizeAction(dto.getAction());
         if ("reject".equals(action) && (dto.getRejectReason() == null || dto.getRejectReason().isBlank())) {
-            throw new BizException(ResultCode.BAD_REQUEST, "rejectReason is required when action=reject");
+            throw new BizException(ResultCode.BAD_REQUEST, "当操作为驳回时，驳回原因不能为空");
         }
         List<Long> ids = dto.getIds().stream().filter(Objects::nonNull).distinct().toList();
         if (ids.isEmpty()) {
-            throw new BizException(ResultCode.BAD_REQUEST, "ids cannot be empty");
+            throw new BizException(ResultCode.BAD_REQUEST, "编号列表不能为空");
         }
         List<CmsAudit> audits = cmsAuditMapper.selectList(new LambdaQueryWrapper<CmsAudit>()
             .in(CmsAudit::getId, ids));
         if (audits.size() != ids.size()) {
-            throw new BizException(ResultCode.BAD_REQUEST, "contains invalid audit id");
+            throw new BizException(ResultCode.BAD_REQUEST, "包含无效的审核编号");
         }
         for (CmsAudit audit : audits) {
             if (audit.getAuditStatus() == null || audit.getAuditStatus() != 1) {
-                throw new BizException(ResultCode.BAD_REQUEST, "batch review contains non-pending audit");
+                throw new BizException(ResultCode.BAD_REQUEST, "批量审核包含非待审核记录");
             }
         }
         for (CmsAudit audit : audits) {
@@ -175,7 +175,7 @@ public class CmsAuditAdminServiceImpl implements CmsAuditAdminService {
     private String normalizeAction(String raw) {
         String action = raw == null ? "" : raw.trim().toLowerCase(Locale.ROOT);
         if (!"pass".equals(action) && !"reject".equals(action)) {
-            throw new BizException(ResultCode.BAD_REQUEST, "action must be pass or reject");
+            throw new BizException(ResultCode.BAD_REQUEST, "操作必须为通过或驳回");
         }
         return action;
     }
@@ -183,7 +183,7 @@ public class CmsAuditAdminServiceImpl implements CmsAuditAdminService {
     private CmsAudit getAuditOrThrow(Long id) {
         CmsAudit audit = cmsAuditMapper.selectById(id);
         if (audit == null) {
-            throw new BizException(ResultCode.BAD_REQUEST, "audit not found");
+            throw new BizException(ResultCode.BAD_REQUEST, "审核记录不存在");
         }
         return audit;
     }
@@ -193,7 +193,7 @@ public class CmsAuditAdminServiceImpl implements CmsAuditAdminService {
             case 1 -> {
                 QaQuestion q = qaQuestionMapper.selectById(bizId);
                 if (q == null) {
-                    throw new BizException(ResultCode.BAD_REQUEST, "target question not found");
+                    throw new BizException(ResultCode.BAD_REQUEST, "目标问题不存在");
                 }
                 q.setStatus(status);
                 q.setRejectReason(rejectReason);
@@ -202,7 +202,7 @@ public class CmsAuditAdminServiceImpl implements CmsAuditAdminService {
             case 2 -> {
                 QaAnswer a = qaAnswerMapper.selectById(bizId);
                 if (a == null) {
-                    throw new BizException(ResultCode.BAD_REQUEST, "target answer not found");
+                    throw new BizException(ResultCode.BAD_REQUEST, "目标回答不存在");
                 }
                 a.setStatus(status);
                 a.setRejectReason(rejectReason);
@@ -211,7 +211,7 @@ public class CmsAuditAdminServiceImpl implements CmsAuditAdminService {
             case 3 -> {
                 QaComment c = qaCommentMapper.selectById(bizId);
                 if (c == null) {
-                    throw new BizException(ResultCode.BAD_REQUEST, "target comment not found");
+                    throw new BizException(ResultCode.BAD_REQUEST, "目标评论不存在");
                 }
                 c.setStatus(status);
                 c.setRejectReason(rejectReason);
@@ -220,12 +220,12 @@ public class CmsAuditAdminServiceImpl implements CmsAuditAdminService {
             case 4 -> {
                 KbEntry e = kbEntryMapper.selectById(bizId);
                 if (e == null) {
-                    throw new BizException(ResultCode.BAD_REQUEST, "target kb entry not found");
+                    throw new BizException(ResultCode.BAD_REQUEST, "目标知识库条目不存在");
                 }
                 e.setStatus(status);
                 kbEntryMapper.updateById(e);
             }
-            default -> throw new BizException(ResultCode.BAD_REQUEST, "unsupported bizType: " + bizType);
+            default -> throw new BizException(ResultCode.BAD_REQUEST, "不支持的业务类型: " + bizType);
         }
     }
 

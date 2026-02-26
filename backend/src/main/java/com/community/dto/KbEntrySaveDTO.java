@@ -8,17 +8,17 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-@Schema(description = "KB entry save")
+@Schema(description = "知识库条目保存请求")
 public class KbEntrySaveDTO {
-    @NotNull(message = "categoryId is required")
+    @NotNull(message = "分类编号不能为空")
     private Long categoryId;
 
-    @NotBlank(message = "title is required")
+    @NotBlank(message = "标题不能为空")
     private String title;
 
     private String summary;
 
-    @NotBlank(message = "content is required")
+    @NotBlank(message = "内容不能为空")
     private String content;
 
     private String source;

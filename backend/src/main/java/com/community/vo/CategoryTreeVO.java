@@ -4,29 +4,29 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 @Data
-@Schema(description = "Category tree node for lazy loading")
+@Schema(description = "用于懒加载的分类树节点")
 public class CategoryTreeVO {
-    @Schema(description = "Category id")
+    @Schema(description = "分类编号")
     private Long id;
 
-    @Schema(description = "Parent id")
+    @Schema(description = "父级编号")
     private Long parentId;
 
-    @Schema(description = "Category name")
+    @Schema(description = "分类名称")
     private String name;
 
-    @Schema(description = "Display label")
+    @Schema(description = "显示标签")
     private String label;
 
-    @Schema(description = "Category status")
+    @Schema(description = "分类状态")
     private Integer status;
 
-    @Schema(description = "Sort order")
+    @Schema(description = "排序顺序")
     private Integer sort;
 
-    @Schema(description = "Whether current node has children")
+    @Schema(description = "当前节点是否有子节点")
     private Boolean hasChildren;
 
-    @Schema(description = "Whether current node is leaf")
+    @Schema(description = "当前节点是否为叶子节点")
     private Boolean leaf;
 }

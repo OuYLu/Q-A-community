@@ -50,7 +50,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor
-@Tag(name = "Admin User")
+@Tag(name = "后台用户管理")
 public class AdminUserController {
     private final UserService userService;
     private final UserAdminService userAdminService;
@@ -61,28 +61,28 @@ public class AdminUserController {
 
     @PostMapping("/staff")
     @PreAuthorize("hasAuthority('rbac:user:manage')")
-    @Operation(summary = "Create staff", description = "Admin only")
+    @Operation(summary = "创建员工", description = "仅管理员")
     public Result<UserVO> createStaff(@Valid @RequestBody AdminCreateStaffDTO dto) {
         return Result.success(userService.createStaff(dto));
     }
 
     @GetMapping("/expert/apply/list")
     @PreAuthorize("hasAuthority('rbac:user:manage')")
-    @Operation(summary = "List expert applications", description = "Admin only")
+    @Operation(summary = "专家申请列表", description = "仅管理员")
     public Result<PageInfo<ExpertApply>> list(@ModelAttribute ExpertApplyQueryDTO query) {
         return Result.success(expertAdminService.listApplies(query));
     }
 
     @GetMapping("/expert/apply/user/{userId}")
     @PreAuthorize("hasAuthority('rbac:user:manage')")
-    @Operation(summary = "Expert apply detail by userId", description = "Admin only")
+    @Operation(summary = "按用户编号查看专家申请详情", description = "仅管理员")
     public Result<ExpertApplyDetailVO> getExpertApplyDetail(@PathVariable Long userId) {
         return Result.success(expertAdminService.getDetailByUserId(userId));
     }
 
     @PostMapping("/expert/apply/review")
     @PreAuthorize("hasAuthority('rbac:user:manage')")
-    @Operation(summary = "Review expert application", description = "Admin only")
+    @Operation(summary = "审核专家申请", description = "仅管理员")
     public Result<Void> review(@Valid @RequestBody ExpertReviewDTO dto) {
         expertAdminService.review(dto);
         return Result.success(null);
@@ -90,35 +90,35 @@ public class AdminUserController {
 
     @GetMapping("/perm/list")
     @PreAuthorize("hasAuthority('rbac:perm:manage')")
-    @Operation(summary = "Permission list", description = "Permission management")
+    @Operation(summary = "权限列表", description = "权限管理")
     public Result<PageInfo<Permission>> listPermissions(@ModelAttribute PermissionQueryDTO query) {
         return Result.success(permissionService.listAll(query));
     }
 
     @PostMapping("/perm")
     @PreAuthorize("hasAuthority('rbac:perm:manage')")
-    @Operation(summary = "Create permission", description = "Permission management")
+    @Operation(summary = "创建权限", description = "权限管理")
     public Result<Permission> createPermission(@Valid @RequestBody PermissionSaveDTO dto) {
         return Result.success(permissionService.create(dto));
     }
 
     @PutMapping("/perm/{id}")
     @PreAuthorize("hasAuthority('rbac:perm:manage')")
-    @Operation(summary = "Update permission", description = "Permission management")
+    @Operation(summary = "更新权限", description = "权限管理")
     public Result<Permission> updatePermission(@PathVariable Long id, @Valid @RequestBody PermissionSaveDTO dto) {
         return Result.success(permissionService.update(id, dto));
     }
 
     @GetMapping("/perm/{id}")
     @PreAuthorize("hasAuthority('rbac:perm:manage')")
-    @Operation(summary = "Permission detail", description = "Permission management")
+    @Operation(summary = "权限详情", description = "权限管理")
     public Result<Permission> getPermission(@PathVariable Long id) {
         return Result.success(permissionService.getById(id));
     }
 
     @DeleteMapping("/perm/{id}")
     @PreAuthorize("hasAuthority('rbac:perm:manage')")
-    @Operation(summary = "Delete permission", description = "Permission management")
+    @Operation(summary = "删除权限", description = "权限管理")
     public Result<Void> deletePermission(@PathVariable Long id) {
         permissionService.delete(id);
         return Result.success(null);
@@ -126,35 +126,35 @@ public class AdminUserController {
 
     @GetMapping("/role/list")
     @PreAuthorize("hasAuthority('rbac:role:manage')")
-    @Operation(summary = "Role list", description = "Role management")
+    @Operation(summary = "角色列表", description = "角色管理")
     public Result<PageInfo<Role>> listRoles(@ModelAttribute RoleQueryDTO query) {
         return Result.success(roleService.listRoles(query));
     }
 
     @PostMapping("/role")
     @PreAuthorize("hasAuthority('rbac:role:manage')")
-    @Operation(summary = "Create role", description = "Role management")
+    @Operation(summary = "创建角色", description = "角色管理")
     public Result<Role> createRole(@Valid @RequestBody RoleCreateDTO dto) {
         return Result.success(roleService.create(dto));
     }
 
     @PutMapping("/role/{id}")
     @PreAuthorize("hasAuthority('rbac:role:manage')")
-    @Operation(summary = "Update role name", description = "Role management")
+    @Operation(summary = "更新角色名称", description = "角色管理")
     public Result<Role> updateRole(@PathVariable Long id, @Valid @RequestBody RoleUpdateDTO dto) {
         return Result.success(roleService.updateName(id, dto));
     }
 
     @GetMapping("/role/{id}")
     @PreAuthorize("hasAuthority('rbac:role:manage')")
-    @Operation(summary = "Role detail", description = "Role management")
+    @Operation(summary = "角色详情", description = "角色管理")
     public Result<Role> getRole(@PathVariable Long id) {
         return Result.success(roleService.getById(id));
     }
 
     @DeleteMapping("/role/{id}")
     @PreAuthorize("hasAuthority('rbac:role:manage')")
-    @Operation(summary = "Delete role", description = "Role management")
+    @Operation(summary = "删除角色", description = "角色管理")
     public Result<Void> deleteRole(@PathVariable Long id) {
         roleService.delete(id);
         return Result.success(null);
@@ -162,7 +162,7 @@ public class AdminUserController {
 
     @GetMapping("/role/{id}/perm/list")
     @PreAuthorize("hasAuthority('rbac:role:manage')")
-    @Operation(summary = "Role permissions", description = "Role management")
+    @Operation(summary = "角色权限", description = "角色管理")
     public Result<PageInfo<Permission>> listRolePermissions(@PathVariable Long id,
                                                             @RequestParam(defaultValue = "1") int pageNum,
                                                             @RequestParam(defaultValue = "10") int pageSize) {
@@ -171,7 +171,7 @@ public class AdminUserController {
 
     @PutMapping("/role/perm")
     @PreAuthorize("hasAuthority('rbac:role:manage')")
-    @Operation(summary = "Update role permissions", description = "Role management")
+    @Operation(summary = "更新角色权限", description = "角色管理")
     public Result<Void> updateRolePermissions(@Valid @RequestBody RolePermUpdateDTO dto) {
         roleService.updateRolePermissions(dto);
         return Result.success(null);
@@ -179,35 +179,35 @@ public class AdminUserController {
 
     @GetMapping("/user/list")
     @PreAuthorize("hasAuthority('rbac:user:manage')")
-    @Operation(summary = "User list", description = "User management")
+    @Operation(summary = "用户列表", description = "用户管理")
     public Result<PageInfo<UserManageVO>> listUsers(@ModelAttribute UserQueryDTO query) {
         return Result.success(userAdminService.listManageableUsers(query));
     }
 
     @GetMapping("/expert/user/list")
     @PreAuthorize("hasAuthority('rbac:user:manage')")
-    @Operation(summary = "Expert user list", description = "User management")
+    @Operation(summary = "专家用户列表", description = "用户管理")
     public Result<PageInfo<ExpertManageVO>> listExpertUsers(@ModelAttribute ExpertUserQueryDTO query) {
         return Result.success(expertUserService.listExperts(query));
     }
 
     @GetMapping("/expert/user/{id}")
     @PreAuthorize("hasAuthority('rbac:user:manage')")
-    @Operation(summary = "Expert user detail", description = "User management")
+    @Operation(summary = "专家用户详情", description = "用户管理")
     public Result<ExpertManageVO> getExpertUser(@PathVariable Long id) {
         return Result.success(expertUserService.getExpertDetail(id));
     }
 
     @GetMapping("/expert/user/{id}/detail")
     @PreAuthorize("hasAuthority('rbac:user:manage')")
-    @Operation(summary = "Expert user detail by userId", description = "Admin only")
+    @Operation(summary = "按用户编号查看专家用户详情", description = "仅管理员")
     public Result<ExpertApplyDetailVO> getExpertUserDetail(@PathVariable Long id) {
         return Result.success(expertAdminService.getDetailByUserId(id));
     }
 
     @PutMapping("/expert/user/{id}/status")
     @PreAuthorize("hasAuthority('rbac:user:manage')")
-    @Operation(summary = "Update expert status", description = "User management")
+    @Operation(summary = "更新专家状态", description = "用户管理")
     public Result<Void> updateExpertStatus(@PathVariable Long id, @Valid @RequestBody ExpertStatusUpdateDTO dto) {
         expertUserService.updateExpertStatus(id, dto);
         return Result.success(null);
@@ -215,7 +215,7 @@ public class AdminUserController {
 
     @PutMapping("/user/{id}")
     @PreAuthorize("hasAuthority('rbac:user:manage')")
-    @Operation(summary = "Update user", description = "User management")
+    @Operation(summary = "更新用户", description = "用户管理")
     public Result<Void> updateUser(@PathVariable Long id, @Valid @RequestBody UserUpdateDTO dto) {
         userAdminService.updateUser(id, dto);
         return Result.success(null);
@@ -223,14 +223,14 @@ public class AdminUserController {
 
     @GetMapping("/user/{id}")
     @PreAuthorize("hasAuthority('rbac:user:manage')")
-    @Operation(summary = "User detail", description = "User management")
+    @Operation(summary = "用户详情", description = "用户管理")
     public Result<UserManageVO> getUser(@PathVariable Long id) {
         return Result.success(userAdminService.getUserDetail(id));
     }
 
     @PutMapping("/user/{id}/status")
     @PreAuthorize("hasAuthority('rbac:user:manage')")
-    @Operation(summary = "Update user status", description = "User management")
+    @Operation(summary = "更新用户状态", description = "用户管理")
     public Result<Void> updateUserStatus(@PathVariable Long id, @Valid @RequestBody UserStatusDTO dto) {
         userAdminService.updateStatus(id, dto);
         return Result.success(null);
@@ -238,7 +238,7 @@ public class AdminUserController {
 
     @DeleteMapping("/user/{id}")
     @PreAuthorize("hasAuthority('rbac:user:manage')")
-    @Operation(summary = "Delete user", description = "User management")
+    @Operation(summary = "删除用户", description = "用户管理")
     public Result<Void> deleteUser(@PathVariable Long id) {
         userAdminService.deleteUser(id);
         return Result.success(null);

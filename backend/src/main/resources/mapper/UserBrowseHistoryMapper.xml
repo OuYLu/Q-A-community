@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.community.mapper.UserBrowseHistoryMapper">
+  <select id="selectMyHistory" resultType="com.community.vo.AppMyHistoryItemVO">
+    SELECT
+      h.biz_type AS bizType,
+      h.biz_id AS bizId,
+      CASE
+        WHEN h.biz_type = 1 THEN q.title
+        WHEN h.biz_type = 2 THEN kb.title
+        WHEN h.biz_type = 3 THEN t.title
+        ELSE CONCAT('CONTENT#', h.biz_id)
+      END AS title,
+      CASE
+        WHEN h.biz_type = 1 THEN LEFT(q.content, 80)
+        WHEN h.biz_type = 2 THEN kb.summary
+        WHEN h.biz_type = 3 THEN t.subtitle
+        ELSE ''
+      END AS subTitle,
+      h.created_at AS viewedAt
+    FROM user_browse_history h
+    LEFT JOIN qa_question q ON h.biz_type = 1 AND q.id = h.biz_id
+    LEFT JOIN kb_entry kb ON h.biz_type = 2 AND kb.id = h.biz_id
+    LEFT JOIN qa_topic t ON h.biz_type = 3 AND t.id = h.biz_id
+    WHERE h.user_id = #{userId}
+    ORDER BY h.created_at DESC, h.id DESC
+  </select>
+</mapper>

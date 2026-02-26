@@ -9,17 +9,17 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-@Schema(description = "QA topic save")
+@Schema(description = "问答话题保存")
 public class QaTopicSaveDTO {
-    @NotBlank(message = "title is required")
+    @NotBlank(message = "标题不能为空")
     private String title;
 
     private String subtitle;
     private String coverImg;
     private String intro;
 
-    @Min(value = 1, message = "status must be between 1 and 4")
-    @Max(value = 4, message = "status must be between 1 and 4")
+    @Min(value = 1, message = "状态必须在1到4之间")
+    @Max(value = 4, message = "状态必须在1到4之间")
     private Integer status;
 
     private List<Long> categoryIds;

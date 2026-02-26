@@ -6,23 +6,23 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-@Schema(description = "Tag detail extra info")
+@Schema(description = "标签扩展信息")
 public class TagDetailExtraVO {
-    @Schema(description = "Tag id")
+    @Schema(description = "标签编号")
     private Long tagId;
 
-    @Schema(description = "Question manage path")
+    @Schema(description = "问题管理路径")
     private String questionManagePath;
 
-    @Schema(description = "Question manage query key")
+    @Schema(description = "问题管理查询键")
     private String questionManageQueryKey;
 
-    @Schema(description = "Question manage query value")
+    @Schema(description = "问题管理查询值")
     private Long questionManageQueryValue;
 
-    @Schema(description = "Question manage full url")
+    @Schema(description = "问题管理完整链接")
     private String questionManageUrl;
 
-    @Schema(description = "Recent questions using this tag")
+    @Schema(description = "使用该标签的最近问题")
     private List<TagRecentQuestionVO> recentQuestions;
 }

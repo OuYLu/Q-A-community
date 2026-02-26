@@ -23,6 +23,8 @@ public class QaQuestion {
 
     private String content;
 
+    private String imageUrls;
+
     private Integer status;
 
     private String rejectReason;
