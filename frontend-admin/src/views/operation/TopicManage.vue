@@ -10,10 +10,11 @@
         </el-form-item>
         <el-form-item label="状态">
           <el-select v-model="query.status" clearable placeholder="全部状态" style="width: 130px">
-            <el-option label="草稿" :value="1" />
-            <el-option label="已发布" :value="2" />
-            <el-option label="已下线" :value="3" />
-            <el-option label="已删除" :value="4" />
+            <el-option label="草稿" :value="0" />
+            <el-option label="已发布" :value="1" />
+            <el-option label="待审核" :value="2" />
+            <el-option label="驳回" :value="3" />
+            <el-option label="下架" :value="4" />
           </el-select>
         </el-form-item>
         <el-form-item label="排序字段">
@@ -80,10 +81,10 @@
           <el-button size="small" type="primary" plain @click="openDetail(scope.row)">详情</el-button>
           <el-button size="small" @click="openEdit(scope.row)">编辑</el-button>
           <el-button
-            v-if="scope.row.status !== 2"
+            v-if="scope.row.status !== 1"
             size="small"
             type="success"
-            @click="changeStatus(scope.row, 2)"
+            @click="changeStatus(scope.row, 1)"
           >
             发布
           </el-button>
@@ -91,11 +92,11 @@
             v-else
             size="small"
             type="warning"
-            @click="changeStatus(scope.row, 3)"
+            @click="changeStatus(scope.row, 4)"
           >
             下线
           </el-button>
-          <el-button v-if="scope.row.status !== 4" size="small" type="danger" @click="removeTopic(scope.row)">删除</el-button>
+          <el-button size="small" type="danger" @click="removeTopic(scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -131,9 +132,13 @@
       </el-form-item>
       <el-form-item label="专题状态" prop="status">
         <el-radio-group v-model="form.status">
-          <el-radio :label="1">草稿</el-radio>
-          <el-radio :label="2">已发布</el-radio>
-          <el-radio :label="3">已下线</el-radio>
+          <el-radio
+            v-for="item in statusEditOptions"
+            :key="item.value"
+            :label="item.value"
+          >
+            {{ item.label }}
+          </el-radio>
         </el-radio-group>
       </el-form-item>
       <el-form-item label="关联分类">
@@ -265,7 +270,7 @@ type TopicForm = {
   subtitle: string;
   coverImg: string;
   intro: string;
-  status: 1 | 2 | 3;
+  status: 0 | 1 | 2 | 3 | 4;
   categoryIds: number[];
 };
 
@@ -286,7 +291,7 @@ const form = reactive<TopicForm>({
   subtitle: "",
   coverImg: "",
   intro: "",
-  status: 1,
+  status: 0,
   categoryIds: []
 });
 const coverLocalPreview = ref("");
@@ -338,39 +343,72 @@ const rules = {
   title: [{ required: true, message: "请输入专题标题", trigger: "blur" }],
   status: [{ required: true, message: "请选择专题状态", trigger: "change" }]
 };
+const statusEditOptions = computed(() => {
+  if (editMode.value === "create") {
+    return [
+      { label: "草稿", value: 0 as const },
+      { label: "已发布", value: 1 as const }
+    ];
+  }
+  return [
+    { label: "已发布", value: 1 as const },
+    { label: "下架", value: 4 as const }
+  ];
+});
 
 const mediaBaseUrl = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/+$/, "");
 const resolveMediaUrl = (raw?: string): string => {
   if (!raw) return "";
-  if (/^(https?:)?\/\//i.test(raw) || raw.startsWith("data:") || raw.startsWith("blob:")) {
-    return raw;
+  const cleanRaw = raw.trim();
+  if (/^(https?:)?\/\//i.test(cleanRaw) || cleanRaw.startsWith("data:") || cleanRaw.startsWith("blob:")) {
+    return cleanRaw;
   }
-  if (!mediaBaseUrl) return raw;
-  if (raw.startsWith("/")) {
+  if (!mediaBaseUrl) return cleanRaw;
+  const hostBase = mediaBaseUrl.replace(/\/api$/, "");
+  const normalizedRaw = cleanRaw.startsWith("/") ? cleanRaw : `/${cleanRaw}`;
+  const isStaticAssetPath =
+    normalizedRaw.startsWith("/uploads/") ||
+    normalizedRaw.startsWith("/upload/") ||
+    normalizedRaw.startsWith("/static/") ||
+    normalizedRaw.startsWith("/files/");
+  if (cleanRaw.startsWith("/")) {
     if (mediaBaseUrl.startsWith("http")) {
-      if (mediaBaseUrl.endsWith("/api") && raw.startsWith("/api/")) {
-        return `${mediaBaseUrl.replace(/\/api$/, "")}${raw}`;
+      if (mediaBaseUrl.endsWith("/api")) {
+        if (cleanRaw.startsWith("/api/")) {
+          return encodeURI(`${hostBase}${cleanRaw}`);
+        }
+        if (isStaticAssetPath) {
+          return encodeURI(`${hostBase}${cleanRaw}`);
+        }
       }
-      return `${mediaBaseUrl}${raw}`;
+      return encodeURI(`${mediaBaseUrl}${cleanRaw}`);
     }
-    return `${mediaBaseUrl}${raw}`;
+    if (cleanRaw === mediaBaseUrl || cleanRaw.startsWith(`${mediaBaseUrl}/`)) {
+      return encodeURI(cleanRaw);
+    }
+    return encodeURI(`${mediaBaseUrl}${cleanRaw}`);
   }
-  return `${mediaBaseUrl}/${raw}`;
+  if (mediaBaseUrl.startsWith("http") && mediaBaseUrl.endsWith("/api") && isStaticAssetPath) {
+    return encodeURI(`${hostBase}${normalizedRaw}`);
+  }
+  return encodeURI(`${mediaBaseUrl}/${cleanRaw}`);
 };
 const coverPreview = computed(() => coverLocalPreview.value || resolveMediaUrl(form.coverImg));
 
 const topicStatusText = (status?: number) => {
-  if (status === 1) return "草稿";
-  if (status === 2) return "已发布";
-  if (status === 3) return "已下线";
-  if (status === 4) return "已删除";
+  if (status === 0) return "草稿";
+  if (status === 1) return "已发布";
+  if (status === 2) return "待审核";
+  if (status === 3) return "驳回";
+  if (status === 4) return "下架";
   return "-";
 };
 
 const topicStatusType = (status?: number) => {
-  if (status === 2) return "success";
-  if (status === 3) return "warning";
-  if (status === 4) return "danger";
+  if (status === 1) return "success";
+  if (status === 2) return "warning";
+  if (status === 3) return "danger";
+  if (status === 4) return "info";
   return "info";
 };
 
@@ -440,7 +478,7 @@ const resetForm = () => {
   form.subtitle = "";
   form.coverImg = "";
   form.intro = "";
-  form.status = 1;
+  form.status = 0;
   form.categoryIds = [];
   coverLocalPreview.value = "";
 };
@@ -461,7 +499,7 @@ const openEdit = async (row: AdminTopicListItemVO) => {
   form.subtitle = res.data.subtitle || "";
   form.coverImg = res.data.coverImg || "";
   form.intro = res.data.intro || "";
-  form.status = (res.data.status === 2 ? 2 : res.data.status === 3 ? 3 : 1) as 1 | 2 | 3;
+  form.status = (res.data.status === 4 ? 4 : 1) as 0 | 1 | 2 | 3 | 4;
   form.categoryIds = (res.data.categories || []).map((item) => item.id);
   coverLocalPreview.value = "";
   formRef.value?.clearValidate();

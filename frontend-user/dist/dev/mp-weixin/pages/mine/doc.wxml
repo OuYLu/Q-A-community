@@ -1,0 +1,1 @@
+<view class="page data-v-2aba08ea"><view class="doc-title data-v-2aba08ea">{{a}}</view><view wx:if="{{b}}" class="state data-v-2aba08ea">加载中...</view><view wx:else class="doc-body data-v-2aba08ea">{{c}}</view></view>

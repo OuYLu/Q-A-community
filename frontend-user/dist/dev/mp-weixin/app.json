@@ -1,0 +1,66 @@
+{
+  "pages": [
+    "pages/home/index",
+    "pages/search/index",
+    "pages/discover/index",
+    "pages/notice/index",
+    "pages/mine/index",
+    "pages/question/detail",
+    "pages/question/ask",
+    "pages/question/answer",
+    "pages/question/answer-detail",
+    "pages/auth/login",
+    "pages/auth/register",
+    "pages/auth/wechat-authorize",
+    "pages/auth/wechat-bind-phone",
+    "pages/mine/list",
+    "pages/mine/doc",
+    "pages/mine/edit-profile",
+    "pages/mine/password"
+  ],
+  "window": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "Smart Community",
+    "navigationBarBackgroundColor": "#f7f5eb",
+    "backgroundColor": "#f7f5eb"
+  },
+  "tabBar": {
+    "color": "#8ba0b3",
+    "selectedColor": "#2f9ad2",
+    "backgroundColor": "#f7f5eb",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/home/index",
+        "text": "首页",
+        "iconPath": "static/tabbar/home.png",
+        "selectedIconPath": "static/tabbar/home-active.png"
+      },
+      {
+        "pagePath": "pages/search/index",
+        "text": "搜索",
+        "iconPath": "static/tabbar/search.png",
+        "selectedIconPath": "static/tabbar/search-active.png"
+      },
+      {
+        "pagePath": "pages/discover/index",
+        "text": "发现",
+        "iconPath": "static/tabbar/discover.png",
+        "selectedIconPath": "static/tabbar/discover-active.png"
+      },
+      {
+        "pagePath": "pages/notice/index",
+        "text": "通知",
+        "iconPath": "static/tabbar/notice.png",
+        "selectedIconPath": "static/tabbar/notice-active.png"
+      },
+      {
+        "pagePath": "pages/mine/index",
+        "text": "我的",
+        "iconPath": "static/tabbar/mine.png",
+        "selectedIconPath": "static/tabbar/mine-active.png"
+      }
+    ]
+  },
+  "usingComponents": {}
+}

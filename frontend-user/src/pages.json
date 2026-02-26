@@ -1,0 +1,150 @@
+﻿{
+    "pages":  [
+                  {
+                      "path":  "pages/home/index",
+                      "style":  {
+                                    "navigationBarTitleText":  "健康问问"
+                                }
+                  },
+                  {
+                      "path":  "pages/search/index",
+                      "style":  {
+                                    "navigationBarTitleText":  "搜索"
+                                }
+                  },
+                  {
+                      "path":  "pages/discover/index",
+                      "style":  {
+                                    "navigationBarTitleText":  "发现"
+                                }
+                  },
+                  {
+                      "path":  "pages/notice/index",
+                      "style":  {
+                                    "navigationBarTitleText":  "通知中心"
+                                }
+                  },
+                  {
+                      "path":  "pages/mine/index",
+                      "style":  {
+                                    "navigationBarTitleText":  "我的"
+                                }
+                  },
+                  {
+                      "path":  "pages/question/detail",
+                      "style":  {
+                                    "navigationBarTitleText":  "问题详情"
+                                }
+                  },
+                  {
+                      "path":  "pages/question/ask",
+                      "style":  {
+                                    "navigationBarTitleText":  "发起提问"
+                                }
+                  },
+                  {
+                      "path":  "pages/question/answer",
+                      "style":  {
+                                    "navigationBarTitleText":  "写回答"
+                                }
+                  },
+                  {
+                      "path":  "pages/question/answer-detail",
+                      "style":  {
+                                    "navigationBarTitleText":  "回答详情"
+                                }
+                  },
+                  {
+                      "path":  "pages/auth/login",
+                      "style":  {
+                                    "navigationBarTitleText":  "登录"
+                                }
+                  },
+                  {
+                      "path":  "pages/auth/register",
+                      "style":  {
+                                    "navigationBarTitleText":  "注册"
+                                }
+                  },
+                  {
+                      "path":  "pages/auth/wechat-authorize",
+                      "style":  {
+                                    "navigationBarTitleText":  "授权登录"
+                                }
+                  },
+                  {
+                      "path":  "pages/auth/wechat-bind-phone",
+                      "style":  {
+                                    "navigationBarTitleText":  "绑定手机号"
+                                }
+                  },
+                  {
+                      "path":  "pages/mine/list",
+                      "style":  {
+                                    "navigationBarTitleText":  "列表"
+                                }
+                  },
+                  {
+                      "path":  "pages/mine/doc",
+                      "style":  {
+                                    "navigationBarTitleText":  "文档"
+                                }
+                  },
+                  {
+                      "path":  "pages/mine/edit-profile",
+                      "style":  {
+                                    "navigationBarTitleText":  "编辑资料"
+                                }
+                  },
+                  {
+                      "path":  "pages/mine/password",
+                      "style":  {
+                                    "navigationBarTitleText":  "设置密码"
+                                }
+                  }
+              ],
+    "tabBar":  {
+                   "color":  "#8ba0b3",
+                   "selectedColor":  "#2f9ad2",
+                   "backgroundColor":  "#f7f5eb",
+                   "borderStyle":  "black",
+                   "list":  [
+                                {
+                                    "pagePath":  "pages/home/index",
+                                    "text":  "首页",
+                                    "iconPath":  "static/tabbar/home.png",
+                                    "selectedIconPath":  "static/tabbar/home-active.png"
+                                },
+                                {
+                                    "pagePath":  "pages/search/index",
+                                    "text":  "搜索",
+                                    "iconPath":  "static/tabbar/search.png",
+                                    "selectedIconPath":  "static/tabbar/search-active.png"
+                                },
+                                {
+                                    "pagePath":  "pages/discover/index",
+                                    "text":  "发现",
+                                    "iconPath":  "static/tabbar/discover.png",
+                                    "selectedIconPath":  "static/tabbar/discover-active.png"
+                                },
+                                {
+                                    "pagePath":  "pages/notice/index",
+                                    "text":  "通知",
+                                    "iconPath":  "static/tabbar/notice.png",
+                                    "selectedIconPath":  "static/tabbar/notice-active.png"
+                                },
+                                {
+                                    "pagePath":  "pages/mine/index",
+                                    "text":  "我的",
+                                    "iconPath":  "static/tabbar/mine.png",
+                                    "selectedIconPath":  "static/tabbar/mine-active.png"
+                                }
+                            ]
+               },
+    "globalStyle":  {
+                        "navigationBarTextStyle":  "black",
+                        "navigationBarTitleText":  "Smart Community",
+                        "navigationBarBackgroundColor":  "#f7f5eb",
+                        "backgroundColor":  "#f7f5eb"
+                    }
+}

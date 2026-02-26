@@ -1,0 +1,38 @@
+{
+  "name": "frontend-user",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev:h5": "uni",
+    "dev:mp-weixin": "uni -p mp-weixin",
+    "build:h5": "uni build -p h5",
+    "build:mp-weixin": "uni build -p mp-weixin"
+  },
+  "dependencies": {
+    "@dcloudio/uni-app": "3.0.0-4030620241128001",
+    "@dcloudio/uni-mp-weixin": "3.0.0-4030620241128001",
+    "pinia": "^2.1.7",
+    "vue": "3.4.21"
+  },
+  "devDependencies": {
+    "@dcloudio/types": "^3.4.14",
+    "@dcloudio/uni-cli-shared": "3.0.0-4030620241128001",
+    "@dcloudio/vite-plugin-uni": "3.0.0-4030620241128001",
+    "sass": "1.69.7",
+    "typescript": "^5.4.5",
+    "vite": "5.2.8"
+  },
+  "overrides": {
+    "vue": "3.4.21",
+    "@vue/compiler-core": "3.4.21",
+    "@vue/compiler-dom": "3.4.21",
+    "@vue/compiler-sfc": "3.4.21",
+    "@vue/compiler-ssr": "3.4.21",
+    "@vue/reactivity": "3.4.21",
+    "@vue/runtime-core": "3.4.21",
+    "@vue/runtime-dom": "3.4.21",
+    "@vue/server-renderer": "3.4.21",
+    "@vue/shared": "3.4.21",
+    "vue-router": "4.3.0"
+  }
+}

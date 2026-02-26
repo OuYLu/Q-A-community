@@ -111,25 +111,9 @@
       <el-table-column prop="reviewedAt" label="处理时间" width="176">
         <template #default="scope">{{ formatDateTime(scope.row.auditedAt || scope.row.reviewedAt) }}</template>
       </el-table-column>
-      <el-table-column label="操作" width="310" fixed="right">
+      <el-table-column label="操作" width="200" fixed="right">
         <template #default="scope">
           <el-button size="small" type="primary" plain @click="openDetail(scope.row)">详情</el-button>
-          <el-button
-            v-if="scope.row.auditStatus === 1"
-            size="small"
-            type="success"
-            @click="reviewSingle(scope.row, 'pass')"
-          >
-            通过
-          </el-button>
-          <el-button
-            v-if="scope.row.auditStatus === 1"
-            size="small"
-            type="danger"
-            @click="openRejectDialog('single', scope.row.id)"
-          >
-            驳回
-          </el-button>
           <el-button
             v-if="scope.row.auditStatus === 2 || scope.row.auditStatus === 3"
             size="small"
@@ -475,16 +459,6 @@ const rejectFromDetail = () => {
   if (!detailAuditId.value) return;
   detailVisible.value = false;
   openRejectDialog("single", detailAuditId.value);
-};
-
-const reviewSingle = async (row: CmsAuditPageItemVO, action: CmsAuditAction) => {
-  if (row.auditStatus !== 1) {
-    ElMessage.warning("仅待审核单可处理");
-    return;
-  }
-  await reviewCmsAudit(row.id, { action });
-  ElMessage.success(action === "pass" ? "已通过" : "已驳回");
-  await loadData();
 };
 
 const batchPass = async () => {

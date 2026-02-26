@@ -1,0 +1,66 @@
+.page.data-v-6c56cc25 {
+  min-height: 100vh;
+  padding: 24rpx;
+  display: flex;
+  align-items: center;
+}
+.panel.data-v-6c56cc25 {
+  width: 100%;
+  padding: 34rpx 28rpx;
+}
+.logo.data-v-6c56cc25 {
+  font-size: 42rpx;
+  font-weight: 800;
+  color: #2b5f86;
+}
+.title.data-v-6c56cc25 {
+  margin-top: 10rpx;
+  font-size: 34rpx;
+  font-weight: 700;
+}
+.sub.data-v-6c56cc25 {
+  margin-top: 8rpx;
+  color: #8ba0b3;
+  line-height: 1.5;
+}
+.label.data-v-6c56cc25 {
+  margin-top: 24rpx;
+  color: #5d768a;
+}
+.input.data-v-6c56cc25 {
+  margin-top: 10rpx;
+  height: 78rpx;
+  border-radius: 18rpx;
+  border: 2rpx solid #9bd1ef;
+  background: #fff;
+  padding: 0 20rpx;
+}
+.btn.data-v-6c56cc25 {
+  margin-top: 24rpx;
+  height: 78rpx;
+  line-height: 78rpx;
+  border: none;
+  border-radius: 18rpx;
+  background: #4ba7d9;
+  color: #fff;
+  font-size: 30rpx;
+  font-weight: 700;
+}
+.ghost.data-v-6c56cc25 {
+  margin-top: 12rpx;
+  background: #e9f5fc;
+  color: #2f9ad2;
+}
+.link.data-v-6c56cc25 {
+  margin-top: 14rpx;
+  border: none;
+  background: transparent;
+  color: #2f9ad2;
+  font-size: 26rpx;
+}
+.agreement.data-v-6c56cc25 {
+  margin-top: 12rpx;
+  color: #9bb0c0;
+  font-size: 24rpx;
+  text-align: center;
+}

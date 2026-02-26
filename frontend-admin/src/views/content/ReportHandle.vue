@@ -83,16 +83,9 @@
       <el-table-column label="创建时间" width="176">
         <template #default="scope">{{ formatDateTime(scope.row.createdAt) }}</template>
       </el-table-column>
-      <el-table-column label="操作" width="430" fixed="right">
+      <el-table-column label="操作" width="100" fixed="right">
         <template #default="scope">
           <el-button size="small" type="primary" plain @click="openDetail(scope.row)">详情</el-button>
-          <template v-if="scope.row.status === 1">
-            <el-button size="small" type="warning" @click="openHandleDialog(scope.row, 1)">下架</el-button>
-            <el-button size="small" type="info" @click="openHandleDialog(scope.row, 2)">警告</el-button>
-            <el-button size="small" type="danger" @click="openHandleDialog(scope.row, 3)">封禁/禁言</el-button>
-            <el-button size="small" @click="openHandleDialog(scope.row, 4)">不处理</el-button>
-            <el-button size="small" type="success" plain @click="toAudit(scope.row)">转审核</el-button>
-          </template>
         </template>
       </el-table-column>
     </el-table>
@@ -147,6 +140,13 @@
       </template>
     </div>
     <template #footer>
+      <template v-if="detail?.report?.status === 1">
+        <el-button type="warning" @click="openHandleDialog(detail.report.id, 1)">下架</el-button>
+        <el-button type="info" @click="openHandleDialog(detail.report.id, 2)">警告</el-button>
+        <el-button type="danger" @click="openHandleDialog(detail.report.id, 3)">封禁/禁言</el-button>
+        <el-button @click="openHandleDialog(detail.report.id, 4)">不处理</el-button>
+        <el-button type="success" plain @click="toAudit(detail.report.id)">转审核</el-button>
+      </template>
       <el-button @click="detailVisible = false">关闭</el-button>
     </template>
   </el-dialog>
@@ -345,19 +345,23 @@ const resetQuery = () => {
   loadData();
 };
 
-const openDetail = async (row: CmsReportPageItemVO) => {
-  detailVisible.value = true;
+const fetchDetail = async (id: number) => {
   detailLoading.value = true;
   try {
-    const res = await getCmsReportDetail(row.id);
+    const res = await getCmsReportDetail(id);
     detail.value = res.data;
   } finally {
     detailLoading.value = false;
   }
 };
 
-const openHandleDialog = (row: CmsReportPageItemVO, action: 1 | 2 | 3 | 4) => {
-  pendingId.value = row.id;
+const openDetail = async (row: CmsReportPageItemVO) => {
+  detailVisible.value = true;
+  await fetchDetail(row.id);
+};
+
+const openHandleDialog = (reportId: number, action: 1 | 2 | 3 | 4) => {
+  pendingId.value = reportId;
   pendingAction.value = action;
   handleResult.value = "";
   handleDialogVisible.value = true;
@@ -372,12 +376,19 @@ const submitHandle = async () => {
   ElMessage.success("处理成功");
   handleDialogVisible.value = false;
   await loadData();
+  if (detailVisible.value && detail.value?.report?.id) {
+    await fetchDetail(detail.value.report.id);
+  }
 };
 
-const toAudit = async (row: CmsReportPageItemVO) => {
+const toAudit = async (reportId: number) => {
   await ElMessageBox.confirm("确认转入审核队列吗？已存在待审举报触发单时不会重复创建。", "提示", { type: "warning" });
-  await transferReportToAudit(row.id);
+  await transferReportToAudit(reportId);
   ElMessage.success("已转入审核队列");
+  await loadData();
+  if (detailVisible.value && detail.value?.report?.id) {
+    await fetchDetail(detail.value.report.id);
+  }
 };
 
 onMounted(() => {

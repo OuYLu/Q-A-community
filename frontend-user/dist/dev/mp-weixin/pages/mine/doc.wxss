@@ -1,0 +1,16 @@
+.page.data-v-2aba08ea {
+  padding: 24rpx;
+}
+.doc-title.data-v-2aba08ea {
+  font-size: 38rpx;
+  font-weight: 700;
+  margin-bottom: 18rpx;
+}
+.doc-body.data-v-2aba08ea {
+  white-space: pre-wrap;
+  line-height: 1.7;
+  color: #3f5e76;
+}
+.state.data-v-2aba08ea {
+  color: #9ab0bf;
+}
