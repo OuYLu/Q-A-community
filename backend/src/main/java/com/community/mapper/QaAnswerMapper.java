@@ -13,7 +13,15 @@ import java.util.List;
 public interface QaAnswerMapper extends BaseMapper<QaAnswer> {
     List<AppMyAnswerItemVO> selectMyAnswers(@Param("userId") Long userId);
 
+    List<AppMyAnswerItemVO> selectUserEffectiveAnswers(@Param("userId") Long userId);
+
     List<AppQuestionAnswerVO> selectAppQuestionAnswers(@Param("questionId") Long questionId);
 
     AppQuestionAnswerVO selectAppAnswerById(@Param("answerId") Long answerId);
+
+    Long sumLikeCountByUserId(@Param("userId") Long userId);
+
+    Long countUserEffectiveAnswers(@Param("userId") Long userId);
+
+    Long countMyEffectiveAnswers(@Param("userId") Long userId);
 }

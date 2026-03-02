@@ -8,6 +8,7 @@
     FROM qa_question_tag qt
     JOIN qa_tag t ON t.id = qt.tag_id
     WHERE qt.question_id = #{questionId}
+      AND t.status = 1
     ORDER BY t.id ASC
   </select>
 </mapper>

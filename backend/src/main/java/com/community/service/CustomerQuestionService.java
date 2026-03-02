@@ -6,6 +6,7 @@ import com.community.dto.AppAnswerUpdateDTO;
 import com.community.dto.AppPageQueryDTO;
 import com.community.dto.AppQuestionCreateDTO;
 import com.community.dto.AppQuestionPageQueryDTO;
+import com.community.dto.AppQuestionReportCreateDTO;
 import com.community.dto.AppQuestionUpdateDTO;
 import com.community.vo.AppMyQuestionItemVO;
 import com.community.vo.AppAnswerDetailVO;
@@ -28,6 +29,14 @@ public interface CustomerQuestionService {
     void updateQuestion(Long id, AppQuestionUpdateDTO dto);
 
     void deleteQuestion(Long id);
+
+    void setQuestionSelfOnly(Long id);
+
+    void setQuestionPublic(Long id);
+
+    Long reportQuestion(Long id, AppQuestionReportCreateDTO dto);
+
+    Long reportAnswer(Long id, AppQuestionReportCreateDTO dto);
 
     Long createAnswer(Long questionId, AppAnswerCreateDTO dto);
 

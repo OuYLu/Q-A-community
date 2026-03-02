@@ -10,12 +10,36 @@
       q.title AS questionTitle,
       a.like_count AS likeCount,
       LEFT(a.content, 100) AS contentPreview,
+      a.status AS answerStatus,
+      q.status AS questionStatus,
+      CASE WHEN a.status = 1 AND q.status IN (1, 5) THEN 1 ELSE 0 END AS effective,
       a.created_at AS createdAt
     FROM qa_answer a
     JOIN qa_question q ON q.id = a.question_id
     WHERE a.user_id = #{userId}
       AND a.delete_flag = 0
       AND q.delete_flag = 0
+    ORDER BY a.created_at DESC, a.id DESC
+  </select>
+
+  <select id="selectUserEffectiveAnswers" resultType="com.community.vo.AppMyAnswerItemVO">
+    SELECT
+      a.id AS answerId,
+      a.question_id AS questionId,
+      q.title AS questionTitle,
+      a.like_count AS likeCount,
+      LEFT(a.content, 100) AS contentPreview,
+      a.status AS answerStatus,
+      q.status AS questionStatus,
+      1 AS effective,
+      a.created_at AS createdAt
+    FROM qa_answer a
+    JOIN qa_question q ON q.id = a.question_id
+    WHERE a.user_id = #{userId}
+      AND a.delete_flag = 0
+      AND a.status = 1
+      AND q.delete_flag = 0
+      AND q.status = 1
     ORDER BY a.created_at DESC, a.id DESC
   </select>
 
@@ -57,5 +81,35 @@
       AND a.delete_flag = 0
       AND a.status = 1
     LIMIT 1
+  </select>
+
+  <select id="sumLikeCountByUserId" resultType="long">
+    SELECT COALESCE(SUM(a.like_count), 0)
+    FROM qa_answer a
+    WHERE a.user_id = #{userId}
+      AND a.delete_flag = 0
+      AND a.status = 1
+  </select>
+
+  <select id="countUserEffectiveAnswers" resultType="long">
+    SELECT COUNT(1)
+    FROM qa_answer a
+    JOIN qa_question q ON q.id = a.question_id
+    WHERE a.user_id = #{userId}
+      AND a.delete_flag = 0
+      AND a.status = 1
+      AND q.delete_flag = 0
+      AND q.status = 1
+  </select>
+
+  <select id="countMyEffectiveAnswers" resultType="long">
+    SELECT COUNT(1)
+    FROM qa_answer a
+    JOIN qa_question q ON q.id = a.question_id
+    WHERE a.user_id = #{userId}
+      AND a.delete_flag = 0
+      AND a.status = 1
+      AND q.delete_flag = 0
+      AND q.status IN (1, 5)
   </select>
 </mapper>

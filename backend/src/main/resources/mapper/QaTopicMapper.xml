@@ -132,8 +132,29 @@
       t.cover_img AS coverImg,
       t.follow_count AS followCount,
       t.question_count AS questionCount,
-      t.today_new_count AS todayNewCount
+      (COALESCE(qt.cnt, 0) + COALESCE(at.cnt, 0)) AS todayNewCount
     FROM qa_topic t
+    LEFT JOIN (
+      SELECT q.topic_id, COUNT(1) AS cnt
+      FROM qa_question q
+      WHERE q.delete_flag = 0
+        AND q.status = 1
+        AND q.created_at >= CURDATE()
+        AND q.created_at &lt; DATE_ADD(CURDATE(), INTERVAL 1 DAY)
+      GROUP BY q.topic_id
+    ) qt ON qt.topic_id = t.id
+    LEFT JOIN (
+      SELECT q.topic_id, COUNT(1) AS cnt
+      FROM qa_answer a
+      JOIN qa_question q ON q.id = a.question_id
+      WHERE a.delete_flag = 0
+        AND a.status = 1
+        AND q.delete_flag = 0
+        AND q.status = 1
+        AND a.created_at >= CURDATE()
+        AND a.created_at &lt; DATE_ADD(CURDATE(), INTERVAL 1 DAY)
+      GROUP BY q.topic_id
+    ) at ON at.topic_id = t.id
     WHERE t.status = 1
     <if test="keyword != null and keyword != ''">
       AND t.title LIKE CONCAT('%', #{keyword}, '%')
@@ -160,10 +181,53 @@
       t.cover_img AS coverImg,
       t.follow_count AS followCount,
       t.question_count AS questionCount,
-      t.today_new_count AS todayNewCount
+      (COALESCE(qt.cnt, 0) + COALESCE(at.cnt, 0)) AS todayNewCount
     FROM qa_topic t
+    LEFT JOIN (
+      SELECT q.topic_id AS topic_id, COUNT(1) AS cnt
+      FROM qa_question q
+      WHERE q.delete_flag = 0
+        AND q.status = 1
+        AND q.created_at &gt;= DATE_SUB(NOW(), INTERVAL 7 DAY)
+      GROUP BY q.topic_id
+    ) q7 ON q7.topic_id = t.id
+    LEFT JOIN (
+      SELECT q.topic_id AS topic_id, COUNT(1) AS cnt
+      FROM qa_answer a
+      JOIN qa_question q ON q.id = a.question_id
+      WHERE a.delete_flag = 0
+        AND a.status = 1
+        AND q.delete_flag = 0
+        AND q.status = 1
+        AND a.created_at &gt;= DATE_SUB(NOW(), INTERVAL 7 DAY)
+      GROUP BY q.topic_id
+    ) a7 ON a7.topic_id = t.id
+    LEFT JOIN (
+      SELECT q.topic_id AS topic_id, COUNT(1) AS cnt
+      FROM qa_question q
+      WHERE q.delete_flag = 0
+        AND q.status = 1
+        AND q.created_at >= CURDATE()
+        AND q.created_at &lt; DATE_ADD(CURDATE(), INTERVAL 1 DAY)
+      GROUP BY q.topic_id
+    ) qt ON qt.topic_id = t.id
+    LEFT JOIN (
+      SELECT q.topic_id AS topic_id, COUNT(1) AS cnt
+      FROM qa_answer a
+      JOIN qa_question q ON q.id = a.question_id
+      WHERE a.delete_flag = 0
+        AND a.status = 1
+        AND q.delete_flag = 0
+        AND q.status = 1
+        AND a.created_at >= CURDATE()
+        AND a.created_at &lt; DATE_ADD(CURDATE(), INTERVAL 1 DAY)
+      GROUP BY q.topic_id
+    ) at ON at.topic_id = t.id
     WHERE t.status = 1
-    ORDER BY t.follow_count DESC, t.question_count DESC, t.created_at DESC
+    ORDER BY (COALESCE(q7.cnt, 0) + COALESCE(a7.cnt, 0)) DESC,
+             t.follow_count DESC,
+             t.question_count DESC,
+             t.created_at DESC
     LIMIT #{limit}
   </select>
 
@@ -181,6 +245,33 @@
         OR t.subtitle LIKE CONCAT('%', #{query}, '%'))
     ORDER BY t.follow_count DESC, t.question_count DESC, t.created_at DESC
     LIMIT #{limit}
+  </select>
+
+  <select id="selectTopicTodayNewCount" resultType="java.lang.Integer">
+    SELECT (
+      COALESCE((
+        SELECT COUNT(1)
+        FROM qa_question q
+        WHERE q.topic_id = #{topicId}
+          AND q.delete_flag = 0
+          AND q.status = 1
+          AND q.created_at >= CURDATE()
+          AND q.created_at &lt; DATE_ADD(CURDATE(), INTERVAL 1 DAY)
+      ), 0)
+      +
+      COALESCE((
+        SELECT COUNT(1)
+        FROM qa_answer a
+        JOIN qa_question q ON q.id = a.question_id
+        WHERE q.topic_id = #{topicId}
+          AND q.delete_flag = 0
+          AND q.status = 1
+          AND a.delete_flag = 0
+          AND a.status = 1
+          AND a.created_at >= CURDATE()
+          AND a.created_at &lt; DATE_ADD(CURDATE(), INTERVAL 1 DAY)
+      ), 0)
+    ) AS cnt
   </select>
 
   <update id="updateFollowCount">

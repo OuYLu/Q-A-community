@@ -172,6 +172,7 @@
       use_count AS useCount,
       created_at AS createdAt
     FROM qa_tag
+    WHERE status = 1
     ORDER BY use_count DESC, id DESC
     LIMIT #{limit}
   </select>

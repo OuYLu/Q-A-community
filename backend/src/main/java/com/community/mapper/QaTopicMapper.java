@@ -45,6 +45,8 @@ public interface QaTopicMapper extends BaseMapper<QaTopic> {
     List<AppSearchTopicVO> selectAppSearchTopics(@Param("query") String query,
                                                  @Param("limit") Integer limit);
 
+    Integer selectTopicTodayNewCount(@Param("topicId") Long topicId);
+
     int updateFollowCount(@Param("id") Long id,
                           @Param("delta") Integer delta);
 }

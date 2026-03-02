@@ -13,6 +13,7 @@ public class CmsReportPageItemVO {
     private String reasonCode;
     private String reasonDetail;
     private Long reporterId;
+    private String reporterName;
     private LocalDateTime createdAt;
     private Integer status;
 

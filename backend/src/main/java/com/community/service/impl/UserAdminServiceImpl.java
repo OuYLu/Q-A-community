@@ -86,6 +86,10 @@ public class UserAdminServiceImpl extends ServiceImpl<UserMapper, User> implemen
             && user.getExpertStatus() != null && user.getExpertStatus() == 0) {
             user.setExpertStatus(3);
         }
+        if (dto.getStatus() != null && dto.getStatus() == 1) {
+            user.setBanUntil(null);
+            user.setBanReason(null);
+        }
 
         user.setStatus(dto.getStatus());
         user.setUpdatedAt(LocalDateTime.now());

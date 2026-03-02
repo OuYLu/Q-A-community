@@ -5,12 +5,15 @@ import com.community.common.BizException;
 import com.community.common.ResultCode;
 import com.community.common.SecurityUser;
 import com.community.dto.AppTopicPageQueryDTO;
+import com.community.dto.AppQuestionCreateDTO;
 import com.community.dto.AppTopicQuestionQueryDTO;
 import com.community.entity.QaTopic;
 import com.community.entity.QaTopicFollow;
 import com.community.mapper.QaQuestionMapper;
+import com.community.mapper.QaTopicCategoryMapper;
 import com.community.mapper.QaTopicFollowMapper;
 import com.community.mapper.QaTopicMapper;
+import com.community.service.CustomerQuestionService;
 import com.community.service.CustomerTopicService;
 import com.community.vo.AppTopicDetailVO;
 import com.community.vo.AppTopicListItemVO;
@@ -29,7 +32,9 @@ import org.springframework.util.StringUtils;
 public class CustomerTopicServiceImpl implements CustomerTopicService {
     private final QaTopicMapper qaTopicMapper;
     private final QaTopicFollowMapper qaTopicFollowMapper;
+    private final QaTopicCategoryMapper qaTopicCategoryMapper;
     private final QaQuestionMapper qaQuestionMapper;
+    private final CustomerQuestionService customerQuestionService;
 
     @Override
     public PageInfo<AppTopicListItemVO> page(AppTopicPageQueryDTO query) {
@@ -57,7 +62,13 @@ public class CustomerTopicServiceImpl implements CustomerTopicService {
         vo.setIntro(topic.getIntro());
         vo.setFollowCount(topic.getFollowCount());
         vo.setQuestionCount(topic.getQuestionCount());
-        vo.setTodayNewCount(topic.getTodayNewCount());
+        Integer todayNewCount = qaTopicMapper.selectTopicTodayNewCount(topic.getId());
+        vo.setTodayNewCount(todayNewCount == null ? 0 : todayNewCount);
+        vo.setTags(qaTopicCategoryMapper.selectCategoriesByTopicId(topic.getId()).stream()
+            .map(x -> x.getName())
+            .filter(StringUtils::hasText)
+            .distinct()
+            .toList());
         vo.setFollowed(isFollowed(topic.getId(), currentUserId()));
         return vo;
     }
@@ -73,8 +84,22 @@ public class CustomerTopicServiceImpl implements CustomerTopicService {
         String sortBy = query == null ? null : query.getSortBy();
         boolean onlyUnsolved = "unsolved".equalsIgnoreCase(sortBy);
         String resolvedSort = StringUtils.hasText(sortBy) ? sortBy : "hot";
+        if (onlyUnsolved) {
+            resolvedSort = "latest";
+        }
         PageHelper.startPage(page, pageSize);
         return new PageInfo<>(qaQuestionMapper.selectAppTopicQuestions(topicId, resolvedSort, onlyUnsolved));
+    }
+
+    @Override
+    @Transactional
+    public Long createTopicQuestion(Long topicId, AppQuestionCreateDTO dto) {
+        QaTopic topic = qaTopicMapper.selectById(topicId);
+        if (topic == null || topic.getStatus() == null || topic.getStatus() != 1) {
+            throw new BizException(ResultCode.BAD_REQUEST, "话题不存在");
+        }
+        dto.setTopicId(topicId);
+        return customerQuestionService.createQuestion(dto);
     }
 
     @Override

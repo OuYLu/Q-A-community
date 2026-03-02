@@ -8,8 +8,11 @@ import com.community.dto.AppMePasswordChangeDTO;
 import com.community.dto.AppMePasswordSetFirstDTO;
 import com.community.dto.AppMeProfileUpdateDTO;
 import com.community.dto.AppPageQueryDTO;
+import com.community.entity.ExpertProfile;
 import com.community.entity.User;
 import com.community.entity.UserStat;
+import com.community.mapper.ExpertPostMapper;
+import com.community.mapper.ExpertProfileMapper;
 import com.community.mapper.QaAnswerMapper;
 import com.community.mapper.QaFavoriteMapper;
 import com.community.mapper.QaQuestionMapper;
@@ -28,12 +31,15 @@ import com.community.vo.AppMyQuestionItemVO;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -45,7 +51,12 @@ public class CustomerMeServiceImpl implements CustomerMeService {
     private final QaQuestionMapper qaQuestionMapper;
     private final QaAnswerMapper qaAnswerMapper;
     private final UserFollowMapper userFollowMapper;
+    private final ExpertProfileMapper expertProfileMapper;
+    private final ExpertPostMapper expertPostMapper;
     private final PasswordEncoder passwordEncoder;
+
+    @Value("${qa.history-retention-days:30}")
+    private int historyRetentionDays;
 
     @Override
     public AppMeOverviewVO overview() {
@@ -56,30 +67,25 @@ public class CustomerMeServiceImpl implements CustomerMeService {
         }
 
         UserStat stat = userStatMapper.selectById(userId);
-        int questionCount = stat != null && stat.getQuestionCount() != null
-                ? stat.getQuestionCount()
-                : Math.toIntExact(qaQuestionMapper.selectCount(new LambdaQueryWrapper<com.community.entity.QaQuestion>()
-                .eq(com.community.entity.QaQuestion::getUserId, userId)
-                .eq(com.community.entity.QaQuestion::getDeleteFlag, 0)));
-        int answerCount = stat != null && stat.getAnswerCount() != null
-                ? stat.getAnswerCount()
-                : Math.toIntExact(qaAnswerMapper.selectCount(new LambdaQueryWrapper<com.community.entity.QaAnswer>()
-                .eq(com.community.entity.QaAnswer::getUserId, userId)
-                .eq(com.community.entity.QaAnswer::getDeleteFlag, 0)));
-        int likeReceivedCount = stat != null && stat.getLikeReceivedCount() != null
-                ? stat.getLikeReceivedCount()
-                : (user.getLikeReceivedCount() == null ? 0 : user.getLikeReceivedCount());
+        int questionCount = Math.toIntExact(qaQuestionMapper.selectCount(new LambdaQueryWrapper<com.community.entity.QaQuestion>()
+            .eq(com.community.entity.QaQuestion::getUserId, userId)
+            .eq(com.community.entity.QaQuestion::getDeleteFlag, 0)
+            .in(com.community.entity.QaQuestion::getStatus, 1, 5)));
+        Long effectiveAnswerCount = qaAnswerMapper.countMyEffectiveAnswers(userId);
+        int answerCount = effectiveAnswerCount == null ? 0 : Math.toIntExact(effectiveAnswerCount);
+        int likeReceivedCount = Math.toIntExact(qaAnswerMapper.sumLikeCountByUserId(userId));
         int followerCount = stat != null && stat.getFollowerCount() != null
-                ? stat.getFollowerCount()
-                : (user.getFollowerCount() == null ? 0 : user.getFollowerCount());
+            ? stat.getFollowerCount()
+            : (user.getFollowerCount() == null ? 0 : user.getFollowerCount());
         int followingCount = stat != null && stat.getFollowingCount() != null
-                ? stat.getFollowingCount()
-                : (user.getFollowingCount() == null ? 0 : user.getFollowingCount());
+            ? stat.getFollowingCount()
+            : (user.getFollowingCount() == null ? 0 : user.getFollowingCount());
 
         int favoriteCount = Math.toIntExact(qaFavoriteMapper.selectCount(new LambdaQueryWrapper<com.community.entity.QaFavorite>()
-                .eq(com.community.entity.QaFavorite::getUserId, userId)));
-        int historyCount = Math.toIntExact(userBrowseHistoryMapper.selectCount(new LambdaQueryWrapper<com.community.entity.UserBrowseHistory>()
-                .eq(com.community.entity.UserBrowseHistory::getUserId, userId)));
+            .eq(com.community.entity.QaFavorite::getUserId, userId)));
+        LocalDateTime retainedFrom = LocalDateTime.now().minusDays(Math.max(1, historyRetentionDays));
+        Long historyCountValue = userBrowseHistoryMapper.countMyHistory(userId, retainedFrom);
+        int historyCount = historyCountValue == null ? 0 : Math.toIntExact(historyCountValue);
 
         AppMeOverviewVO vo = new AppMeOverviewVO();
         vo.setUserId(user.getId());
@@ -87,6 +93,15 @@ public class CustomerMeServiceImpl implements CustomerMeService {
         vo.setPhone(user.getPhone());
         vo.setEmail(user.getEmail());
         vo.setExpertStatus(user.getExpertStatus());
+        if (user.getExpertStatus() != null && user.getExpertStatus() == 3) {
+            ExpertProfile profile = expertProfileMapper.selectOne(new LambdaQueryWrapper<ExpertProfile>()
+                .eq(ExpertProfile::getUserId, userId)
+                .last("LIMIT 1"));
+            if (profile != null) {
+                vo.setExpertTitle(profile.getTitle());
+                vo.setExpertExpertise(profile.getExpertise());
+            }
+        }
         vo.setPasswordSet(user.getPasswordSet());
         vo.setNickname(StringUtils.hasText(user.getNickname()) ? user.getNickname() : user.getUsername());
         vo.setAvatar(user.getAvatar());
@@ -99,6 +114,13 @@ public class CustomerMeServiceImpl implements CustomerMeService {
         vo.setFollowingCount(followingCount);
         vo.setFavoriteCount(favoriteCount);
         vo.setHistoryCount(historyCount);
+        if (user.getExpertStatus() != null && user.getExpertStatus() == 3) {
+            Long postCountValue = expertPostMapper.countMyPosts(userId);
+            int postCount = postCountValue == null ? 0 : Math.toIntExact(postCountValue);
+            vo.setExpertPostCount(postCount);
+        } else {
+            vo.setExpertPostCount(0);
+        }
         return vo;
     }
 
@@ -176,8 +198,9 @@ public class CustomerMeServiceImpl implements CustomerMeService {
     @Override
     public PageInfo<AppMyHistoryItemVO> history(AppPageQueryDTO query) {
         Long userId = requireUserId();
+        LocalDateTime retainedFrom = LocalDateTime.now().minusDays(Math.max(1, historyRetentionDays));
         PageHelper.startPage(resolvePage(query), resolvePageSize(query));
-        return new PageInfo<>(userBrowseHistoryMapper.selectMyHistory(userId));
+        return new PageInfo<>(userBrowseHistoryMapper.selectMyHistory(userId, retainedFrom));
     }
 
     @Override

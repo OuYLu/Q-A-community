@@ -8,6 +8,7 @@ import com.community.vo.AppQuestionHotItemVO;
 import com.community.vo.AppQuestionListItemVO;
 import com.community.vo.AppSearchQuestionVO;
 import com.community.vo.AppTopicQuestionItemVO;
+import com.community.vo.SearchQuestionDoc;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -22,8 +23,19 @@ public interface QaQuestionMapper extends BaseMapper<QaQuestion> {
                                                          @Param("onlyUnsolved") boolean onlyUnsolved);
 
     List<AppSearchQuestionVO> selectAppSearchQuestions(@Param("query") String query,
+                                                       @Param("sortBy") String sortBy,
+                                                       @Param("categoryId") Long categoryId,
+                                                       @Param("topicId") Long topicId,
+                                                       @Param("onlyUnsolved") Boolean onlyUnsolved,
                                                        @Param("limit") Integer limit,
                                                        @Param("offset") Integer offset);
+
+    List<AppSearchQuestionVO> selectAppSearchQuestionsByIds(@Param("ids") List<Long> ids,
+                                                            @Param("categoryId") Long categoryId,
+                                                            @Param("topicId") Long topicId,
+                                                            @Param("onlyUnsolved") Boolean onlyUnsolved);
+
+    List<SearchQuestionDoc> selectSearchQuestionDocs();
 
     List<AppMyQuestionItemVO> selectMyQuestions(@Param("userId") Long userId);
 

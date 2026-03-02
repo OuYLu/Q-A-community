@@ -5,6 +5,7 @@ import com.community.dto.AppNotificationPageQueryDTO;
 import com.community.service.CustomerNotificationService;
 import com.community.vo.AppNotificationItemVO;
 import com.community.vo.AppNotificationUnreadCountVO;
+import com.community.vo.AppReportFeedbackDetailVO;
 import com.github.pagehelper.PageInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -35,8 +36,14 @@ public class CustomerNotificationController {
         return Result.success(customerNotificationService.unreadCount());
     }
 
+    @GetMapping("/report-feedback/{reportId}")
+    @Operation(summary = "举报反馈详情")
+    public Result<AppReportFeedbackDetailVO> reportFeedbackDetail(@PathVariable Long reportId) {
+        return Result.success(customerNotificationService.reportFeedbackDetail(reportId));
+    }
+
     @PostMapping("/{id}/read")
-    @Operation(summary = "读取单条")
+    @Operation(summary = "单条已读")
     public Result<Void> readOne(@PathVariable Long id) {
         customerNotificationService.readOne(id);
         return Result.success(null);
@@ -49,4 +56,3 @@ public class CustomerNotificationController {
         return Result.success(null);
     }
 }
-

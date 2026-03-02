@@ -3,6 +3,8 @@ package com.community.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @Schema(description = "应用话题详情")
 public class AppTopicDetailVO {
@@ -14,6 +16,6 @@ public class AppTopicDetailVO {
     private Integer followCount;
     private Integer questionCount;
     private Integer todayNewCount;
+    private List<String> tags;
     private Boolean followed;
 }
-

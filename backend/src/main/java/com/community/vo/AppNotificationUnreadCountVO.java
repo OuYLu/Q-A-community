@@ -11,4 +11,3 @@ public class AppNotificationUnreadCountVO {
     private Integer total;
     private List<AppNotificationTypeCountVO> byType;
 }
-

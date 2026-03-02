@@ -35,12 +35,15 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
 public class CmsReportAdminServiceImpl implements CmsReportAdminService {
+    private static final int NOTIFY_TYPE_REPORT_FEEDBACK = 7;
+
     private final CmsReportMapper cmsReportMapper;
     private final CmsAuditMapper cmsAuditMapper;
     private final QaQuestionMapper qaQuestionMapper;
@@ -113,37 +116,52 @@ public class CmsReportAdminServiceImpl implements CmsReportAdminService {
     @Transactional
     public void handle(Long id, CmsReportHandleDTO dto) {
         CmsReport report = getReportOrThrow(id);
-        if (report.getStatus() == null || report.getStatus() != 1) {
-            throw new BizException(ResultCode.BAD_REQUEST, "仅待处理举报可处理");
+        if (report.getStatus() == null || report.getStatus() != CmsReport.STATUS_PENDING) {
+            throw new BizException(ResultCode.BAD_REQUEST, "仅待处理举报可执行处理");
         }
+
         Integer action = dto.getHandleAction();
         Long operatorId = currentUserId();
+        Long reporterId = report.getReporterId();
+        Long authorId = resolveContentAuthorId(report.getBizType(), report.getBizId());
+        String contentTitle = resolveContentTitle(report.getBizType(), report.getBizId());
+
         report.setHandleAction(action);
         report.setHandleResult(dto.getHandleResult());
         report.setHandlerId(operatorId);
         report.setHandledAt(LocalDateTime.now());
 
         switch (action) {
-            case 1 -> {
+            case CmsReport.HANDLE_ACTION_OFFLINE -> {
                 updateTargetContentStatus(report.getBizType(), report.getBizId(), 4);
-                report.setStatus(2);
+                report.setStatus(CmsReport.STATUS_HANDLED);
+                createReportOutcomeNotifyToAuthor(authorId, report, contentTitle, "处理结果：下架");
+                createReportOutcomeNotifyToReporter(reporterId, report, contentTitle, "处理结果：已下架");
             }
-            case 2 -> {
-                Long authorId = resolveContentAuthorId(report.getBizType(), report.getBizId());
-                createWarningNotify(authorId, report);
-                report.setStatus(2);
+            case CmsReport.HANDLE_ACTION_WARN -> {
+                report.setStatus(CmsReport.STATUS_HANDLED);
+                createReportOutcomeNotifyToAuthor(authorId, report, contentTitle, "处理结果：警告，请注意内容规范");
+                createReportOutcomeNotifyToReporter(reporterId, report, contentTitle, "处理结果：已警告");
             }
-            case 3 -> {
-                Long authorId = resolveContentAuthorId(report.getBizType(), report.getBizId());
+            case CmsReport.HANDLE_ACTION_BAN -> {
+                updateTargetContentStatus(report.getBizType(), report.getBizId(), 4);
                 User author = userMapper.selectById(authorId);
                 if (author == null) {
-                    throw new BizException(ResultCode.BAD_REQUEST, "目标作者不存在");
+                    throw new BizException(ResultCode.BAD_REQUEST, "被举报内容作者不存在");
                 }
-                author.setStatus(0);
+                int banDays = dto.getBanDays() == null || dto.getBanDays() <= 0 ? 3 : dto.getBanDays();
+                author.setBanUntil(LocalDateTime.now().plusDays(banDays));
+                author.setBanReason(StringUtils.hasText(dto.getHandleResult()) ? dto.getHandleResult().trim() : "违规内容封禁");
                 userMapper.updateById(author);
-                report.setStatus(2);
+
+                report.setStatus(CmsReport.STATUS_HANDLED);
+                createReportOutcomeNotifyToAuthor(authorId, report, contentTitle, "处理结果：封禁 " + banDays + " 天并下架");
+                createReportOutcomeNotifyToReporter(reporterId, report, contentTitle, "处理结果：已封禁并下架");
             }
-            case 4 -> report.setStatus(3);
+            case CmsReport.HANDLE_ACTION_IGNORE -> {
+                report.setStatus(CmsReport.STATUS_REJECTED);
+                createReportOutcomeNotifyToReporter(reporterId, report, contentTitle, "处理结果：不予处理");
+            }
             default -> throw new BizException(ResultCode.BAD_REQUEST, "不支持的处理动作");
         }
         cmsReportMapper.updateById(report);
@@ -183,7 +201,7 @@ public class CmsReportAdminServiceImpl implements CmsReportAdminService {
 
     private void updateTargetContentStatus(Integer bizType, Long bizId, int status) {
         switch (bizType) {
-            case 1 -> {
+            case CmsReport.BIZ_TYPE_QUESTION -> {
                 QaQuestion q = qaQuestionMapper.selectById(bizId);
                 if (q == null) {
                     throw new BizException(ResultCode.BAD_REQUEST, "目标问题不存在");
@@ -191,7 +209,7 @@ public class CmsReportAdminServiceImpl implements CmsReportAdminService {
                 q.setStatus(status);
                 qaQuestionMapper.updateById(q);
             }
-            case 2 -> {
+            case CmsReport.BIZ_TYPE_ANSWER -> {
                 QaAnswer a = qaAnswerMapper.selectById(bizId);
                 if (a == null) {
                     throw new BizException(ResultCode.BAD_REQUEST, "目标回答不存在");
@@ -199,7 +217,7 @@ public class CmsReportAdminServiceImpl implements CmsReportAdminService {
                 a.setStatus(status);
                 qaAnswerMapper.updateById(a);
             }
-            case 3 -> {
+            case CmsReport.BIZ_TYPE_COMMENT -> {
                 QaComment c = qaCommentMapper.selectById(bizId);
                 if (c == null) {
                     throw new BizException(ResultCode.BAD_REQUEST, "目标评论不存在");
@@ -207,10 +225,10 @@ public class CmsReportAdminServiceImpl implements CmsReportAdminService {
                 c.setStatus(status);
                 qaCommentMapper.updateById(c);
             }
-            case 4 -> {
+            case CmsReport.BIZ_TYPE_KB -> {
                 KbEntry e = kbEntryMapper.selectById(bizId);
                 if (e == null) {
-                    throw new BizException(ResultCode.BAD_REQUEST, "目标知识库条目不存在");
+                    throw new BizException(ResultCode.BAD_REQUEST, "目标科普内容不存在");
                 }
                 e.setStatus(status);
                 kbEntryMapper.updateById(e);
@@ -221,31 +239,31 @@ public class CmsReportAdminServiceImpl implements CmsReportAdminService {
 
     private Long resolveContentAuthorId(Integer bizType, Long bizId) {
         return switch (bizType) {
-            case 1 -> {
+            case CmsReport.BIZ_TYPE_QUESTION -> {
                 QaQuestion q = qaQuestionMapper.selectById(bizId);
                 if (q == null) {
                     throw new BizException(ResultCode.BAD_REQUEST, "目标问题不存在");
                 }
                 yield q.getUserId();
             }
-            case 2 -> {
+            case CmsReport.BIZ_TYPE_ANSWER -> {
                 QaAnswer a = qaAnswerMapper.selectById(bizId);
                 if (a == null) {
                     throw new BizException(ResultCode.BAD_REQUEST, "目标回答不存在");
                 }
                 yield a.getUserId();
             }
-            case 3 -> {
+            case CmsReport.BIZ_TYPE_COMMENT -> {
                 QaComment c = qaCommentMapper.selectById(bizId);
                 if (c == null) {
                     throw new BizException(ResultCode.BAD_REQUEST, "目标评论不存在");
                 }
                 yield c.getUserId();
             }
-            case 4 -> {
+            case CmsReport.BIZ_TYPE_KB -> {
                 KbEntry e = kbEntryMapper.selectById(bizId);
                 if (e == null) {
-                    throw new BizException(ResultCode.BAD_REQUEST, "目标知识库条目不存在");
+                    throw new BizException(ResultCode.BAD_REQUEST, "目标科普内容不存在");
                 }
                 yield e.getAuthorUserId();
             }
@@ -253,19 +271,83 @@ public class CmsReportAdminServiceImpl implements CmsReportAdminService {
         };
     }
 
-    private void createWarningNotify(Long receiverId, CmsReport report) {
+    private String resolveContentTitle(Integer bizType, Long bizId) {
+        return switch (bizType) {
+            case CmsReport.BIZ_TYPE_QUESTION -> {
+                QaQuestion q = qaQuestionMapper.selectById(bizId);
+                yield q == null ? "问题#" + bizId : q.getTitle();
+            }
+            case CmsReport.BIZ_TYPE_ANSWER -> {
+                QaAnswer a = qaAnswerMapper.selectById(bizId);
+                if (a == null) {
+                    yield "回答#" + bizId;
+                }
+                QaQuestion q = qaQuestionMapper.selectById(a.getQuestionId());
+                yield q == null ? "回答#" + bizId : q.getTitle();
+            }
+            case CmsReport.BIZ_TYPE_COMMENT -> {
+                QaComment c = qaCommentMapper.selectById(bizId);
+                if (c == null) {
+                    yield "评论#" + bizId;
+                }
+                QaAnswer a = qaAnswerMapper.selectById(c.getBizId());
+                if (a == null) {
+                    yield "评论#" + bizId;
+                }
+                QaQuestion q = qaQuestionMapper.selectById(a.getQuestionId());
+                yield q == null ? "评论#" + bizId : q.getTitle();
+            }
+            case CmsReport.BIZ_TYPE_KB -> {
+                KbEntry e = kbEntryMapper.selectById(bizId);
+                yield e == null ? "科普#" + bizId : e.getTitle();
+            }
+            default -> "内容#" + bizId;
+        };
+    }
+
+    private void createReportOutcomeNotifyToAuthor(Long receiverId, CmsReport report, String contentTitle, String resultText) {
         if (receiverId == null) {
             return;
         }
         NotifyMessage notify = new NotifyMessage();
         notify.setReceiverId(receiverId);
-        notify.setType(1);
+        notify.setType(NOTIFY_TYPE_REPORT_FEEDBACK);
         notify.setBizType(report.getBizType());
-        notify.setBizId(report.getBizId());
-        notify.setTitle("内容警告");
-        notify.setContent("你的内容收到举报，请注意社区规范。");
+        notify.setBizId(report.getId());
+        notify.setTitle("举报处理通知");
+        notify.setContent(buildOutcomeContent(contentTitle, resultText, report.getHandleResult()));
         notify.setIsRead(0);
         notifyMessageMapper.insert(notify);
+    }
+
+    private void createReportOutcomeNotifyToReporter(Long receiverId, CmsReport report, String contentTitle, String resultText) {
+        if (receiverId == null) {
+            return;
+        }
+        NotifyMessage notify = new NotifyMessage();
+        notify.setReceiverId(receiverId);
+        notify.setType(NOTIFY_TYPE_REPORT_FEEDBACK);
+        notify.setBizType(report.getBizType());
+        notify.setBizId(report.getId());
+        notify.setTitle("举报反馈通知");
+        notify.setContent(buildOutcomeContent(contentTitle, resultText, report.getHandleResult()));
+        notify.setIsRead(0);
+        notifyMessageMapper.insert(notify);
+    }
+
+    private String buildOutcomeContent(String contentTitle, String resultText, String handleResult) {
+        String titleSummary = truncateForList(StringUtils.hasText(contentTitle) ? contentTitle.trim() : "-");
+        String resultSource = StringUtils.hasText(handleResult) ? handleResult.trim() : resultText;
+        String resultSummary = truncateForList(StringUtils.hasText(resultSource) ? resultSource : "-");
+        return "内容：" + titleSummary + "；处理结果：" + resultSummary;
+    }
+
+    private String truncateForList(String input) {
+        if (!StringUtils.hasText(input)) {
+            return "";
+        }
+        String s = input.trim();
+        return s.length() > 10 ? s.substring(0, 10) + "..." : s;
     }
 
     private Long currentUserId() {

@@ -2,7 +2,9 @@ package com.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.community.entity.KbEntry;
+import com.community.vo.AppSearchKbVO;
 import com.community.vo.KbEntryPageItemVO;
+import com.community.vo.SearchKbDoc;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -19,4 +21,12 @@ public interface KbEntryMapper extends BaseMapper<KbEntry> {
                                             @Param("endTime") LocalDateTime endTime,
                                             @Param("sortBy") String sortBy,
                                             @Param("sortOrder") String sortOrder);
+
+    List<AppSearchKbVO> selectAppSearchKb(@Param("query") String query,
+                                          @Param("limit") Integer limit,
+                                          @Param("offset") Integer offset);
+
+    List<AppSearchKbVO> selectAppSearchKbByIds(@Param("ids") List<Long> ids);
+
+    List<SearchKbDoc> selectSearchKbDocs();
 }

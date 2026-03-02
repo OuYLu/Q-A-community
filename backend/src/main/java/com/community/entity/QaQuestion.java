@@ -10,6 +10,14 @@ import java.time.LocalDateTime;
 @Data
 @TableName("qa_question")
 public class QaQuestion {
+    // 状态：1-已发布，2-待审核，3-驳回，4-下架，5-仅自己可见，6-用户删除
+    public static final int STATUS_PUBLISHED = 1;
+    public static final int STATUS_PENDING = 2;
+    public static final int STATUS_REJECTED = 3;
+    public static final int STATUS_OFFLINE = 4;
+    public static final int STATUS_SELF_ONLY = 5;
+    public static final int STATUS_DELETED_BY_USER = 6;
+
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 

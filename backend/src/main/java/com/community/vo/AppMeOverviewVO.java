@@ -12,6 +12,8 @@ public class AppMeOverviewVO {
     private String phone;
     private String email;
     private Integer expertStatus;
+    private String expertTitle;
+    private String expertExpertise;
     private Integer passwordSet;
     private String nickname;
     private String avatar;
@@ -27,6 +29,7 @@ public class AppMeOverviewVO {
 
     private Integer favoriteCount;
     private Integer historyCount;
+    private Integer expertPostCount;
 }
 
 

@@ -20,6 +20,9 @@ public class AppQuestionDetailVO {
     @Schema(description = "Question content")
     private String content;
 
+    @Schema(description = "Question status")
+    private Integer status;
+
     @JsonIgnore
     private String imageUrlsRaw;
 

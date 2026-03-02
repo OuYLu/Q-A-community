@@ -19,12 +19,64 @@
         WHEN h.biz_type = 3 THEN t.subtitle
         ELSE ''
       END AS subTitle,
-      h.created_at AS viewedAt
-    FROM user_browse_history h
-    LEFT JOIN qa_question q ON h.biz_type = 1 AND q.id = h.biz_id
-    LEFT JOIN kb_entry kb ON h.biz_type = 2 AND kb.id = h.biz_id
-    LEFT JOIN qa_topic t ON h.biz_type = 3 AND t.id = h.biz_id
-    WHERE h.user_id = #{userId}
-    ORDER BY h.created_at DESC, h.id DESC
+      h.viewed_at AS viewedAt
+    FROM (
+      SELECT
+        biz_type,
+        biz_id,
+        MAX(created_at) AS viewed_at
+      FROM user_browse_history
+      WHERE user_id = #{userId}
+        AND created_at >= #{retainedFrom}
+      GROUP BY biz_type, biz_id
+    ) h
+    LEFT JOIN qa_question q ON h.biz_type = 1 AND q.id = h.biz_id AND q.delete_flag = 0 AND q.status = 1
+    LEFT JOIN kb_entry kb ON h.biz_type = 2 AND kb.id = h.biz_id AND kb.status = 1
+    LEFT JOIN qa_topic t ON h.biz_type = 3 AND t.id = h.biz_id AND t.status = 1
+    WHERE (
+        (h.biz_type = 1 AND q.id IS NOT NULL)
+        OR (h.biz_type = 2 AND kb.id IS NOT NULL)
+        OR (h.biz_type = 3 AND t.id IS NOT NULL)
+      )
+    ORDER BY h.viewed_at DESC, h.biz_id DESC
   </select>
+
+  <select id="countMyHistory" resultType="long">
+    SELECT COUNT(1)
+    FROM (
+      SELECT
+        biz_type,
+        biz_id
+      FROM user_browse_history
+      WHERE user_id = #{userId}
+        AND created_at >= #{retainedFrom}
+      GROUP BY biz_type, biz_id
+    ) h
+    LEFT JOIN qa_question q ON h.biz_type = 1 AND q.id = h.biz_id AND q.delete_flag = 0 AND q.status = 1
+    LEFT JOIN kb_entry kb ON h.biz_type = 2 AND kb.id = h.biz_id AND kb.status = 1
+    LEFT JOIN qa_topic t ON h.biz_type = 3 AND t.id = h.biz_id AND t.status = 1
+    WHERE (
+        (h.biz_type = 1 AND q.id IS NOT NULL)
+        OR (h.biz_type = 2 AND kb.id IS NOT NULL)
+        OR (h.biz_type = 3 AND t.id IS NOT NULL)
+      )
+  </select>
+
+  <delete id="deleteOlderThan">
+    DELETE
+    FROM user_browse_history
+    WHERE created_at &lt; #{expireBefore}
+  </delete>
+
+  <delete id="deleteInvalidRows">
+    DELETE h
+    FROM user_browse_history h
+    LEFT JOIN qa_question q ON h.biz_type = 1 AND q.id = h.biz_id AND q.delete_flag = 0 AND q.status = 1
+    LEFT JOIN kb_entry kb ON h.biz_type = 2 AND kb.id = h.biz_id AND kb.status = 1
+    LEFT JOIN qa_topic t ON h.biz_type = 3 AND t.id = h.biz_id AND t.status = 1
+    WHERE (h.biz_type = 1 AND q.id IS NULL)
+       OR (h.biz_type = 2 AND kb.id IS NULL)
+       OR (h.biz_type = 3 AND t.id IS NULL)
+       OR (h.biz_type NOT IN (1,2,3))
+  </delete>
 </mapper>

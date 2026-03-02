@@ -1,5 +1,6 @@
 package com.community.service.impl;
 
+import com.community.common.SecurityUser;
 import com.community.dto.AppQuestionPageQueryDTO;
 import com.community.mapper.ExpertProfileMapper;
 import com.community.mapper.QaCategoryMapper;
@@ -15,6 +16,8 @@ import com.community.vo.AppTopicListItemVO;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,7 +33,14 @@ public class CustomerDiscoverServiceImpl implements CustomerDiscoverService {
     @Override
     public AppGuestHomeVO guestHome(Integer topicLimit, Integer questionLimit, Integer expertLimit) {
         AppGuestHomeVO vo = new AppGuestHomeVO();
-        vo.setCategories(qaCategoryMapper.selectAppCategoryList());
+        Long userId = currentUserId();
+        List<AppCategoryVO> preferred = userId == null ? List.of() : qaCategoryMapper.selectAppPreferredCategories(userId, 2);
+        if (preferred == null || preferred.isEmpty()) {
+            List<AppCategoryVO> fallback = qaCategoryMapper.selectAppCategoryList();
+            vo.setCategories(fallback == null ? List.of() : fallback.stream().limit(2).toList());
+        } else {
+            vo.setCategories(preferred);
+        }
         vo.setHotTopics(qaTopicMapper.selectAppHotTopics(resolveLimit(topicLimit, 8, 30)));
         vo.setHotQuestions(qaQuestionMapper.selectAppHotQuestions(resolveLimit(questionLimit, 8, 30)));
         vo.setExperts(expertProfileMapper.selectAppExpertCards(resolveLimit(expertLimit, 6, 20)));
@@ -78,5 +88,13 @@ public class CustomerDiscoverServiceImpl implements CustomerDiscoverService {
     private int resolveLimit(Integer limit, int def, int max) {
         int resolved = (limit == null || limit <= 0) ? def : limit;
         return Math.min(resolved, max);
+    }
+
+    private Long currentUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof SecurityUser securityUser)) {
+            return null;
+        }
+        return securityUser.getId();
     }
 }

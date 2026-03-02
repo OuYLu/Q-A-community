@@ -54,4 +54,62 @@
       </choose>,
       e.id DESC
   </select>
+
+  <select id="selectAppSearchKb" resultType="com.community.vo.AppSearchKbVO">
+    SELECT
+      e.id,
+      e.title,
+      LEFT(COALESCE(NULLIF(e.summary, ''), e.content), 120) AS summary,
+      e.view_count AS viewCount,
+      e.like_count AS likeCount,
+      e.source AS source,
+      e.created_at AS createdAt
+    FROM kb_entry e
+    WHERE e.status = 1
+      AND (e.title LIKE CONCAT('%', #{query}, '%')
+        OR e.summary LIKE CONCAT('%', #{query}, '%')
+        OR e.content LIKE CONCAT('%', #{query}, '%'))
+    ORDER BY
+      (CASE WHEN e.title LIKE CONCAT('%', #{query}, '%') THEN 10 ELSE 0 END
+      + CASE WHEN e.summary LIKE CONCAT('%', #{query}, '%') THEN 3 ELSE 0 END
+      + CASE WHEN e.content LIKE CONCAT('%', #{query}, '%') THEN 2 ELSE 0 END
+      + e.like_count * 2 + e.view_count * 0.2) DESC,
+      e.created_at DESC,
+      e.id DESC
+    LIMIT #{limit} OFFSET #{offset}
+  </select>
+
+  <select id="selectAppSearchKbByIds" resultType="com.community.vo.AppSearchKbVO">
+    SELECT
+      e.id,
+      e.title,
+      LEFT(COALESCE(NULLIF(e.summary, ''), e.content), 120) AS summary,
+      e.view_count AS viewCount,
+      e.like_count AS likeCount,
+      e.source AS source,
+      e.created_at AS createdAt
+    FROM kb_entry e
+    WHERE e.status = 1
+      AND e.id IN
+      <foreach collection="ids" item="id" open="(" separator="," close=")">
+        #{id}
+      </foreach>
+    ORDER BY FIELD(e.id,
+      <foreach collection="ids" item="id" separator=",">
+        #{id}
+      </foreach>
+    )
+  </select>
+
+  <select id="selectSearchKbDocs" resultType="com.community.vo.SearchKbDoc">
+    SELECT
+      e.id,
+      e.title,
+      e.summary,
+      e.content,
+      e.source,
+      e.created_at AS createdAt
+    FROM kb_entry e
+    WHERE e.status = 1
+  </select>
 </mapper>

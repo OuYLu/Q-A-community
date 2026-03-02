@@ -9,4 +9,3 @@ public class AppNotificationTypeCountVO {
     private Integer type;
     private Integer cnt;
 }
-

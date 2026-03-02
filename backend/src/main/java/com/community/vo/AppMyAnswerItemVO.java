@@ -12,6 +12,9 @@ public class AppMyAnswerItemVO {
     private String questionTitle;
     private Integer likeCount;
     private String contentPreview;
+    private Integer answerStatus;
+    private Integer questionStatus;
+    private Integer effective;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;

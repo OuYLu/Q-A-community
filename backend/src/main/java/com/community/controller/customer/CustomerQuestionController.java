@@ -7,6 +7,7 @@ import com.community.dto.AppAnswerUpdateDTO;
 import com.community.dto.AppPageQueryDTO;
 import com.community.dto.AppQuestionCreateDTO;
 import com.community.dto.AppQuestionPageQueryDTO;
+import com.community.dto.AppQuestionReportCreateDTO;
 import com.community.dto.AppQuestionUpdateDTO;
 import com.community.service.CustomerQuestionService;
 import com.community.vo.AppMyQuestionItemVO;
@@ -72,6 +73,32 @@ public class CustomerQuestionController {
     public Result<Void> deleteQuestion(@PathVariable Long id) {
         customerQuestionService.deleteQuestion(id);
         return Result.success(null);
+    }
+
+    @PutMapping("/api/customer/questions/{id}/self-only")
+    @Operation(summary = "Set question self-only")
+    public Result<Void> setQuestionSelfOnly(@PathVariable Long id) {
+        customerQuestionService.setQuestionSelfOnly(id);
+        return Result.success(null);
+    }
+
+    @PutMapping("/api/customer/questions/{id}/public")
+    @Operation(summary = "Set question public")
+    public Result<Void> setQuestionPublic(@PathVariable Long id) {
+        customerQuestionService.setQuestionPublic(id);
+        return Result.success(null);
+    }
+
+    @PostMapping("/api/customer/questions/{id}/report")
+    @Operation(summary = "Report question")
+    public Result<Long> reportQuestion(@PathVariable Long id, @Valid @RequestBody AppQuestionReportCreateDTO dto) {
+        return Result.success(customerQuestionService.reportQuestion(id, dto));
+    }
+
+    @PostMapping("/api/customer/answers/{id}/report")
+    @Operation(summary = "Report answer")
+    public Result<Long> reportAnswer(@PathVariable Long id, @Valid @RequestBody AppQuestionReportCreateDTO dto) {
+        return Result.success(customerQuestionService.reportAnswer(id, dto));
     }
 
     @PostMapping("/api/customer/questions/{id}/answers")

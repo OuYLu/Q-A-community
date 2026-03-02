@@ -4,11 +4,13 @@ import com.community.common.BizException;
 import com.community.common.ResultCode;
 import com.community.common.SecurityUser;
 import com.community.dto.AppNotificationPageQueryDTO;
+import com.community.mapper.CmsReportMapper;
 import com.community.mapper.NotifyMessageMapper;
 import com.community.service.CustomerNotificationService;
 import com.community.vo.AppNotificationItemVO;
 import com.community.vo.AppNotificationTypeCountVO;
 import com.community.vo.AppNotificationUnreadCountVO;
+import com.community.vo.AppReportFeedbackDetailVO;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.RequiredArgsConstructor;
@@ -16,14 +18,19 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class CustomerNotificationServiceImpl implements CustomerNotificationService {
     private final NotifyMessageMapper notifyMessageMapper;
+    private final CmsReportMapper cmsReportMapper;
 
     @Override
     public PageInfo<AppNotificationItemVO> page(AppNotificationPageQueryDTO query) {
@@ -33,12 +40,13 @@ public class CustomerNotificationServiceImpl implements CustomerNotificationServ
         }
         Integer page = query == null || query.getPage() == null ? 1 : query.getPage();
         Integer pageSize = query == null || query.getPageSize() == null ? 10 : query.getPageSize();
-        PageHelper.startPage(page, pageSize);
+        PageHelper.startPage(page, Math.min(pageSize, 50));
         List<AppNotificationItemVO> list = notifyMessageMapper.selectAppNotifications(
-                userId,
-                query == null ? null : query.getType(),
-                query == null ? null : query.getIsRead()
+            userId,
+            parseTypes(query),
+            query == null ? null : query.getIsRead()
         );
+        normalizeReportFeedbackSummary(userId, list);
         return new PageInfo<>(list);
     }
 
@@ -59,6 +67,19 @@ public class CustomerNotificationServiceImpl implements CustomerNotificationServ
         vo.setTotal(total);
         vo.setByType(rows);
         return vo;
+    }
+
+    @Override
+    public AppReportFeedbackDetailVO reportFeedbackDetail(Long reportId) {
+        Long userId = currentUserId();
+        if (userId == null) {
+            throw new BizException(ResultCode.UNAUTHORIZED, "未授权");
+        }
+        AppReportFeedbackDetailVO detail = cmsReportMapper.selectAppReportFeedbackDetail(reportId, userId);
+        if (detail == null) {
+            throw new BizException(ResultCode.BAD_REQUEST, "举报反馈不存在或无权限");
+        }
+        return detail;
     }
 
     @Override
@@ -84,6 +105,33 @@ public class CustomerNotificationServiceImpl implements CustomerNotificationServ
         notifyMessageMapper.updateReadAll(userId, LocalDateTime.now());
     }
 
+    private List<Integer> parseTypes(AppNotificationPageQueryDTO query) {
+        if (query == null) {
+            return null;
+        }
+        Set<Integer> set = new LinkedHashSet<>();
+        if (query.getType() != null) {
+            set.add(query.getType());
+        }
+        if (StringUtils.hasText(query.getTypes())) {
+            String[] parts = query.getTypes().split(",");
+            for (String part : parts) {
+                if (!StringUtils.hasText(part)) {
+                    continue;
+                }
+                try {
+                    set.add(Integer.parseInt(part.trim()));
+                } catch (NumberFormatException ignore) {
+                    // ignore invalid type token
+                }
+            }
+        }
+        if (set.isEmpty()) {
+            return null;
+        }
+        return new ArrayList<>(set);
+    }
+
     private Long currentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
@@ -94,5 +142,29 @@ public class CustomerNotificationServiceImpl implements CustomerNotificationServ
             return securityUser.getId();
         }
         return null;
+    }
+
+    private void normalizeReportFeedbackSummary(Long userId, List<AppNotificationItemVO> list) {
+        if (list == null || list.isEmpty()) {
+            return;
+        }
+        for (AppNotificationItemVO item : list) {
+            if (item == null || item.getType() == null || item.getType() != 7 || item.getBizId() == null) {
+                continue;
+            }
+            AppReportFeedbackDetailVO detail = cmsReportMapper.selectAppReportFeedbackDetail(item.getBizId(), userId);
+            if (detail == null) {
+                continue;
+            }
+            item.setContent("内容：" + truncateForList(detail.getContentTitle()) + "；处理结果：" + truncateForList(detail.getHandleResult()));
+        }
+    }
+
+    private String truncateForList(String input) {
+        if (!StringUtils.hasText(input)) {
+            return "-";
+        }
+        String s = input.trim();
+        return s.length() > 10 ? s.substring(0, 10) + "..." : s;
     }
 }

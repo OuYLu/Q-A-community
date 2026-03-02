@@ -32,14 +32,16 @@ import java.util.Set;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/common/upload")
+@RequestMapping({"/api/common/upload", "/api/common/uploads"})
 @Tag(name = "Common Upload")
 public class FileUploadController {
 
     private static final String BIZ_AVATAR = "avatar";
     private static final String BIZ_EXPERT_PROOF = "expert-proof";
+    private static final String BIZ_EXPERT_POST = "expert-post";
     private static final String BIZ_QUESTION = "question";
     private static final String BIZ_ANSWER = "answer";
+    private static final String BIZ_CATEGORY = "category";
 
     private static final Set<String> IMAGE_EXTENSIONS = Set.of("jpg", "jpeg", "png", "gif", "webp", "bmp");
     private static final Set<String> EXPERT_EXTENSIONS = Set.of(
@@ -63,8 +65,10 @@ public class FileUploadController {
         String normalizedBizType = bizType.trim().toLowerCase(Locale.ROOT);
         if (!BIZ_AVATAR.equals(normalizedBizType)
             && !BIZ_EXPERT_PROOF.equals(normalizedBizType)
+            && !BIZ_EXPERT_POST.equals(normalizedBizType)
             && !BIZ_QUESTION.equals(normalizedBizType)
-            && !BIZ_ANSWER.equals(normalizedBizType)) {
+            && !BIZ_ANSWER.equals(normalizedBizType)
+            && !BIZ_CATEGORY.equals(normalizedBizType)) {
             throw new BizException(ResultCode.BAD_REQUEST, "unsupported bizType");
         }
 
@@ -103,22 +107,27 @@ public class FileUploadController {
     @GetMapping("/{bizType}/{filename}")
     @Operation(summary = "Get uploaded file")
     public ResponseEntity<Resource> get(@PathVariable String bizType, @PathVariable String filename) {
-        if (!StringUtils.hasText(bizType) || !StringUtils.hasText(filename)) {
+        String normalizedBizType = normalizeReadableBizType(bizType);
+        if (normalizedBizType == null || !isValidFilename(filename)) {
             return ResponseEntity.badRequest().build();
         }
-
-        String normalizedBizType = bizType.trim().toLowerCase(Locale.ROOT);
-        if (!BIZ_AVATAR.equals(normalizedBizType)
-            && !BIZ_EXPERT_PROOF.equals(normalizedBizType)
-            && !BIZ_QUESTION.equals(normalizedBizType)
-            && !BIZ_ANSWER.equals(normalizedBizType)) {
-            return ResponseEntity.badRequest().build();
-        }
-        if (filename.contains("..") || filename.contains("/") || filename.contains("\\")) {
-            return ResponseEntity.badRequest().build();
-        }
-
         Path filePath = Paths.get(uploadDir, normalizedBizType).toAbsolutePath().normalize().resolve(filename).normalize();
+        return buildFileResponse(filePath);
+    }
+
+    @GetMapping
+    @Operation(summary = "Get uploaded file by query")
+    public ResponseEntity<Resource> getByQuery(@RequestParam("bizType") String bizType,
+                                               @RequestParam("filename") String filename) {
+        String normalizedBizType = normalizeReadableBizType(bizType);
+        if (normalizedBizType == null || !isValidFilename(filename)) {
+            return ResponseEntity.badRequest().build();
+        }
+        Path filePath = Paths.get(uploadDir, normalizedBizType).toAbsolutePath().normalize().resolve(filename).normalize();
+        return buildFileResponse(filePath);
+    }
+
+    private ResponseEntity<Resource> buildFileResponse(Path filePath) {
         Resource resource;
         try {
             resource = new UrlResource(filePath.toUri());
@@ -155,9 +164,38 @@ public class FileUploadController {
         if (BIZ_ANSWER.equals(bizType) && !IMAGE_EXTENSIONS.contains(extension)) {
             throw new BizException(ResultCode.BAD_REQUEST, "answer image only supports jpg/jpeg/png/gif/webp/bmp");
         }
+        if (BIZ_CATEGORY.equals(bizType) && !IMAGE_EXTENSIONS.contains(extension)) {
+            throw new BizException(ResultCode.BAD_REQUEST, "category icon only supports jpg/jpeg/png/gif/webp/bmp");
+        }
         if (BIZ_EXPERT_PROOF.equals(bizType) && !EXPERT_EXTENSIONS.contains(extension)) {
             throw new BizException(ResultCode.BAD_REQUEST, "expert-proof only supports image/doc/pdf/txt");
         }
+        if (BIZ_EXPERT_POST.equals(bizType) && !IMAGE_EXTENSIONS.contains(extension)) {
+            throw new BizException(ResultCode.BAD_REQUEST, "expert-post only supports image files");
+        }
+    }
+
+    private String normalizeReadableBizType(String bizType) {
+        if (!StringUtils.hasText(bizType)) {
+            return null;
+        }
+        String normalizedBizType = bizType.trim().toLowerCase(Locale.ROOT);
+        if (!BIZ_AVATAR.equals(normalizedBizType)
+            && !BIZ_EXPERT_PROOF.equals(normalizedBizType)
+            && !BIZ_EXPERT_POST.equals(normalizedBizType)
+            && !BIZ_QUESTION.equals(normalizedBizType)
+            && !BIZ_ANSWER.equals(normalizedBizType)
+            && !BIZ_CATEGORY.equals(normalizedBizType)) {
+            return null;
+        }
+        return normalizedBizType;
+    }
+
+    private boolean isValidFilename(String filename) {
+        return StringUtils.hasText(filename)
+            && !filename.contains("..")
+            && !filename.contains("/")
+            && !filename.contains("\\");
     }
 
     private String getExtension(String filename) {

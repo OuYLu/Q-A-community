@@ -2,6 +2,7 @@ package com.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.community.entity.CmsReport;
+import com.community.vo.AppReportFeedbackDetailVO;
 import com.community.vo.CmsReportDetailRowVO;
 import com.community.vo.CmsReportPageItemVO;
 import org.apache.ibatis.annotations.Mapper;
@@ -20,4 +21,7 @@ public interface CmsReportMapper extends BaseMapper<CmsReport> {
                                                     @Param("endTime") LocalDateTime endTime);
 
     CmsReportDetailRowVO selectAdminReportDetail(@Param("id") Long id);
+
+    AppReportFeedbackDetailVO selectAppReportFeedbackDetail(@Param("id") Long id,
+                                                            @Param("userId") Long userId);
 }

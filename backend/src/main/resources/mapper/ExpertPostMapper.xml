@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.community.mapper.ExpertPostMapper">
+  <select id="selectPublishedPage" resultType="com.community.vo.AppExpertPostItemVO">
+    SELECT
+      e.id,
+      e.category_id AS categoryId,
+      c.name AS categoryName,
+      e.author_user_id AS authorUserId,
+      CASE WHEN e.source = 'expert_post' THEN u.nickname ELSE '问问官方' END AS authorName,
+      CASE WHEN e.source = 'expert_post' THEN u.avatar ELSE NULL END AS authorAvatar,
+      ep.expertise AS authorExpertise,
+      e.source AS source,
+      e.title,
+      e.summary,
+      e.content_ref AS contentRefRaw,
+      e.status,
+      e.view_count AS viewCount,
+      e.like_count AS likeCount,
+      e.favorite_count AS favoriteCount,
+      e.created_at AS createdAt
+    FROM kb_entry e
+    LEFT JOIN user u ON u.id = e.author_user_id
+    LEFT JOIN expert_profile ep ON ep.user_id = e.author_user_id
+    LEFT JOIN kb_category c ON c.id = e.category_id
+    WHERE e.status = 1
+    <if test="categoryId != null">
+      AND e.category_id = #{categoryId}
+    </if>
+    <if test="keyword != null and keyword != ''">
+      AND (e.title LIKE CONCAT('%', #{keyword}, '%')
+        OR e.summary LIKE CONCAT('%', #{keyword}, '%'))
+    </if>
+    ORDER BY
+      <choose>
+        <when test="sortBy == 'hot'">e.like_count DESC, e.view_count DESC, e.created_at DESC</when>
+        <otherwise>e.created_at DESC, e.id DESC</otherwise>
+      </choose>
+  </select>
+
+  <select id="selectMyPage" resultType="com.community.vo.AppExpertPostItemVO">
+    SELECT
+      e.id,
+      e.author_user_id AS authorUserId,
+      u.nickname AS authorName,
+      u.avatar AS authorAvatar,
+      ep.expertise AS authorExpertise,
+      e.source AS source,
+      e.title,
+      e.summary,
+      e.content_ref AS contentRefRaw,
+      e.status,
+      e.view_count AS viewCount,
+      e.like_count AS likeCount,
+      e.favorite_count AS favoriteCount,
+      e.created_at AS createdAt
+    FROM kb_entry e
+    JOIN user u ON u.id = e.author_user_id
+    LEFT JOIN expert_profile ep ON ep.user_id = e.author_user_id
+    WHERE e.source = 'expert_post'
+      AND e.author_user_id = #{authorUserId}
+    <if test="status != null">
+      AND e.status = #{status}
+    </if>
+    <if test="keyword != null and keyword != ''">
+      AND (e.title LIKE CONCAT('%', #{keyword}, '%')
+        OR e.summary LIKE CONCAT('%', #{keyword}, '%'))
+    </if>
+    ORDER BY e.created_at DESC, e.id DESC
+  </select>
+
+  <select id="selectPublishedDetail" resultType="com.community.vo.AppExpertPostDetailVO">
+    SELECT
+      e.id,
+      e.category_id AS categoryId,
+      c.name AS categoryName,
+      e.author_user_id AS authorUserId,
+      CASE WHEN e.source = 'expert_post' THEN u.nickname ELSE '问问官方' END AS authorName,
+      CASE WHEN e.source = 'expert_post' THEN u.avatar ELSE NULL END AS authorAvatar,
+      ep.expertise AS authorExpertise,
+      ep.title AS authorTitle,
+      e.source AS source,
+      e.title,
+      e.summary,
+      e.content,
+      e.content_ref AS contentRefRaw,
+      e.status,
+      e.view_count AS viewCount,
+      e.like_count AS likeCount,
+      e.favorite_count AS favoriteCount,
+      e.created_at AS createdAt,
+      e.updated_at AS updatedAt
+    FROM kb_entry e
+    LEFT JOIN user u ON u.id = e.author_user_id
+    LEFT JOIN expert_profile ep ON ep.user_id = e.author_user_id
+    LEFT JOIN kb_category c ON c.id = e.category_id
+    WHERE e.id = #{id}
+      AND e.status = 1
+  </select>
+
+  <select id="selectMyDetail" resultType="com.community.vo.AppExpertPostDetailVO">
+    SELECT
+      e.id,
+      e.category_id AS categoryId,
+      c.name AS categoryName,
+      e.author_user_id AS authorUserId,
+      u.nickname AS authorName,
+      u.avatar AS authorAvatar,
+      ep.expertise AS authorExpertise,
+      ep.title AS authorTitle,
+      e.title,
+      e.summary,
+      e.content,
+      e.content_ref AS contentRefRaw,
+      e.status,
+      e.view_count AS viewCount,
+      e.like_count AS likeCount,
+      e.favorite_count AS favoriteCount,
+      e.created_at AS createdAt,
+      e.updated_at AS updatedAt
+    FROM kb_entry e
+    JOIN user u ON u.id = e.author_user_id
+    LEFT JOIN expert_profile ep ON ep.user_id = e.author_user_id
+    LEFT JOIN kb_category c ON c.id = e.category_id
+    WHERE e.id = #{id}
+      AND e.source = 'expert_post'
+      AND e.author_user_id = #{authorUserId}
+  </select>
+
+  <update id="increaseViewCount">
+    UPDATE kb_entry
+    SET view_count = COALESCE(view_count, 0) + 1,
+        updated_at = NOW()
+    WHERE id = #{id}
+      AND status = 1
+  </update>
+
+  <select id="countMyPosts" resultType="long">
+    SELECT COUNT(1)
+    FROM kb_entry
+    WHERE source = 'expert_post'
+      AND author_user_id = #{authorUserId}
+  </select>
+
+  <select id="selectPublishedByAuthor" resultType="com.community.vo.AppExpertPostItemVO">
+    SELECT
+      e.id,
+      e.category_id AS categoryId,
+      c.name AS categoryName,
+      e.author_user_id AS authorUserId,
+      u.nickname AS authorName,
+      u.avatar AS authorAvatar,
+      ep.expertise AS authorExpertise,
+      e.source AS source,
+      e.title,
+      e.summary,
+      e.content_ref AS contentRefRaw,
+      e.status,
+      e.view_count AS viewCount,
+      e.like_count AS likeCount,
+      e.favorite_count AS favoriteCount,
+      e.created_at AS createdAt
+    FROM kb_entry e
+    JOIN user u ON u.id = e.author_user_id
+    LEFT JOIN expert_profile ep ON ep.user_id = e.author_user_id
+    LEFT JOIN kb_category c ON c.id = e.category_id
+    WHERE e.source = 'expert_post'
+      AND e.status = 1
+      AND e.author_user_id = #{authorUserId}
+    ORDER BY e.created_at DESC, e.id DESC
+  </select>
+
+  <select id="countPublishedByAuthor" resultType="long">
+    SELECT COUNT(1)
+    FROM kb_entry
+    WHERE source = 'expert_post'
+      AND status = 1
+      AND author_user_id = #{authorUserId}
+  </select>
+</mapper>

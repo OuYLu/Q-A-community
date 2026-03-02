@@ -12,6 +12,7 @@
       r.reason_code AS reasonCode,
       r.reason_detail AS reasonDetail,
       r.reporter_id AS reporterId,
+      COALESCE(reporter.nickname, reporter.username, CONCAT('User#', reporter.id)) AS reporterName,
       r.created_at AS createdAt,
       r.status,
       r.handler_id AS handlerId,
@@ -28,6 +29,7 @@
     LEFT JOIN qa_answer ans ON r.biz_type = 2 AND ans.id = r.biz_id
     LEFT JOIN qa_comment c ON r.biz_type = 3 AND c.id = r.biz_id
     LEFT JOIN kb_entry kb ON r.biz_type = 4 AND kb.id = r.biz_id
+    LEFT JOIN `user` reporter ON reporter.id = r.reporter_id
     LEFT JOIN `user` u ON u.id = COALESCE(q.user_id, ans.user_id, c.user_id, kb.author_user_id)
     WHERE 1 = 1
     <if test="bizType != null">
@@ -87,6 +89,45 @@
     LEFT JOIN kb_entry kb ON r.biz_type = 4 AND kb.id = r.biz_id
     LEFT JOIN `user` u ON u.id = COALESCE(q.user_id, ans.user_id, c.user_id, kb.author_user_id)
     WHERE r.id = #{id}
+    LIMIT 1
+  </select>
+
+  <select id="selectAppReportFeedbackDetail" resultType="com.community.vo.AppReportFeedbackDetailVO">
+    SELECT
+      r.id AS reportId,
+      r.biz_type AS bizType,
+      r.biz_id AS bizId,
+      COALESCE(q.title, qAns.title, qComment.title, kb.title, CONCAT('Content#', r.biz_id)) AS contentTitle,
+      COALESCE(q.content, ans.content, c.content, kb.content) AS contentText,
+      r.reason_code AS reasonCode,
+      r.reason_detail AS reasonDetail,
+      r.status,
+      r.handle_action AS handleAction,
+      r.handle_result AS handleResult,
+      r.reporter_id AS reporterId,
+      COALESCE(reporter.nickname, reporter.username, CONCAT('User#', reporter.id)) AS reporterName,
+      COALESCE(q.user_id, ans.user_id, c.user_id, kb.author_user_id) AS authorId,
+      COALESCE(author.nickname, author.username, CONCAT('User#', author.id)) AS authorName,
+      r.handler_id AS handlerId,
+      COALESCE(handler.nickname, handler.username, CONCAT('User#', handler.id)) AS handlerName,
+      r.created_at AS createdAt,
+      r.handled_at AS handledAt
+    FROM cms_report r
+    LEFT JOIN qa_question q ON r.biz_type = 1 AND q.id = r.biz_id
+    LEFT JOIN qa_answer ans ON r.biz_type = 2 AND ans.id = r.biz_id
+    LEFT JOIN qa_question qAns ON ans.question_id = qAns.id
+    LEFT JOIN qa_comment c ON r.biz_type = 3 AND c.id = r.biz_id
+    LEFT JOIN qa_answer cAns ON c.biz_type = 2 AND c.biz_id = cAns.id
+    LEFT JOIN qa_question qComment ON cAns.question_id = qComment.id
+    LEFT JOIN kb_entry kb ON r.biz_type = 4 AND kb.id = r.biz_id
+    LEFT JOIN `user` reporter ON reporter.id = r.reporter_id
+    LEFT JOIN `user` author ON author.id = COALESCE(q.user_id, ans.user_id, c.user_id, kb.author_user_id)
+    LEFT JOIN `user` handler ON handler.id = r.handler_id
+    WHERE r.id = #{id}
+      AND (
+        r.reporter_id = #{userId}
+        OR COALESCE(q.user_id, ans.user_id, c.user_id, kb.author_user_id) = #{userId}
+      )
     LIMIT 1
   </select>
 </mapper>

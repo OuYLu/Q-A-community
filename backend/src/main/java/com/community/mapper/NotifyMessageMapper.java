@@ -13,7 +13,7 @@ import java.util.List;
 @Mapper
 public interface NotifyMessageMapper extends BaseMapper<NotifyMessage> {
     List<AppNotificationItemVO> selectAppNotifications(@Param("userId") Long userId,
-                                                       @Param("type") Integer type,
+                                                       @Param("types") List<Integer> types,
                                                        @Param("isRead") Integer isRead);
 
     List<AppNotificationTypeCountVO> selectUnreadCountByType(@Param("userId") Long userId);

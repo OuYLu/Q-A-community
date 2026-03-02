@@ -40,7 +40,11 @@ public class SecurityConfig {
         // Define which endpoints are public and which require authentication
         http.authorizeHttpRequests(auth -> auth
             .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+            .requestMatchers(HttpMethod.GET, "/api/common/upload").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/common/upload/**").permitAll()
+            .requestMatchers(HttpMethod.GET, "/api/common/uploads").permitAll()
+            .requestMatchers(HttpMethod.GET, "/api/common/uploads/**").permitAll()
+            .requestMatchers(HttpMethod.GET, "/api/expert/posts/**").permitAll()
             .requestMatchers(
                 "/api/health",
                 "/api/common/avatar/**",
