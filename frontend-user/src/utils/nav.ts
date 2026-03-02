@@ -25,9 +25,33 @@ export function openQuestionDetail(id: number) {
   });
 }
 
-export function openAskPage() {
-  if (!requireAuth("/pages/question/ask")) return;
-  uni.navigateTo({ url: "/pages/question/ask" });
+export function openAskPage(params?: { topicId?: number | string; topicTitle?: string }) {
+  const askUrl = (() => {
+    if (!params?.topicId) {
+      return "/pages/question/ask";
+    }
+    const topicId = encodeURIComponent(String(params.topicId));
+    const topicTitle = encodeURIComponent(params.topicTitle || "");
+    return `/pages/question/ask?topicId=${topicId}&topicTitle=${topicTitle}`;
+  })();
+
+  const authStore = useAuthStore();
+  if (!authStore.isLogin) {
+    uni.showModal({
+      title: "提示",
+      content: "未登录，登录后才能发起提问",
+      confirmText: "去登录",
+      cancelText: "取消",
+      success: (res) => {
+        if (!res.confirm) return;
+        const target = encodeURIComponent(askUrl);
+        uni.navigateTo({ url: `/pages/auth/login?redirect=${target}` });
+      }
+    });
+    return;
+  }
+  if (!requireAuth(askUrl)) return;
+  uni.navigateTo({ url: askUrl });
 }
 
 export function openExpertPostCreatePage() {

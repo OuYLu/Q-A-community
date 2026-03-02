@@ -2,7 +2,7 @@
 import { computed, ref } from "vue";
 import { onLoad, onReachBottom } from "@dcloudio/uni-app";
 import { topicApi, type AppTopicDetailVO, type AppTopicQuestionItemVO } from "@/api/topic";
-import { openQuestionDetail } from "@/utils/nav";
+import { openAskPage, openQuestionDetail } from "@/utils/nav";
 
 type SortKey = "hot" | "latest" | "unsolved";
 
@@ -93,8 +93,7 @@ async function toggleFollow() {
 
 function goAskInTopic() {
   if (!topicId.value) return;
-  const t = encodeURIComponent(topic.value?.title || "");
-  uni.navigateTo({ url: `/pages/question/ask?topicId=${topicId.value}&topicTitle=${t}` });
+  openAskPage({ topicId: topicId.value, topicTitle: topic.value?.title || "" });
 }
 
 onLoad(async (options) => {
