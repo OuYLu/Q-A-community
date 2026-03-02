@@ -23,6 +23,11 @@ const notificationApi = {
       url: "/api/customer/notifications/read-all",
       method: "POST"
     });
+  },
+  reportFeedbackDetail(reportId) {
+    return api_http.request({
+      url: `/api/customer/notifications/report-feedback/${reportId}`
+    });
   }
 };
 exports.notificationApi = notificationApi;

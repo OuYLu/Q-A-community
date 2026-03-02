@@ -1,7 +1,8 @@
-﻿<script setup lang="ts">
+<script setup lang="ts">
 import { computed, ref } from "vue";
 import { onLoad, onShow } from "@dcloudio/uni-app";
 import { ensurePageAuth } from "@/utils/auth-guard";
+import { openUserHomePage } from "@/utils/nav";
 import { questionApi, type AppAnswerCommentVO, type AppAnswerDetailVO } from "@/api/question";
 
 const answerId = ref(0);
@@ -47,6 +48,25 @@ function startReply(comment: AppAnswerCommentVO) {
 function cancelReply() {
   replyParentId.value = null;
   replyToName.value = "";
+}
+
+function reportAnswer() {
+  if (!detail.value?.answer?.id) return;
+  const title = encodeURIComponent(detail.value.questionTitle || "");
+  uni.navigateTo({
+    url: `/pages/question/report?targetType=answer&answerId=${detail.value.answer.id}&title=${title}`
+  });
+}
+
+function showMoreMenu() {
+  uni.showActionSheet({
+    itemList: ["举报"],
+    success: (res) => {
+      if (res.tapIndex === 0) {
+        reportAnswer();
+      }
+    }
+  });
 }
 
 async function loadDetail() {
@@ -103,6 +123,16 @@ async function submitComment() {
   }
 }
 
+function openAnswerAuthor() {
+  if (!detail.value?.answer?.authorId) return;
+  openUserHomePage(Number(detail.value.answer.authorId));
+}
+
+function openCommentAuthor(comment: AppAnswerCommentVO) {
+  if (!comment?.authorId) return;
+  openUserHomePage(Number(comment.authorId));
+}
+
 onLoad((options) => {
   answerId.value = Number(options?.id || options?.answerId || 0);
   if (!answerId.value) {
@@ -124,12 +154,15 @@ onShow(() => {
 <template>
   <view class="page">
     <view v-if="loading" class="state">加载中...</view>
-    <view v-else-if="!detail" class="state">{{ loadFailed ? (loadErrorText || "回答不存在或已删除") : "未找到回答" }}</view>
+    <view v-else-if="!detail" class="state">
+      {{ loadFailed ? (loadErrorText || "回答不存在或已删除") : "未找到回答" }}
+    </view>
     <view v-else>
       <view class="question-title">问题：{{ detail.questionTitle }}</view>
 
       <view class="answer-card">
-        <view class="author-row">
+        <view class="more-btn" @click.stop="showMoreMenu">...</view>
+        <view class="author-row" @click.stop="openAnswerAuthor">
           <image v-if="detail.answer.authorAvatar" class="avatar" :src="detail.answer.authorAvatar" mode="aspectFill" />
           <view v-else class="avatar-fallback">{{ defaultAvatarText }}</view>
           <view class="author-info">
@@ -156,15 +189,15 @@ onShow(() => {
 
         <view class="answer-actions">
           <view class="mini-action like-btn" :class="{ active: detail.answer.liked }" @click="toggleLike">
-            <text class="mini-icon">❤</text>
+            <text class="mini-icon">赞</text>
             <text>{{ detail.answer.likeCount || 0 }}</text>
           </view>
           <view class="mini-action" :class="{ active: detail.answer.favorited }" @click="toggleFavorite">
-            <text class="mini-icon">⭐</text>
+            <text class="mini-icon">藏</text>
             <text>{{ detail.answer.favoriteCount || 0 }}</text>
           </view>
           <view class="mini-action">
-            <text class="mini-icon">💬</text>
+            <text class="mini-icon">评</text>
             <text>{{ detail.answer.commentCount || 0 }}</text>
           </view>
         </view>
@@ -175,28 +208,28 @@ onShow(() => {
 
       <view v-for="root in rootComments" :key="root.id" class="comment-card">
         <view class="comment-main">
-          <view class="author-row">
+          <view class="author-row" @click.stop="openCommentAuthor(root)">
             <image v-if="root.authorAvatar" class="avatar mini" :src="root.authorAvatar" mode="aspectFill" />
             <view v-else class="avatar-fallback mini">{{ defaultAvatarText }}</view>
             <view class="author-info">
               <view class="author-name small">{{ root.authorName || "匿名用户" }}</view>
               <view class="author-time">{{ root.createdAt || "" }}</view>
             </view>
-            <view class="reply-btn" @click="startReply(root)">↩</view>
+            <view class="reply-btn" @click.stop="startReply(root)">↩</view>
           </view>
           <view class="comment-content">{{ root.content }}</view>
         </view>
 
         <view v-if="childrenOf(root.id).length" class="child-list">
           <view v-for="child in childrenOf(root.id)" :key="child.id" class="child-item">
-            <view class="author-row">
+            <view class="author-row" @click.stop="openCommentAuthor(child)">
               <image v-if="child.authorAvatar" class="avatar mini" :src="child.authorAvatar" mode="aspectFill" />
               <view v-else class="avatar-fallback mini">{{ defaultAvatarText }}</view>
               <view class="author-info">
                 <view class="author-name small">{{ child.authorName || "匿名用户" }}</view>
                 <view class="author-time">{{ child.createdAt || "" }}</view>
               </view>
-              <view class="reply-btn" @click="startReply(child)">↩</view>
+              <view class="reply-btn" @click.stop="startReply(child)">↩</view>
             </view>
             <view class="comment-content">{{ child.content }}</view>
           </view>
@@ -242,7 +275,23 @@ page {
 }
 
 .answer-card {
+  position: relative;
   padding: 18rpx;
+}
+
+.more-btn {
+  position: absolute;
+  right: 12rpx;
+  top: 10rpx;
+  width: 66rpx;
+  height: 46rpx;
+  border-radius: 24rpx;
+  border: 2rpx solid #d8dfe8;
+  background: #f4f6f9;
+  color: #72859a;
+  text-align: center;
+  line-height: 42rpx;
+  font-size: 34rpx;
 }
 
 .author-row {

@@ -319,11 +319,8 @@
 
   <el-dialog v-model="reviewVisible" title="专家审核" width="420px">
     <el-form :model="reviewForm" label-width="80px">
-      <el-form-item label="结果">
-        <el-radio-group v-model="reviewForm.status">
-          <el-radio :label="2">通过</el-radio>
-          <el-radio :label="3">拒绝</el-radio>
-        </el-radio-group>
+      <el-form-item label="">
+        <span>{{ reviewConfirmText }}</span>
       </el-form-item>
       <el-form-item v-if="reviewForm.status === 3" label="原因">
         <el-input v-model="reviewForm.rejectReason" type="textarea" />
@@ -331,7 +328,9 @@
     </el-form>
     <template #footer>
       <el-button @click="reviewVisible = false">取消</el-button>
-      <el-button type="primary" @click="submitReview">提交</el-button>
+      <el-button :type="reviewForm.status === 2 ? 'success' : 'danger'" @click="submitReview">
+        {{ reviewForm.status === 2 ? "确认通过" : "确认拒绝" }}
+      </el-button>
     </template>
   </el-dialog>
 
@@ -472,6 +471,9 @@ const editForm = reactive<UserUpdateDTO>({});
 const createForm = reactive<AdminCreateStaffDTO>({ username: "", password: "" });
 
 const reviewForm = reactive<ExpertReviewDTO>({ applyId: 0, status: 2, rejectReason: "" });
+const reviewConfirmText = computed(() =>
+  reviewForm.status === 2 ? "是否确认通过该专家申请？" : "是否确认拒绝该专家申请？"
+);
 const createFormRef = ref<FormInstance>();
 const editFormRef = ref<FormInstance>();
 

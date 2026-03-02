@@ -1,13 +1,11 @@
-﻿import { requireAuth } from "@/utils/auth-guard";
+import { requireAuth } from "@/utils/auth-guard";
 import { useAuthStore } from "@/stores/auth";
 
 export function openQuestionDetail(id: number) {
   const authStore = useAuthStore();
   const detailUrl = `/pages/question/detail?id=${id}`;
   if (authStore.isLogin) {
-    uni.navigateTo({
-      url: detailUrl
-    });
+    uni.navigateTo({ url: detailUrl });
     return;
   }
 
@@ -29,8 +27,40 @@ export function openQuestionDetail(id: number) {
 
 export function openAskPage() {
   if (!requireAuth("/pages/question/ask")) return;
-  uni.navigateTo({
-    url: "/pages/question/ask"
+  uni.navigateTo({ url: "/pages/question/ask" });
+}
+
+export function openExpertPostCreatePage() {
+  if (!requireAuth("/pages/expert/post-create")) return;
+  uni.navigateTo({ url: "/pages/expert/post-create" });
+}
+
+export function openExpertPostDetailPage(id: number) {
+  const authStore = useAuthStore();
+  const detailUrl = `/pages/expert/post-detail?id=${id}`;
+  if (authStore.isLogin) {
+    uni.navigateTo({
+      url: detailUrl,
+      fail: () => {
+        uni.showToast({ title: "打开科普详情失败", icon: "none" });
+      }
+    });
+    return;
+  }
+
+  uni.showModal({
+    title: "提示",
+    content: "登录后才能查看科普详情",
+    confirmText: "去登录",
+    cancelText: "返回首页",
+    success: (res) => {
+      if (res.confirm) {
+        const target = encodeURIComponent(detailUrl);
+        uni.navigateTo({ url: `/pages/auth/login?redirect=${target}` });
+        return;
+      }
+      uni.switchTab({ url: "/pages/home/index" });
+    }
   });
 }
 
@@ -54,4 +84,9 @@ export function openAnswerDetailPage(answerId: number) {
       console.error("openAnswerDetailPage failed:", err);
     }
   });
+}
+
+export function openUserHomePage(userId: number) {
+  if (!requireAuth(`/pages/user/home?userId=${userId}`)) return;
+  uni.navigateTo({ url: `/pages/user/home?userId=${userId}` });
 }

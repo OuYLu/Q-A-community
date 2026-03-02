@@ -30,18 +30,92 @@
 .head.data-v-8e21c599 {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 20rpx;
+  margin-bottom: 16rpx;
 }
 .action.data-v-8e21c599 {
   color: #4ba7d9;
 }
+.line-tabs.data-v-8e21c599 {
+  display: flex;
+  align-items: center;
+  border-bottom: 2rpx solid #d7e4ef;
+  margin-bottom: 10rpx;
+}
+.read-tabs.data-v-8e21c599 {
+  border-bottom: none;
+  margin-bottom: 16rpx;
+  gap: 12rpx;
+}
+.line-tab.data-v-8e21c599 {
+  position: relative;
+  padding: 10rpx 18rpx 12rpx;
+  color: #7f94a8;
+  font-size: 25rpx;
+}
+.type-tab.data-v-8e21c599 {
+  flex: 1;
+  text-align: center;
+}
+.type-tab + .type-tab.data-v-8e21c599::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 2rpx;
+  height: 24rpx;
+  transform: translateY(-50%);
+  background: #d7e4ef;
+}
+.line-tab.active.data-v-8e21c599 {
+  color: #2f8fc3;
+  font-weight: 700;
+}
+.read-tab-btn.data-v-8e21c599 {
+  min-width: 120rpx;
+  text-align: center;
+  padding: 10rpx 0;
+  border-radius: 26rpx;
+  border: 2rpx solid #d7e4ef;
+  background: #f5f8fb;
+}
+.read-tab-btn + .read-tab-btn.data-v-8e21c599::before {
+  display: none;
+}
+.read-tab-btn.active.data-v-8e21c599 {
+  color: #2f8fc3;
+  border-color: #83bee2;
+  background: #e9f4fb;
+}
 .notify-item.data-v-8e21c599 {
+  position: relative;
   padding: 22rpx;
   margin-bottom: 12rpx;
+}
+.unread-dot.data-v-8e21c599 {
+  position: absolute;
+  right: 12rpx;
+  top: 12rpx;
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+  background: #ff5a5f;
+}
+.title-row.data-v-8e21c599 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12rpx;
 }
 .title.data-v-8e21c599 {
   font-size: 30rpx;
   font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.type.data-v-8e21c599 {
+  font-size: 22rpx;
+  color: #8ba0b3;
 }
 .content.data-v-8e21c599,
 .time.data-v-8e21c599 {
@@ -55,4 +129,8 @@
   color: #8ba0b3;
   text-align: center;
   margin-top: 80rpx;
+}
+.state.load-more.data-v-8e21c599 {
+  margin-top: 12rpx;
+  margin-bottom: 10rpx;
 }

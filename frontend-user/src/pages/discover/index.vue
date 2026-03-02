@@ -1,52 +1,77 @@
-﻿<script setup lang="ts">
+<script setup lang="ts">
 import { computed, ref } from "vue";
 import { onShow } from "@dcloudio/uni-app";
-import { discoverApi, type AppCategoryVO, type AppExpertCardVO, type AppTopicListItemVO } from "@/api/discover";
-import { topicApi } from "@/api/topic";
+import {
+  discoverApi,
+  type AppCategoryVO,
+  type AppExpertCardVO,
+  type AppQuestionHotItemVO,
+  type AppTopicListItemVO
+} from "@/api/discover";
 import { useAuthStore } from "@/stores/auth";
-import { useQaStore } from "@/stores/qa";
-import { openQuestionDetail } from "@/utils/nav";
+import { openQuestionDetail, openUserHomePage } from "@/utils/nav";
 
-const qaStore = useQaStore();
+type DiscoverTab = "category" | "rank" | "expert";
+
 const authStore = useAuthStore();
+const needLogin = computed(() => !authStore.isLogin);
+const loading = ref(false);
+const activeTab = ref<DiscoverTab>("category");
+
 const categories = ref<AppCategoryVO[]>([]);
 const topics = ref<AppTopicListItemVO[]>([]);
+const hotQuestions = ref<AppQuestionHotItemVO[]>([]);
 const experts = ref<AppExpertCardVO[]>([]);
+const failedCategoryIconIds = ref<number[]>([]);
 const failedTopicCoverIds = ref<number[]>([]);
-const loading = ref(false);
-const needLogin = computed(() => !authStore.isLogin);
+const failedAvatarIds = ref<number[]>([]);
+
+const tabs: Array<{ key: DiscoverTab; label: string; icon: string; activeIcon: string }> = [
+  { key: "category", label: "分类", icon: "/static/tabbar/topic.png", activeIcon: "/static/tabbar/topic-active.png" },
+  { key: "rank", label: "热榜", icon: "/static/tabbar/hot.png", activeIcon: "/static/tabbar/hot-active.png" },
+  { key: "expert", label: "专家", icon: "/static/tabbar/expert.png", activeIcon: "/static/tabbar/expert-active.png" }
+];
 
 async function loadData() {
   loading.value = true;
   try {
-    const [cateData, topicData, expertData] = await Promise.all([
+    const [categoryData, topicData, rankData, expertData] = await Promise.all([
       discoverApi.getCategories(),
-      discoverApi.getHotTopics(6),
-      discoverApi.getExperts(6)
+      discoverApi.getHotTopics(12),
+      discoverApi.getHotQuestions(20),
+      discoverApi.getExperts(20)
     ]);
-    categories.value = cateData;
-    topics.value = topicData;
+    categories.value = categoryData || [];
+    topics.value = topicData || [];
+    hotQuestions.value = rankData || [];
+    experts.value = expertData || [];
+    failedCategoryIconIds.value = [];
     failedTopicCoverIds.value = [];
-    experts.value = expertData;
-    if (topicData.length > 0) {
-      const firstTopicQuestions = await topicApi.questions(topicData[0].id, {
-        sortBy: "hot",
-        page: 1,
-        pageSize: 8
-      });
-      qaStore.upsertFromTopicQuestions(firstTopicQuestions.list || []);
-    }
+    failedAvatarIds.value = [];
   } catch {
-    uni.showToast({ title: "发现页面加载失败", icon: "none" });
+    uni.showToast({ title: "发现页加载失败", icon: "none" });
   } finally {
     loading.value = false;
   }
 }
 
-function openTopicQuestion() {
-  const q = qaStore.questions[0];
-  if (!q) return;
-  openQuestionDetail(q.id);
+function setTab(tab: DiscoverTab) {
+  activeTab.value = tab;
+}
+
+function hasCategoryIcon(item: AppCategoryVO) {
+  return !!item.icon && !failedCategoryIconIds.value.includes(item.id);
+}
+
+function onCategoryIconError(categoryId: number) {
+  if (failedCategoryIconIds.value.includes(categoryId)) return;
+  failedCategoryIconIds.value = [...failedCategoryIconIds.value, categoryId];
+}
+
+function openCategory(item: AppCategoryVO) {
+  uni.navigateTo({
+    url: `/pages/discover/category-detail?categoryId=${item.id}&categoryName=${encodeURIComponent(item.name || "")}`
+  });
 }
 
 function hasTopicCover(item: AppTopicListItemVO) {
@@ -56,6 +81,30 @@ function hasTopicCover(item: AppTopicListItemVO) {
 function onTopicCoverError(topicId: number) {
   if (failedTopicCoverIds.value.includes(topicId)) return;
   failedTopicCoverIds.value = [...failedTopicCoverIds.value, topicId];
+}
+
+function avatarAvailable(userId: number, avatar?: string) {
+  return !!avatar && !failedAvatarIds.value.includes(userId);
+}
+
+function onAvatarError(userId: number) {
+  if (failedAvatarIds.value.includes(userId)) return;
+  failedAvatarIds.value = [...failedAvatarIds.value, userId];
+}
+
+function openTopic(item: AppTopicListItemVO) {
+  uni.navigateTo({
+    url: `/pages/discover/topic-detail?topicId=${item.id}&topicTitle=${encodeURIComponent(item.title || "")}`
+  });
+}
+
+function openHotQuestion(item: AppQuestionHotItemVO) {
+  openQuestionDetail(item.id);
+}
+
+function openExpert(item: AppExpertCardVO) {
+  if (!item?.userId) return;
+  openUserHomePage(Number(item.userId));
 }
 
 function goLogin() {
@@ -74,48 +123,131 @@ onShow(async () => {
   <view class="page">
     <view v-if="needLogin" class="auth-card app-card">
       <view class="title">登录后可查看发现内容</view>
-      <view class="auth-sub">分类、专题和达人内容仅登录后可用</view>
+      <view class="auth-sub">专题、热榜和专家内容仅登录后可用</view>
       <button class="auth-btn" @click="goLogin">去登录</button>
     </view>
 
     <template v-else>
+      <view class="tabs">
+        <view
+          v-for="tab in tabs"
+          :key="tab.key"
+          class="tab-item"
+          :class="{ active: activeTab === tab.key }"
+          @click="setTab(tab.key)"
+        >
+          <image class="tab-icon" :src="activeTab === tab.key ? tab.activeIcon : tab.icon" mode="aspectFit" />
+          <text class="tab-label">{{ tab.label }}</text>
+        </view>
+      </view>
+
       <view v-if="loading" class="state">加载中...</view>
       <view v-else>
-        <view class="block">
-          <view class="title">分类浏览</view>
-          <view class="cate-grid">
-            <view v-for="item in categories" :key="item.id" class="app-card cate-item">
-              <text class="name">{{ item.name }}</text>
-              <text class="cnt">{{ item.questionCount }}问答</text>
+        <view v-if="activeTab === 'category'">
+          <view class="section-title">分类浏览</view>
+          <view v-if="!categories.length" class="state">暂无分类</view>
+          <view v-else class="category-grid">
+            <view v-for="item in categories" :key="item.id" class="app-card category-item" @click="openCategory(item)">
+              <image
+                v-if="hasCategoryIcon(item)"
+                class="category-icon"
+                :src="item.icon"
+                mode="aspectFill"
+                @error="onCategoryIconError(item.id)"
+              />
+              <view v-else class="category-icon category-icon--fallback">图</view>
+              <view class="category-name">{{ item.name }}</view>
+            </view>
+          </view>
+
+          <view class="section-title section-gap">热门专题</view>
+          <view v-if="!topics.length" class="state">暂无专题</view>
+          <view v-else>
+            <view v-for="item in topics" :key="item.id" class="app-card topic-item" @click="openTopic(item)">
+              <image
+                v-if="hasTopicCover(item)"
+                class="topic-cover"
+                :src="item.coverImg"
+                mode="aspectFill"
+                @error="onTopicCoverError(item.id)"
+              />
+              <view v-else class="topic-cover topic-cover--fallback">
+                <text class="fallback-text">专题封面</text>
+              </view>
+              <view class="topic-main">
+                <view class="topic-title">{{ item.title }}</view>
+                <view class="topic-sub">{{ item.subtitle || "点击查看该专题热门问题" }}</view>
+                <view class="topic-meta">
+                  <view class="meta-item">
+                    <text class="meta-label">问题</text>
+                    <text>{{ item.questionCount }}</text>
+                  </view>
+                  <view class="meta-item">
+                    <text class="meta-label">关注</text>
+                    <text>{{ item.followCount }}</text>
+                  </view>
+                </view>
+              </view>
             </view>
           </view>
         </view>
 
-        <view class="block">
-          <view class="title">热门专题</view>
-          <view v-for="item in topics" :key="item.id" class="app-card topic-item" @click="openTopicQuestion">
-            <image
-              v-if="hasTopicCover(item)"
-              class="topic-cover"
-              :src="item.coverImg"
-              mode="aspectFill"
-              @error="onTopicCoverError(item.id)"
-            />
-            <view v-else class="topic-cover topic-cover--fallback">
-              <text class="fallback-text">专题封面</text>
+        <view v-else-if="activeTab === 'rank'">
+          <view v-if="!hotQuestions.length" class="state">暂无热榜</view>
+          <view v-else>
+            <view
+              v-for="(item, idx) in hotQuestions"
+              :key="item.id"
+              class="app-card rank-item"
+              @click="openHotQuestion(item)"
+            >
+              <view class="rank-no" :class="{ top3: idx < 3 }">{{ idx + 1 }}</view>
+              <view class="rank-main">
+                <view class="rank-title">{{ item.title }}</view>
+                <view class="rank-author">{{ item.authorName }}</view>
+                <view class="rank-meta">
+                  <view class="meta-item">
+                    <text class="meta-label">回答</text>
+                    <text>{{ item.answerCount }}</text>
+                  </view>
+                  <view class="meta-item">
+                    <text class="meta-label">浏览</text>
+                    <text>{{ item.viewCount }}</text>
+                  </view>
+                  <view class="meta-item">
+                    <text class="meta-label">点赞</text>
+                    <text>{{ item.likeCount }}</text>
+                  </view>
+                </view>
+              </view>
+              <view class="hot-tag">热</view>
             </view>
-            <view class="topic-title">{{ item.title }}</view>
-            <view class="topic-sub">{{ item.subtitle }}</view>
-            <view class="cnt">{{ item.questionCount }}问题 {{ item.followCount }}人关注 · 今日+{{ item.todayNewCount || 0 }}</view>
           </view>
         </view>
 
-        <view class="block">
-          <view class="title">达人</view>
-          <view class="expert-row">
-            <view v-for="item in experts" :key="item.userId" class="app-card expert-item">
-              <view class="expert-name">{{ item.nickname }}</view>
-              <view class="expert-title">{{ item.title || item.organization }}</view>
+        <view v-else>
+          <view v-if="!experts.length" class="state">暂无专家</view>
+          <view v-else>
+            <view v-for="item in experts" :key="item.userId" class="app-card expert-item" @click="openExpert(item)">
+              <image
+                v-if="avatarAvailable(item.userId, item.avatar)"
+                class="expert-avatar"
+                :src="item.avatar"
+                mode="aspectFill"
+                @error="onAvatarError(item.userId)"
+              />
+              <view v-else class="expert-avatar expert-avatar--fallback">
+                <text>{{ (item.nickname || "专").slice(0, 1) }}</text>
+              </view>
+
+              <view class="expert-main">
+                <view class="expert-name-row">
+                  <text class="expert-name">{{ item.nickname }}</text>
+                  <view class="expert-badge">专家</view>
+                </view>
+                <view class="expert-title">{{ item.title || item.organization || "认证专家" }}</view>
+                <view class="expert-skill">{{ item.expertise || "擅长健康问答与科普" }}</view>
+              </view>
             </view>
           </view>
         </view>
@@ -126,7 +258,7 @@ onShow(async () => {
 
 <style scoped lang="scss">
 .page {
-  padding: 24rpx;
+  padding: 20rpx 24rpx 24rpx;
   min-height: 100vh;
   box-sizing: border-box;
 }
@@ -155,39 +287,129 @@ onShow(async () => {
   transform: translateY(-50%);
 }
 
-.block {
-  margin-bottom: 26rpx;
+.tabs {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  margin-bottom: 18rpx;
+  border-bottom: 1rpx solid #d8e4ef;
 }
 
-.title {
-  font-size: 34rpx;
+.tab-item {
+  height: 86rpx;
+  padding: 6rpx 12rpx 8rpx;
+  color: #6b8297;
+  display: flex;
+  flex-direction: row;
+  gap: 8rpx;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.tab-icon {
+  width: 28rpx;
+  height: 28rpx;
+}
+
+.tab-label {
+  font-size: 26rpx;
+  line-height: 1.2;
+}
+
+.tab-item.active {
+  color: #1f3f55;
   font-weight: 700;
-  margin-bottom: 14rpx;
 }
 
-.cate-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12rpx;
-}
-
-.cate-item {
-  padding: 18rpx;
-  min-height: 120rpx;
+.tab-item.active::after {
+  content: "";
+  position: absolute;
+  left: 12rpx;
+  right: 12rpx;
+  bottom: -1rpx;
+  height: 5rpx;
+  border-radius: 5rpx;
+  background: #5aadd6;
 }
 
 .topic-item,
+.rank-item,
 .expert-item {
-  padding: 20rpx;
-  margin-bottom: 12rpx;
+  margin-bottom: 14rpx;
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #1f3f55;
+  margin: 8rpx 0 12rpx;
+}
+
+.section-gap {
+  margin-top: 18rpx;
+}
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8rpx;
+}
+
+.category-item {
+  padding: 6rpx 8rpx;
+  min-height: 66rpx;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8rpx;
+  border-radius: 14rpx;
+  background: #f7f5eb;
+  border: 2rpx solid #cfe4f1;
+}
+
+.category-icon {
+  width: 36rpx;
+  height: 36rpx;
+  border-radius: 8rpx;
+  background: #e9f1f8;
+  flex-shrink: 0;
+}
+
+.category-icon--fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #5f7386;
+  font-size: 24rpx;
+  font-weight: 700;
+}
+
+.category-name {
+  font-size: 23rpx;
+  font-weight: 700;
+  color: #24465e;
+  text-align: left;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.topic-item {
+  padding: 16rpx;
+  display: flex;
+  gap: 16rpx;
+  align-items: flex-start;
 }
 
 .topic-cover {
-  width: 100%;
-  height: 220rpx;
+  width: 220rpx;
+  height: 160rpx;
   border-radius: 14rpx;
   background: #f2f6fa;
-  margin-bottom: 14rpx;
+  flex-shrink: 0;
 }
 
 .topic-cover--fallback {
@@ -205,22 +427,141 @@ onShow(async () => {
 }
 
 .topic-title,
-.expert-name {
+.rank-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #1f3f55;
+}
+
+.topic-main {
+  min-width: 0;
+  flex: 1;
+}
+
+.topic-sub,
+.rank-author,
+.expert-title,
+.expert-skill {
+  color: #8096aa;
+  margin-top: 8rpx;
+}
+
+.topic-sub {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.topic-meta,
+.rank-meta {
+  margin-top: 12rpx;
+  display: flex;
+  gap: 18rpx;
+  flex-wrap: wrap;
+}
+
+.meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8rpx;
+  color: #6f879b;
+  font-size: 24rpx;
+}
+
+.meta-label {
+  color: #8ba0b3;
+}
+
+.rank-item {
+  padding: 18rpx;
+  display: flex;
+  gap: 14rpx;
+  align-items: flex-start;
+}
+
+.rank-no {
+  width: 42rpx;
+  height: 42rpx;
+  border-radius: 12rpx;
+  background: #ebf2f8;
+  color: #6f8294;
+  font-size: 24rpx;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.rank-no.top3 {
+  background: #ffe8b0;
+  color: #9a6b00;
+}
+
+.rank-main {
+  flex: 1;
+}
+
+.hot-tag {
+  min-width: 44rpx;
+  height: 36rpx;
+  padding: 0 8rpx;
+  border-radius: 10rpx;
+  background: #ffe8b0;
+  color: #8c5a00;
+  font-size: 22rpx;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.expert-item {
+  padding: 18rpx;
+  display: flex;
+  gap: 14rpx;
+  align-items: flex-start;
+}
+
+.expert-avatar {
+  width: 78rpx;
+  height: 78rpx;
+  border-radius: 50%;
+  background: #e8f0f7;
+  flex-shrink: 0;
+}
+
+.expert-avatar--fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #5f7386;
   font-size: 30rpx;
   font-weight: 700;
 }
 
-.topic-sub,
-.expert-title,
-.cnt {
-  margin-top: 8rpx;
-  color: #8ba0b3;
+.expert-main {
+  flex: 1;
 }
 
-.expert-row {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12rpx;
+.expert-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.expert-badge {
+  padding: 2rpx 10rpx;
+  border-radius: 10rpx;
+  background: #dff0fb;
+  color: #3f7ea2;
+  font-size: 20rpx;
+}
+
+.expert-name {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #1f3f55;
 }
 
 .state {

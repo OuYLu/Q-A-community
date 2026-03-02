@@ -17,6 +17,7 @@ export type CmsReportPageItemVO = {
   reasonCode?: string;
   reasonDetail?: string;
   reporterId?: number;
+  reporterName?: string;
   createdAt?: string;
   status?: number;
   contentTitle?: string;

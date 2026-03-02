@@ -51,6 +51,27 @@
 .panel.data-v-308a4d57 {
   margin-top: 24rpx;
 }
+.sort-tabs.data-v-308a4d57 {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-bottom: 16rpx;
+}
+.sort-tab.data-v-308a4d57 {
+  padding: 8rpx 16rpx;
+  border-radius: 18rpx;
+  border: 2rpx solid #d2deea;
+  color: #7f94a8;
+}
+.sort-tab.active.data-v-308a4d57 {
+  border-color: #4ba7d9;
+  color: #2d89be;
+  background: #eaf6fd;
+}
+.back-link.data-v-308a4d57 {
+  margin-left: auto;
+  color: #8ba0b3;
+}
 .head.data-v-308a4d57 {
   display: flex;
   justify-content: space-between;
@@ -75,6 +96,38 @@
 .hot.data-v-308a4d57 {
   background: #f3ecd1;
 }
+.result-section.data-v-308a4d57 {
+  margin-bottom: 20rpx;
+}
+.section-title.data-v-308a4d57 {
+  font-size: 30rpx;
+  font-weight: 700;
+  margin-bottom: 12rpx;
+}
+.kb-author-row.data-v-308a4d57 {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  margin-bottom: 8rpx;
+}
+.kb-author-avatar.data-v-308a4d57 {
+  width: 44rpx;
+  height: 44rpx;
+  border-radius: 50%;
+  background: #eef3f8;
+}
+.kb-author-name.data-v-308a4d57 {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #2a3340;
+}
+.kb-official.data-v-308a4d57 {
+  padding: 2rpx 10rpx;
+  border-radius: 999rpx;
+  border: 2rpx solid #3fa2d8;
+  color: #2d89be;
+  font-size: 22rpx;
+}
 .result-item.data-v-308a4d57 {
   padding: 22rpx;
   margin-top: 14rpx;
@@ -96,5 +149,11 @@
 .state.data-v-308a4d57 {
   color: #8ba0b3;
   text-align: center;
-  padding: 40rpx 0;
+  padding: 32rpx 0;
+}
+.state.inline.data-v-308a4d57 {
+  padding: 10rpx 0 18rpx;
+}
+.state.load-more.data-v-308a4d57 {
+  padding-top: 18rpx;
 }

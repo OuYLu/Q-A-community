@@ -8254,15 +8254,9 @@ function defineStore(idOrOptions, setup, setupOptions) {
   let id;
   let options;
   const isSetupStore = typeof setup === "function";
-  if (typeof idOrOptions === "string") {
+  {
     id = idOrOptions;
     options = isSetupStore ? setupOptions : setup;
-  } else {
-    options = idOrOptions;
-    id = idOrOptions.id;
-    if (typeof id !== "string") {
-      throw new Error(`[🍍]: "defineStore()" must be passed a store id as its first argument.`);
-    }
   }
   function useStore(pinia, hot) {
     const hasContext = hasInjectionContext();
@@ -8315,6 +8309,7 @@ const createHook = (lifecycle) => (hook, target = getCurrentInstance()) => {
 const onShow = /* @__PURE__ */ createHook(ON_SHOW);
 const onLoad = /* @__PURE__ */ createHook(ON_LOAD);
 const onReachBottom = /* @__PURE__ */ createHook(ON_REACH_BOTTOM);
+const onPullDownRefresh = /* @__PURE__ */ createHook(ON_PULL_DOWN_REFRESH);
 exports._export_sfc = _export_sfc;
 exports.computed = computed;
 exports.createPinia = createPinia;
@@ -8323,10 +8318,12 @@ exports.defineComponent = defineComponent;
 exports.defineStore = defineStore;
 exports.e = e;
 exports.f = f;
+exports.getCurrentInstance = getCurrentInstance;
 exports.index = index;
 exports.n = n;
 exports.o = o;
 exports.onLoad = onLoad;
+exports.onPullDownRefresh = onPullDownRefresh;
 exports.onReachBottom = onReachBottom;
 exports.onShow = onShow;
 exports.ref = ref;

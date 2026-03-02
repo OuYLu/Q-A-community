@@ -3,6 +3,7 @@ const common_vendor = require("../../common/vendor.js");
 const utils_authGuard = require("../../utils/auth-guard.js");
 const api_discover = require("../../api/discover.js");
 const api_question = require("../../api/question.js");
+const api_topic = require("../../api/topic.js");
 const utils_constants = require("../../utils/constants.js");
 const stores_auth = require("../../stores/auth.js");
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
@@ -23,6 +24,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const categorySearch = common_vendor.ref("");
     const categorySearchLoading = common_vendor.ref(false);
     const authStore = stores_auth.useAuthStore();
+    const fixedTopicId = common_vendor.ref(null);
+    const fixedTopicTitle = common_vendor.ref("");
     const categoryPlaceholder = common_vendor.computed(() => {
       if (categoryLoading.value)
         return "分类加载中...";
@@ -84,6 +87,13 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     common_vendor.onShow(() => {
       utils_authGuard.ensurePageAuth();
     });
+    common_vendor.onLoad((options) => {
+      const topicId = Number((options == null ? void 0 : options.topicId) || 0);
+      if (topicId > 0) {
+        fixedTopicId.value = topicId;
+        fixedTopicTitle.value = decodeURIComponent(String((options == null ? void 0 : options.topicTitle) || ""));
+      }
+    });
     async function submit() {
       if (!title.value.trim()) {
         common_vendor.index.showToast({ title: "请输入问题标题", icon: "none" });
@@ -95,13 +105,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
       const tags = tagsInput.value.split(/[，, ]+/).map((x) => x.trim()).filter(Boolean).slice(0, 5);
       try {
-        const questionId = await api_question.questionApi.createQuestion({
+        const payload = {
           title: title.value.trim(),
           content: content.value.trim() || void 0,
           categoryId: categoryId.value || void 0,
           tagNames: tags.length ? tags : void 0,
           imageUrls: imageUrls.value.length ? imageUrls.value : void 0
-        });
+        };
+        const questionId = fixedTopicId.value ? await api_topic.topicApi.createTopicQuestion(fixedTopicId.value, payload) : await api_question.questionApi.createQuestion(payload);
         common_vendor.index.showToast({ title: "提问成功", icon: "success" });
         setTimeout(() => {
           common_vendor.index.redirectTo({
@@ -279,13 +290,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           up: showCategoryPanel.value
         }),
         g: common_vendor.o(toggleCategoryPanel),
-        h: showCategoryPanel.value
+        h: fixedTopicId.value
+      }, fixedTopicId.value ? {
+        i: common_vendor.t(fixedTopicTitle.value || `专题#${fixedTopicId.value}`)
+      } : {}, {
+        j: showCategoryPanel.value
       }, showCategoryPanel.value ? common_vendor.e({
-        i: categorySearch.value,
-        j: common_vendor.o(($event) => categorySearch.value = $event.detail.value),
-        k: normalizedSearch.value
+        k: categorySearch.value,
+        l: common_vendor.o(($event) => categorySearch.value = $event.detail.value),
+        m: normalizedSearch.value
       }, normalizedSearch.value ? common_vendor.e({
-        l: common_vendor.f(searchMatches.value, (item, k0, i0) => {
+        n: common_vendor.f(searchMatches.value, (item, k0, i0) => {
           var _a, _b;
           return {
             a: common_vendor.t(item.parent ? `${getCategoryText(item.parent)} / ${getCategoryText(item.node)}` : getCategoryText(item.node)),
@@ -293,11 +308,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             c: common_vendor.o(($event) => applyCategory(item.node, item.parent), `${((_b = item.parent) == null ? void 0 : _b.id) || "root"}-${item.node.id}`)
           };
         }),
-        m: !searchMatches.value.length && !categorySearchLoading.value
+        o: !searchMatches.value.length && !categorySearchLoading.value
       }, !searchMatches.value.length && !categorySearchLoading.value ? {} : {}, {
-        n: categorySearchLoading.value
+        p: categorySearchLoading.value
       }, categorySearchLoading.value ? {} : {}) : common_vendor.e({
-        o: common_vendor.f(filteredRoots.value, (root, k0, i0) => {
+        q: common_vendor.f(filteredRoots.value, (root, k0, i0) => {
           return {
             a: common_vendor.t(getCategoryText(root)),
             b: root.id,
@@ -307,31 +322,31 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             d: common_vendor.o(($event) => selectRoot(root), root.id)
           };
         }),
-        p: common_vendor.f(currentChildren.value, (child, k0, i0) => {
+        r: common_vendor.f(currentChildren.value, (child, k0, i0) => {
           return {
             a: common_vendor.t(getCategoryText(child)),
             b: child.id,
             c: common_vendor.o(($event) => selectedRoot.value && selectChild(child, selectedRoot.value), child.id)
           };
         }),
-        q: !currentChildren.value.length
+        s: !currentChildren.value.length
       }, !currentChildren.value.length ? {} : {})) : {}, {
-        r: content.value,
-        s: common_vendor.o(($event) => content.value = $event.detail.value),
-        t: common_vendor.t(content.value.length),
-        v: common_vendor.f(imageUrls.value, (url, idx, i0) => {
+        t: content.value,
+        v: common_vendor.o(($event) => content.value = $event.detail.value),
+        w: common_vendor.t(content.value.length),
+        x: common_vendor.f(imageUrls.value, (url, idx, i0) => {
           return {
             a: url,
             b: common_vendor.o(($event) => removeImage(idx), url + idx),
             c: url + idx
           };
         }),
-        w: uploadingImages.value
+        y: uploadingImages.value
       }, uploadingImages.value ? {} : {}, {
-        x: common_vendor.o(chooseImages),
-        y: tagsInput.value,
-        z: common_vendor.o(($event) => tagsInput.value = $event.detail.value),
-        A: common_vendor.o(submit)
+        z: common_vendor.o(chooseImages),
+        A: tagsInput.value,
+        B: common_vendor.o(($event) => tagsInput.value = $event.detail.value),
+        C: common_vendor.o(submit)
       });
     };
   }

@@ -1,7 +1,13 @@
-<script>
+<script lang="ts">
+import { refreshNoticeTabDot } from "@/utils/notice-badge";
+
 export default {
-  onLaunch() {},
-  onShow() {},
+  onLaunch() {
+    refreshNoticeTabDot();
+  },
+  onShow() {
+    refreshNoticeTabDot();
+  },
   onHide() {}
 }
 </script>

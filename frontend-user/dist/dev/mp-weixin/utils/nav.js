@@ -6,9 +6,7 @@ function openQuestionDetail(id) {
   const authStore = stores_auth.useAuthStore();
   const detailUrl = `/pages/question/detail?id=${id}`;
   if (authStore.isLogin) {
-    common_vendor.index.navigateTo({
-      url: detailUrl
-    });
+    common_vendor.index.navigateTo({ url: detailUrl });
     return;
   }
   common_vendor.index.showModal({
@@ -29,8 +27,38 @@ function openQuestionDetail(id) {
 function openAskPage() {
   if (!utils_authGuard.requireAuth("/pages/question/ask"))
     return;
-  common_vendor.index.navigateTo({
-    url: "/pages/question/ask"
+  common_vendor.index.navigateTo({ url: "/pages/question/ask" });
+}
+function openExpertPostCreatePage() {
+  if (!utils_authGuard.requireAuth("/pages/expert/post-create"))
+    return;
+  common_vendor.index.navigateTo({ url: "/pages/expert/post-create" });
+}
+function openExpertPostDetailPage(id) {
+  const authStore = stores_auth.useAuthStore();
+  const detailUrl = `/pages/expert/post-detail?id=${id}`;
+  if (authStore.isLogin) {
+    common_vendor.index.navigateTo({
+      url: detailUrl,
+      fail: () => {
+        common_vendor.index.showToast({ title: "打开科普详情失败", icon: "none" });
+      }
+    });
+    return;
+  }
+  common_vendor.index.showModal({
+    title: "提示",
+    content: "登录后才能查看科普详情",
+    confirmText: "去登录",
+    cancelText: "返回首页",
+    success: (res) => {
+      if (res.confirm) {
+        const target = encodeURIComponent(detailUrl);
+        common_vendor.index.navigateTo({ url: `/pages/auth/login?redirect=${target}` });
+        return;
+      }
+      common_vendor.index.switchTab({ url: "/pages/home/index" });
+    }
   });
 }
 function openAnswerPage(questionId, title) {
@@ -55,7 +83,15 @@ function openAnswerDetailPage(answerId) {
     }
   });
 }
+function openUserHomePage(userId) {
+  if (!utils_authGuard.requireAuth(`/pages/user/home?userId=${userId}`))
+    return;
+  common_vendor.index.navigateTo({ url: `/pages/user/home?userId=${userId}` });
+}
 exports.openAnswerDetailPage = openAnswerDetailPage;
 exports.openAnswerPage = openAnswerPage;
 exports.openAskPage = openAskPage;
+exports.openExpertPostCreatePage = openExpertPostCreatePage;
+exports.openExpertPostDetailPage = openExpertPostDetailPage;
 exports.openQuestionDetail = openQuestionDetail;
+exports.openUserHomePage = openUserHomePage;

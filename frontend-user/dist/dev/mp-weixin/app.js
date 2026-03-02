@@ -1,16 +1,21 @@
 "use strict";
 Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 const common_vendor = require("./common/vendor.js");
+const utils_noticeBadge = require("./utils/notice-badge.js");
 if (!Math) {
   "./pages/home/index.js";
   "./pages/search/index.js";
   "./pages/discover/index.js";
+  "./pages/discover/category-detail.js";
+  "./pages/discover/topic-detail.js";
   "./pages/notice/index.js";
+  "./pages/notice/report-feedback.js";
   "./pages/mine/index.js";
   "./pages/question/detail.js";
   "./pages/question/ask.js";
   "./pages/question/answer.js";
   "./pages/question/answer-detail.js";
+  "./pages/question/report.js";
   "./pages/auth/login.js";
   "./pages/auth/register.js";
   "./pages/auth/wechat-authorize.js";
@@ -19,11 +24,17 @@ if (!Math) {
   "./pages/mine/doc.js";
   "./pages/mine/edit-profile.js";
   "./pages/mine/password.js";
+  "./pages/user/home.js";
+  "./pages/mine/expert-apply.js";
+  "./pages/expert/post-create.js";
+  "./pages/expert/post-detail.js";
 }
 const _sfc_main = {
   onLaunch() {
+    utils_noticeBadge.refreshNoticeTabDot();
   },
   onShow() {
+    utils_noticeBadge.refreshNoticeTabDot();
   },
   onHide() {
   }

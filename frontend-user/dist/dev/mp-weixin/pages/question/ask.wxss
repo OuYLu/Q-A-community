@@ -151,3 +151,23 @@
   background: #4ba7d9;
   color: #fff;
 }
+.topic-fixed.data-v-7aad2763 {
+  margin-top: 12rpx;
+  border: 2rpx solid #d6e8f6;
+  border-radius: 14rpx;
+  background: #f2f9ff;
+  padding: 14rpx 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12rpx;
+}
+.topic-fixed-label.data-v-7aad2763 {
+  color: #5f84a3;
+  font-size: 24rpx;
+}
+.topic-fixed-value.data-v-7aad2763 {
+  color: #2b5d82;
+  font-weight: 700;
+  font-size: 26rpx;
+}

@@ -43,6 +43,12 @@ const questionApi = {
       data
     });
   },
+  deleteQuestion(questionId) {
+    return api_http.request({
+      url: `/api/customer/questions/${questionId}`,
+      method: "DELETE"
+    });
+  },
   detail(id) {
     return api_http.request({
       url: `/api/customer/questions/${id}`
@@ -130,6 +136,32 @@ const questionApi = {
       url: `/api/customer/answers/${answerId}/comments`,
       method: "POST",
       data: { content, parentId }
+    });
+  },
+  setQuestionSelfOnly(questionId) {
+    return api_http.request({
+      url: `/api/customer/questions/${questionId}/self-only`,
+      method: "PUT"
+    });
+  },
+  setQuestionPublic(questionId) {
+    return api_http.request({
+      url: `/api/customer/questions/${questionId}/public`,
+      method: "PUT"
+    });
+  },
+  reportQuestion(questionId, data) {
+    return api_http.request({
+      url: `/api/customer/questions/${questionId}/report`,
+      method: "POST",
+      data
+    });
+  },
+  reportAnswer(answerId, data) {
+    return api_http.request({
+      url: `/api/customer/answers/${answerId}/report`,
+      method: "POST",
+      data
     });
   }
 };

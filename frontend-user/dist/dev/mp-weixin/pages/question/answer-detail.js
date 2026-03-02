@@ -1,6 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const utils_authGuard = require("../../utils/auth-guard.js");
+const utils_nav = require("../../utils/nav.js");
 const api_question = require("../../api/question.js");
 const defaultAvatarText = "用户";
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
@@ -45,6 +46,25 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     function cancelReply() {
       replyParentId.value = null;
       replyToName.value = "";
+    }
+    function reportAnswer() {
+      var _a, _b;
+      if (!((_b = (_a = detail.value) == null ? void 0 : _a.answer) == null ? void 0 : _b.id))
+        return;
+      const title = encodeURIComponent(detail.value.questionTitle || "");
+      common_vendor.index.navigateTo({
+        url: `/pages/question/report?targetType=answer&answerId=${detail.value.answer.id}&title=${title}`
+      });
+    }
+    function showMoreMenu() {
+      common_vendor.index.showActionSheet({
+        itemList: ["举报"],
+        success: (res) => {
+          if (res.tapIndex === 0) {
+            reportAnswer();
+          }
+        }
+      });
     }
     async function loadDetail() {
       if (!answerId.value)
@@ -100,6 +120,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         posting.value = false;
       }
     }
+    function openAnswerAuthor() {
+      var _a, _b;
+      if (!((_b = (_a = detail.value) == null ? void 0 : _a.answer) == null ? void 0 : _b.authorId))
+        return;
+      utils_nav.openUserHomePage(Number(detail.value.answer.authorId));
+    }
+    function openCommentAuthor(comment) {
+      if (!(comment == null ? void 0 : comment.authorId))
+        return;
+      utils_nav.openUserHomePage(Number(comment.authorId));
+    }
     common_vendor.onLoad((options) => {
       answerId.value = Number((options == null ? void 0 : options.id) || (options == null ? void 0 : options.answerId) || 0);
       if (!answerId.value) {
@@ -124,20 +155,22 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         c: common_vendor.t(loadFailed.value ? loadErrorText.value || "回答不存在或已删除" : "未找到回答")
       } : common_vendor.e({
         d: common_vendor.t(detail.value.questionTitle),
-        e: detail.value.answer.authorAvatar
-      }, detail.value.answer.authorAvatar ? {
+        e: common_vendor.o(showMoreMenu),
         f: detail.value.answer.authorAvatar
+      }, detail.value.answer.authorAvatar ? {
+        g: detail.value.answer.authorAvatar
       } : {
-        g: common_vendor.t(defaultAvatarText)
+        h: common_vendor.t(defaultAvatarText)
       }, {
-        h: common_vendor.t(detail.value.answer.authorName || "匿名用户"),
-        i: detail.value.answer.bestAnswer
+        i: common_vendor.t(detail.value.answer.authorName || "匿名用户"),
+        j: detail.value.answer.bestAnswer
       }, detail.value.answer.bestAnswer ? {} : {}, {
-        j: common_vendor.t(detail.value.answer.createdAt || ""),
-        k: common_vendor.t(detail.value.answer.content),
-        l: (_a = detail.value.answer.imageUrls) == null ? void 0 : _a.length
+        k: common_vendor.t(detail.value.answer.createdAt || ""),
+        l: common_vendor.o(openAnswerAuthor),
+        m: common_vendor.t(detail.value.answer.content),
+        n: (_a = detail.value.answer.imageUrls) == null ? void 0 : _a.length
       }, ((_b = detail.value.answer.imageUrls) == null ? void 0 : _b.length) ? {
-        m: common_vendor.f(detail.value.answer.imageUrls, (url, idx, i0) => {
+        o: common_vendor.f(detail.value.answer.imageUrls, (url, idx, i0) => {
           return {
             a: url + idx,
             b: url,
@@ -145,17 +178,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           };
         })
       } : {}, {
-        n: common_vendor.t(detail.value.answer.likeCount || 0),
-        o: detail.value.answer.liked ? 1 : "",
-        p: common_vendor.o(toggleLike),
-        q: common_vendor.t(detail.value.answer.favoriteCount || 0),
-        r: detail.value.answer.favorited ? 1 : "",
-        s: common_vendor.o(toggleFavorite),
-        t: common_vendor.t(detail.value.answer.commentCount || 0),
-        v: common_vendor.t(comments.value.length),
-        w: !comments.value.length
+        p: common_vendor.t(detail.value.answer.likeCount || 0),
+        q: detail.value.answer.liked ? 1 : "",
+        r: common_vendor.o(toggleLike),
+        s: common_vendor.t(detail.value.answer.favoriteCount || 0),
+        t: detail.value.answer.favorited ? 1 : "",
+        v: common_vendor.o(toggleFavorite),
+        w: common_vendor.t(detail.value.answer.commentCount || 0),
+        x: common_vendor.t(comments.value.length),
+        y: !comments.value.length
       }, !comments.value.length ? {} : {}, {
-        x: common_vendor.f(rootComments.value, (root, k0, i0) => {
+        z: common_vendor.f(rootComments.value, (root, k0, i0) => {
           return common_vendor.e({
             a: root.authorAvatar
           }, root.authorAvatar ? {
@@ -166,10 +199,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             d: common_vendor.t(root.authorName || "匿名用户"),
             e: common_vendor.t(root.createdAt || ""),
             f: common_vendor.o(($event) => startReply(root), root.id),
-            g: common_vendor.t(root.content),
-            h: childrenOf(root.id).length
+            g: common_vendor.o(($event) => openCommentAuthor(root), root.id),
+            h: common_vendor.t(root.content),
+            i: childrenOf(root.id).length
           }, childrenOf(root.id).length ? {
-            i: common_vendor.f(childrenOf(root.id), (child, k1, i1) => {
+            j: common_vendor.f(childrenOf(root.id), (child, k1, i1) => {
               return common_vendor.e({
                 a: child.authorAvatar
               }, child.authorAvatar ? {
@@ -180,24 +214,25 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
                 d: common_vendor.t(child.authorName || "匿名用户"),
                 e: common_vendor.t(child.createdAt || ""),
                 f: common_vendor.o(($event) => startReply(child), child.id),
-                g: common_vendor.t(child.content),
-                h: child.id
+                g: common_vendor.o(($event) => openCommentAuthor(child), child.id),
+                h: common_vendor.t(child.content),
+                i: child.id
               });
             })
           } : {}, {
-            j: root.id
+            k: root.id
           });
         }),
-        y: replyParentId.value
+        A: replyParentId.value
       }, replyParentId.value ? {
-        z: common_vendor.t(replyToName.value),
-        A: common_vendor.o(cancelReply)
+        B: common_vendor.t(replyToName.value),
+        C: common_vendor.o(cancelReply)
       } : {}, {
-        B: commentPlaceholder.value,
-        C: commentInput.value,
-        D: common_vendor.o(($event) => commentInput.value = $event.detail.value),
-        E: common_vendor.t(posting.value ? "发送中" : "发送"),
-        F: common_vendor.o(submitComment)
+        D: commentPlaceholder.value,
+        E: commentInput.value,
+        F: common_vendor.o(($event) => commentInput.value = $event.detail.value),
+        G: common_vendor.t(posting.value ? "发送中" : "发送"),
+        H: common_vendor.o(submitComment)
       }), {
         b: !detail.value
       });

@@ -14,6 +14,12 @@ const displayNickname = computed(() => overview.value?.nickname || authStore.use
 const displaySlogan = computed(
   () => overview.value?.slogan || authStore.user?.slogan || "这个人很懒，还没有填写个性签名"
 );
+const isVerifiedExpert = computed(() => overview.value?.expertStatus === 3);
+const expertCapsule = computed(() => {
+  const text = (overview.value?.expertExpertise || "").trim();
+  if (!text) return "已认证专家";
+  return text.length > 14 ? `${text.slice(0, 14)}...` : text;
+});
 const avatarUrl = computed(() => {
   const avatar = overview.value?.avatar || authStore.user?.avatar || "";
   if (!avatar) return "";
@@ -21,23 +27,50 @@ const avatarUrl = computed(() => {
   return `${BASE_URL}${avatar}`;
 });
 
-const profileStats = computed(() => [
-  { label: "提问", value: overview.value?.questionCount ?? 0 },
-  { label: "回答", value: overview.value?.answerCount ?? 0 },
-  { label: "获赞", value: overview.value?.likeReceivedCount ?? 0 },
-  { label: "粉丝", value: overview.value?.followerCount ?? 0 }
-]);
+const profileStats = computed(() => {
+  const base = [
+    { label: "提问", value: overview.value?.questionCount ?? 0 },
+    { label: "回答", value: overview.value?.answerCount ?? 0 },
+    { label: "获赞", value: overview.value?.likeReceivedCount ?? 0 },
+    { label: "粉丝", value: overview.value?.followerCount ?? 0 }
+  ];
+  if (isVerifiedExpert.value) {
+    base.push({ label: "科普", value: overview.value?.expertPostCount ?? 0 });
+  }
+  return base;
+});
 
-const myContent = computed(() => [
-  { icon: "🔖", title: "我的收藏", value: String(overview.value?.favoriteCount ?? 0), type: "favorites" },
-  { icon: "🕒", title: "浏览历史", value: String(overview.value?.historyCount ?? 0), type: "history" },
-  { icon: "💬", title: "我的提问", value: String(overview.value?.questionCount ?? 0), type: "questions" },
-  { icon: "⭐", title: "我的回答", value: String(overview.value?.answerCount ?? 0), type: "answers" }
-]);
+const myContent = computed(() => {
+  const rows = [
+    { icon: "🔖", title: "我的收藏", value: String(overview.value?.favoriteCount ?? 0), type: "favorites" },
+    { icon: "🕒", title: "浏览历史", value: String(overview.value?.historyCount ?? 0), type: "history" },
+    { icon: "💬", title: "我的提问", value: String(overview.value?.questionCount ?? 0), type: "questions" },
+    { icon: "⭐", title: "我的回答", value: String(overview.value?.answerCount ?? 0), type: "answers" }
+  ];
+  if (isVerifiedExpert.value) {
+    rows.push({
+      icon: "📚",
+      title: "我的科普",
+      value: String(overview.value?.expertPostCount ?? 0),
+      type: "expert-posts"
+    });
+  }
+  return rows;
+});
 
-const social = computed(() => [
+type SocialItem = {
+  icon?: string;
+  iconImage?: string;
+  title: string;
+  value?: string;
+  type: "following" | "followers" | "expert-apply";
+  disabled?: boolean;
+};
+
+const social = computed<SocialItem[]>(() => [
   { icon: "👥", title: "关注", value: String(overview.value?.followingCount ?? 0), type: "following" },
-  { icon: "🤍", title: "粉丝", value: String(overview.value?.followerCount ?? 0), type: "followers" }
+  { icon: "🤍", title: "粉丝", value: String(overview.value?.followerCount ?? 0), type: "followers" },
+  buildExpertSocialItem(overview.value?.expertStatus)
 ]);
 
 const others = [
@@ -64,6 +97,58 @@ function editProfile() {
 
 function openList(type: string) {
   uni.navigateTo({ url: `/pages/mine/list?type=${type}` });
+}
+
+function openSocial(type: string) {
+  if (type === "expert-apply") {
+    const status = overview.value?.expertStatus;
+    if (status === 2) {
+      uni.showToast({ title: "专家认证审核中", icon: "none" });
+      return;
+    }
+    if (status === 3) {
+      uni.showToast({ title: "专家认证已通过", icon: "none" });
+      return;
+    }
+    uni.navigateTo({ url: "/pages/mine/expert-apply" });
+    return;
+  }
+  openList(type);
+}
+
+function buildExpertSocialItem(expertStatus?: number | null): SocialItem {
+  if (expertStatus === 2) {
+    return {
+      iconImage: "/static/tabbar/expert.png",
+      title: "专家认证",
+      value: "审核中",
+      type: "expert-apply",
+      disabled: true
+    };
+  }
+  if (expertStatus === 3) {
+    return {
+      iconImage: "/static/tabbar/expert.png",
+      title: "专家认证",
+      value: "已通过",
+      type: "expert-apply",
+      disabled: true
+    };
+  }
+  if (expertStatus === 4) {
+    return {
+      iconImage: "/static/tabbar/expert.png",
+      title: "重新申请专家",
+      value: "已驳回",
+      type: "expert-apply"
+    };
+  }
+  return {
+    iconImage: "/static/tabbar/expert.png",
+    title: "申请专家",
+    value: "未申请",
+    type: "expert-apply"
+  };
 }
 
 function openDoc(type: string) {
@@ -122,7 +207,11 @@ onShow(() => {
         <image v-if="avatarUrl" class="avatar-img" :src="avatarUrl" mode="aspectFill" />
         <view v-else class="avatar">健</view>
         <view class="user-meta">
-          <view class="name">{{ displayNickname }}</view>
+          <view class="name-row">
+            <view class="name">{{ displayNickname }}</view>
+            <image v-if="isVerifiedExpert" class="expert-badge" src="/static/tabbar/expert-active.png" mode="aspectFit" />
+            <view v-if="isVerifiedExpert" class="expert-pill">{{ expertCapsule }}</view>
+          </view>
           <view class="desc">{{ displaySlogan }}</view>
         </view>
         <button class="edit-btn" @click="editProfile">编辑资料</button>
@@ -153,13 +242,16 @@ onShow(() => {
 
     <view class="section-title">社交</view>
     <view class="list-card">
-      <view v-for="item in social" :key="item.title" class="list-row" @click="openList(item.type)">
+      <view v-for="item in social" :key="item.title" class="list-row" :class="{ 'row-disabled': item.disabled }" @click="openSocial(item.type)">
         <view class="row-left">
-          <view class="icon">{{ item.icon }}</view>
+          <view class="icon">
+            <image v-if="item.iconImage" class="icon-image" :src="item.iconImage" mode="aspectFit" />
+            <text v-else>{{ item.icon }}</text>
+          </view>
           <text class="row-title">{{ item.title }}</text>
         </view>
         <view class="row-right">
-          <text class="pill">{{ item.value }}</text>
+          <text v-if="item.value !== undefined" class="pill">{{ item.value }}</text>
           <text class="arrow">›</text>
         </view>
       </view>
@@ -261,6 +353,32 @@ onShow(() => {
   font-weight: 700;
 }
 
+.name-row {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  flex-wrap: wrap;
+}
+
+.expert-badge {
+  width: 32rpx;
+  height: 32rpx;
+}
+
+.expert-pill {
+  max-width: 300rpx;
+  height: 34rpx;
+  line-height: 34rpx;
+  padding: 0 12rpx;
+  border-radius: 999rpx;
+  background: #eaf4fb;
+  color: #2f6f99;
+  font-size: 20rpx;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .desc {
   margin-top: 6rpx;
   color: #7f95a8;
@@ -325,6 +443,10 @@ onShow(() => {
   border-bottom: 1rpx solid #f3efdf;
 }
 
+.row-disabled {
+  opacity: 0.9;
+}
+
 .list-row:last-child {
   border-bottom: none;
 }
@@ -344,6 +466,11 @@ onShow(() => {
   align-items: center;
   justify-content: center;
   font-size: 28rpx;
+}
+
+.icon-image {
+  width: 34rpx;
+  height: 34rpx;
 }
 
 .row-title {

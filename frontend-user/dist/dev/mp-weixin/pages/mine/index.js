@@ -1,5 +1,6 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
+const common_assets = require("../../common/assets.js");
 const stores_auth = require("../../stores/auth.js");
 const api_me = require("../../api/me.js");
 const utils_constants = require("../../utils/constants.js");
@@ -20,6 +21,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         return ((_a = overview.value) == null ? void 0 : _a.slogan) || ((_b = authStore.user) == null ? void 0 : _b.slogan) || "这个人很懒，还没有填写个性签名";
       }
     );
+    const isVerifiedExpert = common_vendor.computed(() => {
+      var _a;
+      return ((_a = overview.value) == null ? void 0 : _a.expertStatus) === 3;
+    });
+    const expertCapsule = common_vendor.computed(() => {
+      var _a;
+      const text = (((_a = overview.value) == null ? void 0 : _a.expertExpertise) || "").trim();
+      if (!text)
+        return "已认证专家";
+      return text.length > 14 ? `${text.slice(0, 14)}...` : text;
+    });
     const avatarUrl = common_vendor.computed(() => {
       var _a, _b;
       const avatar = ((_a = overview.value) == null ? void 0 : _a.avatar) || ((_b = authStore.user) == null ? void 0 : _b.avatar) || "";
@@ -30,28 +42,42 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return `${utils_constants.BASE_URL}${avatar}`;
     });
     const profileStats = common_vendor.computed(() => {
-      var _a, _b, _c, _d;
-      return [
+      var _a, _b, _c, _d, _e;
+      const base = [
         { label: "提问", value: ((_a = overview.value) == null ? void 0 : _a.questionCount) ?? 0 },
         { label: "回答", value: ((_b = overview.value) == null ? void 0 : _b.answerCount) ?? 0 },
         { label: "获赞", value: ((_c = overview.value) == null ? void 0 : _c.likeReceivedCount) ?? 0 },
         { label: "粉丝", value: ((_d = overview.value) == null ? void 0 : _d.followerCount) ?? 0 }
       ];
+      if (isVerifiedExpert.value) {
+        base.push({ label: "科普", value: ((_e = overview.value) == null ? void 0 : _e.expertPostCount) ?? 0 });
+      }
+      return base;
     });
     const myContent = common_vendor.computed(() => {
-      var _a, _b, _c, _d;
-      return [
+      var _a, _b, _c, _d, _e;
+      const rows = [
         { icon: "🔖", title: "我的收藏", value: String(((_a = overview.value) == null ? void 0 : _a.favoriteCount) ?? 0), type: "favorites" },
         { icon: "🕒", title: "浏览历史", value: String(((_b = overview.value) == null ? void 0 : _b.historyCount) ?? 0), type: "history" },
         { icon: "💬", title: "我的提问", value: String(((_c = overview.value) == null ? void 0 : _c.questionCount) ?? 0), type: "questions" },
         { icon: "⭐", title: "我的回答", value: String(((_d = overview.value) == null ? void 0 : _d.answerCount) ?? 0), type: "answers" }
       ];
+      if (isVerifiedExpert.value) {
+        rows.push({
+          icon: "📚",
+          title: "我的科普",
+          value: String(((_e = overview.value) == null ? void 0 : _e.expertPostCount) ?? 0),
+          type: "expert-posts"
+        });
+      }
+      return rows;
     });
     const social = common_vendor.computed(() => {
-      var _a, _b;
+      var _a, _b, _c;
       return [
         { icon: "👥", title: "关注", value: String(((_a = overview.value) == null ? void 0 : _a.followingCount) ?? 0), type: "following" },
-        { icon: "🤍", title: "粉丝", value: String(((_b = overview.value) == null ? void 0 : _b.followerCount) ?? 0), type: "followers" }
+        { icon: "🤍", title: "粉丝", value: String(((_b = overview.value) == null ? void 0 : _b.followerCount) ?? 0), type: "followers" },
+        buildExpertSocialItem((_c = overview.value) == null ? void 0 : _c.expertStatus)
       ];
     });
     const others = [
@@ -74,6 +100,57 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     function openList(type) {
       common_vendor.index.navigateTo({ url: `/pages/mine/list?type=${type}` });
+    }
+    function openSocial(type) {
+      var _a;
+      if (type === "expert-apply") {
+        const status = (_a = overview.value) == null ? void 0 : _a.expertStatus;
+        if (status === 2) {
+          common_vendor.index.showToast({ title: "专家认证审核中", icon: "none" });
+          return;
+        }
+        if (status === 3) {
+          common_vendor.index.showToast({ title: "专家认证已通过", icon: "none" });
+          return;
+        }
+        common_vendor.index.navigateTo({ url: "/pages/mine/expert-apply" });
+        return;
+      }
+      openList(type);
+    }
+    function buildExpertSocialItem(expertStatus) {
+      if (expertStatus === 2) {
+        return {
+          iconImage: "/static/tabbar/expert.png",
+          title: "专家认证",
+          value: "审核中",
+          type: "expert-apply",
+          disabled: true
+        };
+      }
+      if (expertStatus === 3) {
+        return {
+          iconImage: "/static/tabbar/expert.png",
+          title: "专家认证",
+          value: "已通过",
+          type: "expert-apply",
+          disabled: true
+        };
+      }
+      if (expertStatus === 4) {
+        return {
+          iconImage: "/static/tabbar/expert.png",
+          title: "重新申请专家",
+          value: "已驳回",
+          type: "expert-apply"
+        };
+      }
+      return {
+        iconImage: "/static/tabbar/expert.png",
+        title: "申请专家",
+        value: "未申请",
+        type: "expert-apply"
+      };
     }
     function openDoc(type) {
       common_vendor.index.navigateTo({ url: `/pages/mine/doc?type=${type}` });
@@ -128,16 +205,24 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         d: avatarUrl.value
       } : {}, {
         e: common_vendor.t(displayNickname.value),
-        f: common_vendor.t(displaySlogan.value),
-        g: common_vendor.o(editProfile),
-        h: common_vendor.f(profileStats.value, (item, k0, i0) => {
+        f: isVerifiedExpert.value
+      }, isVerifiedExpert.value ? {
+        g: common_assets._imports_0
+      } : {}, {
+        h: isVerifiedExpert.value
+      }, isVerifiedExpert.value ? {
+        i: common_vendor.t(expertCapsule.value)
+      } : {}, {
+        j: common_vendor.t(displaySlogan.value),
+        k: common_vendor.o(editProfile),
+        l: common_vendor.f(profileStats.value, (item, k0, i0) => {
           return {
             a: common_vendor.t(item.value),
             b: common_vendor.t(item.label),
             c: item.label
           };
         }),
-        i: common_vendor.f(myContent.value, (item, k0, i0) => {
+        m: common_vendor.f(myContent.value, (item, k0, i0) => {
           return {
             a: common_vendor.t(item.icon),
             b: common_vendor.t(item.title),
@@ -146,16 +231,25 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             e: common_vendor.o(($event) => openList(item.type), item.title)
           };
         }),
-        j: common_vendor.f(social.value, (item, k0, i0) => {
-          return {
-            a: common_vendor.t(item.icon),
-            b: common_vendor.t(item.title),
-            c: common_vendor.t(item.value),
-            d: item.title,
-            e: common_vendor.o(($event) => openList(item.type), item.title)
-          };
+        n: common_vendor.f(social.value, (item, k0, i0) => {
+          return common_vendor.e({
+            a: item.iconImage
+          }, item.iconImage ? {
+            b: item.iconImage
+          } : {
+            c: common_vendor.t(item.icon)
+          }, {
+            d: common_vendor.t(item.title),
+            e: item.value !== void 0
+          }, item.value !== void 0 ? {
+            f: common_vendor.t(item.value)
+          } : {}, {
+            g: item.title,
+            h: item.disabled ? 1 : "",
+            i: common_vendor.o(($event) => openSocial(item.type), item.title)
+          });
         }),
-        k: common_vendor.f(others, (item, k0, i0) => {
+        o: common_vendor.f(others, (item, k0, i0) => {
           return {
             a: common_vendor.t(item.icon),
             b: common_vendor.t(item.title),
@@ -163,9 +257,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             d: common_vendor.o(($event) => openDoc(item.type), item.title)
           };
         }),
-        l: common_vendor.t(formatJoinedAt((_a = overview.value) == null ? void 0 : _a.joinedAt)),
-        m: common_vendor.o(logout),
-        n: loading.value
+        p: common_vendor.t(formatJoinedAt((_a = overview.value) == null ? void 0 : _a.joinedAt)),
+        q: common_vendor.o(logout),
+        r: loading.value
       }));
     };
   }

@@ -20,7 +20,22 @@ page {
   border-radius: 20rpx;
 }
 .answer-card {
+  position: relative;
   padding: 18rpx;
+}
+.more-btn {
+  position: absolute;
+  right: 12rpx;
+  top: 10rpx;
+  width: 66rpx;
+  height: 46rpx;
+  border-radius: 24rpx;
+  border: 2rpx solid #d8dfe8;
+  background: #f4f6f9;
+  color: #72859a;
+  text-align: center;
+  line-height: 42rpx;
+  font-size: 34rpx;
 }
 .author-row {
   display: flex;

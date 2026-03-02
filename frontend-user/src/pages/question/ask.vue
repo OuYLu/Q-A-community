@@ -1,9 +1,10 @@
 ﻿<script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { onShow } from "@dcloudio/uni-app";
+import { onLoad, onShow } from "@dcloudio/uni-app";
 import { ensurePageAuth } from "@/utils/auth-guard";
 import { discoverApi, type AppCategoryTreeNodeVO } from "@/api/discover";
 import { questionApi } from "@/api/question";
+import { topicApi } from "@/api/topic";
 import { BASE_URL } from "@/utils/constants";
 import { useAuthStore } from "@/stores/auth";
 
@@ -22,6 +23,8 @@ const childCategoryMap = ref<Record<number, AppCategoryTreeNodeVO[]>>({});
 const categorySearch = ref("");
 const categorySearchLoading = ref(false);
 const authStore = useAuthStore();
+const fixedTopicId = ref<number | null>(null);
+const fixedTopicTitle = ref("");
 
 const categoryPlaceholder = computed(() => {
   if (categoryLoading.value) return "分类加载中...";
@@ -82,6 +85,14 @@ onShow(() => {
   ensurePageAuth();
 });
 
+onLoad((options) => {
+  const topicId = Number(options?.topicId || 0);
+  if (topicId > 0) {
+    fixedTopicId.value = topicId;
+    fixedTopicTitle.value = decodeURIComponent(String(options?.topicTitle || ""));
+  }
+});
+
 async function submit() {
   if (!title.value.trim()) {
     uni.showToast({ title: "请输入问题标题", icon: "none" });
@@ -99,13 +110,16 @@ async function submit() {
     .slice(0, 5);
 
   try {
-    const questionId = await questionApi.createQuestion({
+    const payload = {
       title: title.value.trim(),
       content: content.value.trim() || undefined,
       categoryId: categoryId.value || undefined,
       tagNames: tags.length ? tags : undefined,
       imageUrls: imageUrls.value.length ? imageUrls.value : undefined
-    });
+    };
+    const questionId = fixedTopicId.value
+      ? await topicApi.createTopicQuestion(fixedTopicId.value, payload)
+      : await questionApi.createQuestion(payload);
 
     uni.showToast({ title: "提问成功", icon: "success" });
     setTimeout(() => {
@@ -297,6 +311,11 @@ watch(categorySearch, () => {
     <view class="input category-picker" @click="toggleCategoryPanel">
       <text :class="{ placeholder: !categoryName }">{{ categoryPlaceholder }}</text>
       <text :class="['arrow', { up: showCategoryPanel }]" />
+    </view>
+
+    <view v-if="fixedTopicId" class="topic-fixed">
+      <text class="topic-fixed-label">所属专题</text>
+      <text class="topic-fixed-value">{{ fixedTopicTitle || `专题#${fixedTopicId}` }}</text>
     </view>
 
     <view v-if="showCategoryPanel" class="category-panel">
@@ -550,5 +569,28 @@ watch(categorySearch, () => {
   border-radius: 18rpx;
   background: #4ba7d9;
   color: #fff;
+}
+
+.topic-fixed {
+  margin-top: 12rpx;
+  border: 2rpx solid #d6e8f6;
+  border-radius: 14rpx;
+  background: #f2f9ff;
+  padding: 14rpx 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12rpx;
+}
+
+.topic-fixed-label {
+  color: #5f84a3;
+  font-size: 24rpx;
+}
+
+.topic-fixed-value {
+  color: #2b5d82;
+  font-weight: 700;
+  font-size: 26rpx;
 }
 </style>

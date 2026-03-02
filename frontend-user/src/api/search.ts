@@ -6,7 +6,7 @@ export interface AppSearchQuestionVO {
   summary?: string;
   answerCount?: number;
   viewCount?: number;
-  authorName?: string;
+  likeCount?: number;
   createdAt?: string;
 }
 
@@ -23,11 +23,22 @@ export interface AppSearchTagVO {
   questionCount: number;
 }
 
+export interface AppSearchKbVO {
+  id: number;
+  title: string;
+  summary?: string;
+  viewCount?: number;
+  likeCount?: number;
+  source?: string | null;
+  createdAt?: string;
+}
+
 export interface AppSearchResultVO {
   query: string;
   questions: AppSearchQuestionVO[];
   topics: AppSearchTopicVO[];
   tags: AppSearchTagVO[];
+  kbEntries: AppSearchKbVO[];
 }
 
 export interface AppSearchHotVO {
@@ -41,7 +52,16 @@ export interface AppSearchHistoryVO {
 }
 
 export const searchApi = {
-  search(params: { query: string; type?: "all" | "question" | "topic" | "tag"; page?: number; pageSize?: number }) {
+  search(params: {
+    query: string;
+    type?: "all" | "question" | "topic" | "tag" | "kb";
+    sortBy?: "comprehensive" | "latest" | "hot";
+    categoryId?: number;
+    topicId?: number;
+    onlyUnsolved?: boolean;
+    page?: number;
+    pageSize?: number;
+  }) {
     return request<AppSearchResultVO>({
       url: "/api/customer/search",
       params
@@ -65,7 +85,7 @@ export const searchApi = {
       method: "DELETE"
     });
   },
-  logSearch(data: { queryText: string; searchType?: string; hitCount?: number }) {
+  logSearch(data: { queryText: string; searchType?: number; hitCount?: number }) {
     return request<void>({
       url: "/api/customer/search/log",
       method: "POST",

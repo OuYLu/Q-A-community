@@ -11,6 +11,11 @@ export interface AppQuestionCreateDTO {
   imageUrls?: string[];
 }
 
+export interface AppQuestionReportCreateDTO {
+  reasonCode: string;
+  reasonDetail?: string;
+}
+
 export interface AppAnswerCreateDTO {
   content: string;
   isAnonymous?: number;
@@ -59,6 +64,7 @@ export interface AppQuestionDetailVO {
   id: number;
   title: string;
   content?: string;
+  status?: number;
   imageUrls?: string[];
   categoryId?: number;
   categoryName?: string;
@@ -162,6 +168,12 @@ export const questionApi = {
       data
     });
   },
+  deleteQuestion(questionId: number) {
+    return request<void>({
+      url: `/api/customer/questions/${questionId}`,
+      method: "DELETE"
+    });
+  },
   detail(id: number) {
     return request<AppQuestionDetailVO>({
       url: `/api/customer/questions/${id}`
@@ -257,6 +269,32 @@ export const questionApi = {
       url: `/api/customer/answers/${answerId}/comments`,
       method: "POST",
       data: { content, parentId }
+    });
+  },
+  setQuestionSelfOnly(questionId: number) {
+    return request<void>({
+      url: `/api/customer/questions/${questionId}/self-only`,
+      method: "PUT"
+    });
+  },
+  setQuestionPublic(questionId: number) {
+    return request<void>({
+      url: `/api/customer/questions/${questionId}/public`,
+      method: "PUT"
+    });
+  },
+  reportQuestion(questionId: number, data: AppQuestionReportCreateDTO) {
+    return request<number>({
+      url: `/api/customer/questions/${questionId}/report`,
+      method: "POST",
+      data
+    });
+  },
+  reportAnswer(answerId: number, data: AppQuestionReportCreateDTO) {
+    return request<number>({
+      url: `/api/customer/answers/${answerId}/report`,
+      method: "POST",
+      data
     });
   }
 };

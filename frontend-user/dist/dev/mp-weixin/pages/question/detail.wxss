@@ -11,7 +11,22 @@
   border-radius: 20rpx;
 }
 .question-card.data-v-76570c52 {
+  position: relative;
   padding: 20rpx;
+}
+.more-btn.data-v-76570c52 {
+  position: absolute;
+  right: 14rpx;
+  top: 10rpx;
+  width: 66rpx;
+  height: 46rpx;
+  border-radius: 24rpx;
+  border: 2rpx solid #d8dfe8;
+  background: #f4f6f9;
+  color: #72859a;
+  text-align: center;
+  line-height: 42rpx;
+  font-size: 34rpx;
 }
 .author-row.data-v-76570c52,
 .answer-author.data-v-76570c52 {

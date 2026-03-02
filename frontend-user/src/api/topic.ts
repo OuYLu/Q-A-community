@@ -1,4 +1,5 @@
 import { request } from "@/api/http";
+import { BASE_URL } from "@/utils/constants";
 
 export interface PageInfo<T> {
   list: T[];
@@ -19,6 +20,7 @@ export interface AppTopicListItemVO {
 
 export interface AppTopicDetailVO extends AppTopicListItemVO {
   intro: string;
+  tags?: string[];
   followed: boolean;
 }
 
@@ -31,6 +33,15 @@ export interface AppTopicQuestionItemVO {
   likeCount?: number;
   createdAt?: string;
   authorName?: string;
+}
+
+function toAbsoluteUrl(url?: string) {
+  if (!url) return "";
+  const text = url.trim();
+  if (!text) return "";
+  if (text.startsWith("http://") || text.startsWith("https://")) return text;
+  if (text.startsWith("/")) return `${BASE_URL}${text}`;
+  return `${BASE_URL}/${text}`;
 }
 
 export const topicApi = {
@@ -49,12 +60,29 @@ export const topicApi = {
   detail(id: number) {
     return request<AppTopicDetailVO>({
       url: `/api/customer/topics/${id}`
-    });
+    }).then((data) => ({
+      ...data,
+      coverImg: toAbsoluteUrl(data?.coverImg)
+    }));
   },
   questions(id: number, params: { sortBy?: "hot" | "latest" | "unsolved"; page?: number; pageSize?: number }) {
     return request<PageInfo<AppTopicQuestionItemVO>>({
       url: `/api/customer/topics/${id}/questions`,
       params
+    });
+  },
+  createTopicQuestion(id: number, data: {
+    title: string;
+    content?: string;
+    categoryId?: number;
+    tagIds?: number[];
+    tagNames?: string[];
+    imageUrls?: string[];
+  }) {
+    return request<number>({
+      url: `/api/customer/topics/${id}/questions`,
+      method: "POST",
+      data
     });
   },
   follow(id: number) {

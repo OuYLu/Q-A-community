@@ -54,7 +54,7 @@
         <template #default="scope">{{ bizTypeText(scope.row.bizType) }}</template>
       </el-table-column>
       <el-table-column label="举报原因" width="130">
-        <template #default="scope">{{ reasonTypeText(scope.row.reasonType) }}</template>
+        <template #default="scope">{{ reportReasonText(scope.row.reasonCode, scope.row.reasonType) }}</template>
       </el-table-column>
       <el-table-column label="内容摘要" min-width="260" show-overflow-tooltip>
         <template #default="scope">
@@ -68,7 +68,9 @@
         <template #default="scope">{{ scope.row.authorName || (scope.row.authorId ? `#${scope.row.authorId}` : "-") }}</template>
       </el-table-column>
       <el-table-column label="举报人" width="100">
-        <template #default="scope">{{ scope.row.reporterId || "-" }}</template>
+        <template #default="scope">
+          {{ scope.row.reporterName || (scope.row.reporterId ? `#${scope.row.reporterId}` : "-") }}
+        </template>
       </el-table-column>
       <el-table-column label="状态" width="100">
         <template #default="scope">
@@ -109,7 +111,7 @@
         <h4>举报单信息</h4>
         <el-descriptions :column="3" border>
           <el-descriptions-item label="业务类型">{{ bizTypeText(detail.report.bizType) }}</el-descriptions-item>
-          <el-descriptions-item label="原因类型">{{ reasonTypeText(detail.report.reasonType) }}</el-descriptions-item>
+          <el-descriptions-item label="举报原因">{{ reportReasonText(detail.report.reasonCode, detail.report.reasonType) }}</el-descriptions-item>
           <el-descriptions-item label="举报人ID">{{ detail.report.reporterId || "-" }}</el-descriptions-item>
           <el-descriptions-item label="举报状态">{{ reportStatusText(detail.report.status) }}</el-descriptions-item>
           <el-descriptions-item label="处理动作">{{ handleActionText(detail.report.handleAction) }}</el-descriptions-item>
@@ -141,11 +143,10 @@
     </div>
     <template #footer>
       <template v-if="detail?.report?.status === 1">
-        <el-button type="warning" @click="openHandleDialog(detail.report.id, 1)">下架</el-button>
-        <el-button type="info" @click="openHandleDialog(detail.report.id, 2)">警告</el-button>
-        <el-button type="danger" @click="openHandleDialog(detail.report.id, 3)">封禁/禁言</el-button>
-        <el-button @click="openHandleDialog(detail.report.id, 4)">不处理</el-button>
-        <el-button type="success" plain @click="toAudit(detail.report.id)">转审核</el-button>
+        <el-button type="warning" @click="detail?.report?.id && openHandleDialog(detail.report.id, 1)">下架</el-button>
+        <el-button type="info" @click="detail?.report?.id && openHandleDialog(detail.report.id, 2)">警告</el-button>
+        <el-button type="danger" @click="detail?.report?.id && openHandleDialog(detail.report.id, 3)">封禁/禁言</el-button>
+        <el-button @click="detail?.report?.id && openHandleDialog(detail.report.id, 4)">不处理</el-button>
       </template>
       <el-button @click="detailVisible = false">关闭</el-button>
     </template>
@@ -179,8 +180,8 @@
 
 <script setup lang="ts">
 import { onMounted, reactive, ref } from "vue";
-import { ElMessage, ElMessageBox } from "element-plus";
-import { getCmsReportDetail, handleCmsReport, pageCmsReport, transferReportToAudit } from "../../api/report";
+import { ElMessage } from "element-plus";
+import { getCmsReportDetail, handleCmsReport, pageCmsReport } from "../../api/report";
 import type { CmsReportDetailVO, CmsReportPageItemVO, CmsReportPageQueryDTO } from "../../types/report";
 
 const pageSizes = [10, 20, 50, 100];
@@ -234,6 +235,26 @@ const reasonTypeText = (value?: number) => {
   if (value === 3) return "低质灌水";
   if (value === 4) return "其他";
   return value == null ? "-" : String(value);
+};
+
+const reasonCodeText = (code?: string) => {
+  const normalized = (code || "").trim().toLowerCase();
+  if (!normalized) return "";
+  if (normalized === "illegal") return "违法违规";
+  if (normalized === "porn") return "低俗色情";
+  if (normalized === "abuse") return "辱骂攻击";
+  if (normalized === "ad") return "广告营销";
+  if (normalized === "privacy") return "隐私泄露";
+  if (normalized === "other") return "其他";
+  return code || "";
+};
+
+const reportReasonText = (reasonCode?: string, reasonType?: number) => {
+  const fromCode = reasonCodeText(reasonCode);
+  if (fromCode) {
+    return fromCode;
+  }
+  return reasonTypeText(reasonType);
 };
 
 const handleActionText = (value?: number) => {
@@ -375,16 +396,6 @@ const submitHandle = async () => {
   });
   ElMessage.success("处理成功");
   handleDialogVisible.value = false;
-  await loadData();
-  if (detailVisible.value && detail.value?.report?.id) {
-    await fetchDetail(detail.value.report.id);
-  }
-};
-
-const toAudit = async (reportId: number) => {
-  await ElMessageBox.confirm("确认转入审核队列吗？已存在待审举报触发单时不会重复创建。", "提示", { type: "warning" });
-  await transferReportToAudit(reportId);
-  ElMessage.success("已转入审核队列");
   await loadData();
   if (detailVisible.value && detail.value?.report?.id) {
     await fetchDetail(detail.value.report.id);

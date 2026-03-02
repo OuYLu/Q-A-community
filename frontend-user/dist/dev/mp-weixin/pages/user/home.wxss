@@ -1,0 +1,152 @@
+.page.data-v-3013224c {
+  padding: 24rpx;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+.profile-card.data-v-3013224c {
+  padding: 24rpx;
+}
+.head-row.data-v-3013224c {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+.avatar.data-v-3013224c {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  border: 2rpx solid #9bd1ef;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2f9ad2;
+  font-size: 52rpx;
+  font-weight: 700;
+  background: #f3eed7;
+}
+.avatar-img.data-v-3013224c {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  border: 2rpx solid #9bd1ef;
+  background: #fff;
+}
+.user-meta.data-v-3013224c {
+  flex: 1;
+  min-width: 0;
+}
+.name.data-v-3013224c {
+  font-size: 44rpx;
+  font-weight: 700;
+}
+.name-row.data-v-3013224c {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  flex-wrap: wrap;
+}
+.expert-pill.data-v-3013224c {
+  max-width: 260rpx;
+  height: 34rpx;
+  line-height: 34rpx;
+  padding: 0 12rpx;
+  border-radius: 999rpx;
+  background: #eaf4fb;
+  color: #2f6f99;
+  font-size: 20rpx;
+}
+.desc.data-v-3013224c {
+  margin-top: 6rpx;
+  color: #7f95a8;
+  line-height: 1.3;
+}
+.follow-btn.data-v-3013224c {
+  margin-top: 18rpx;
+  width: 100%;
+  height: 72rpx;
+  line-height: 72rpx;
+  padding: 0;
+  font-size: 26rpx;
+  border: 2rpx solid #4ba7d9;
+  border-radius: 18rpx;
+  background: #4ba7d9;
+  color: #fff;
+}
+.follow-btn.active.data-v-3013224c {
+  border-color: #cfdbe4;
+  background: #eef3f7;
+  color: #6f879b;
+}
+.stat-row.data-v-3013224c {
+  margin-top: 22rpx;
+  padding-top: 20rpx;
+  border-top: 2rpx solid #f0ead7;
+  display: grid;
+  gap: 10rpx;
+}
+.stat-item.data-v-3013224c {
+  text-align: center;
+}
+.stat-value.data-v-3013224c {
+  font-size: 46rpx;
+  font-weight: 700;
+}
+.stat-label.data-v-3013224c {
+  color: #8ba0b3;
+  margin-top: 4rpx;
+}
+.tab-row.data-v-3013224c {
+  margin-top: 18rpx;
+  display: flex;
+  gap: 12rpx;
+}
+.tab-pill.data-v-3013224c {
+  padding: 10rpx 24rpx;
+  border-radius: 999rpx;
+  border: 2rpx solid #d6e3f0;
+  color: #5d7084;
+  font-weight: 700;
+  background: #f6f9fc;
+}
+.tab-pill.active.data-v-3013224c {
+  border-color: #5aa9d9;
+  color: #2d89be;
+  background: #eaf6ff;
+}
+.section-title.data-v-3013224c {
+  margin: 18rpx 0 10rpx;
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #8ea1b2;
+}
+.answer-card.data-v-3013224c,
+.post-card.data-v-3013224c {
+  margin-bottom: 12rpx;
+  padding: 18rpx;
+}
+.question-title.data-v-3013224c,
+.post-title.data-v-3013224c {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #22364d;
+  line-height: 1.35;
+}
+.answer-preview.data-v-3013224c,
+.post-summary.data-v-3013224c {
+  margin-top: 8rpx;
+  color: #6e8599;
+  line-height: 1.5;
+}
+.answer-meta.data-v-3013224c,
+.post-meta.data-v-3013224c {
+  margin-top: 10rpx;
+  display: flex;
+  justify-content: space-between;
+  color: #8ea1b2;
+  font-size: 24rpx;
+}
+.state.data-v-3013224c {
+  text-align: center;
+  color: #9ab0bf;
+  padding: 24rpx 0;
+}

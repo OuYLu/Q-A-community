@@ -1,11 +1,13 @@
-﻿<script setup lang="ts">
+<script setup lang="ts">
 import { computed, ref } from "vue";
 import { onLoad, onShow } from "@dcloudio/uni-app";
 import { ensurePageAuth } from "@/utils/auth-guard";
-import { openAnswerPage, openAnswerDetailPage } from "@/utils/nav";
+import { openAnswerPage, openAnswerDetailPage, openUserHomePage } from "@/utils/nav";
 import { questionApi, type AppQuestionAnswerVO, type AppQuestionDetailVO } from "@/api/question";
+import { useAuthStore } from "@/stores/auth";
 
 const questionId = ref(0);
+const authStore = useAuthStore();
 const loading = ref(false);
 const loadFailed = ref(false);
 const actionLoading = ref(false);
@@ -15,6 +17,12 @@ const defaultAvatarText = "用户";
 
 const answers = computed(() => question.value?.answers || []);
 const bannerImages = computed(() => question.value?.imageUrls || []);
+const isMine = computed(() => {
+  const currentId = authStore.user?.userId;
+  if (!currentId || !question.value?.authorId) return false;
+  return Number(currentId) === Number(question.value.authorId);
+});
+const isSelfOnly = computed(() => Number(question.value?.status || 0) === 5);
 
 function previewImages(index: number, urls: string[]) {
   if (!urls.length) return;
@@ -33,7 +41,7 @@ async function loadDetail() {
     question.value = await questionApi.detail(questionId.value);
   } catch (err: any) {
     loadFailed.value = true;
-    uni.showToast({ title: err?.message || "加载问题失败", icon: "none" });
+    uni.showToast({ title: err?.message || "加载失败", icon: "none" });
   } finally {
     loading.value = false;
   }
@@ -45,7 +53,7 @@ async function toggleLike() {
     const updated = await questionApi.toggleLike(question.value.id);
     question.value = { ...question.value, likeCount: updated.likeCount, liked: updated.liked };
   } catch (err: any) {
-    uni.showToast({ title: err?.message || "操作失败", icon: "none" });
+    uni.showToast({ title: err?.message || "点赞失败", icon: "none" });
   }
 }
 
@@ -55,7 +63,7 @@ async function toggleFavorite() {
     const updated = await questionApi.toggleFavorite(question.value.id);
     question.value = { ...question.value, favoriteCount: updated.favoriteCount, favorited: updated.favorited };
   } catch (err: any) {
-    uni.showToast({ title: err?.message || "操作失败", icon: "none" });
+    uni.showToast({ title: err?.message || "收藏失败", icon: "none" });
   }
 }
 
@@ -66,7 +74,7 @@ async function toggleAnswerLike(answerId: number) {
     await questionApi.toggleAnswerLike(answerId);
     await loadDetail();
   } catch (err: any) {
-    uni.showToast({ title: err?.message || "操作失败", icon: "none" });
+    uni.showToast({ title: err?.message || "点赞失败", icon: "none" });
   } finally {
     actionLoading.value = false;
   }
@@ -79,7 +87,7 @@ async function toggleAnswerFavorite(answerId: number) {
     await questionApi.toggleAnswerFavorite(answerId);
     await loadDetail();
   } catch (err: any) {
-    uni.showToast({ title: err?.message || "操作失败", icon: "none" });
+    uni.showToast({ title: err?.message || "收藏失败", icon: "none" });
   } finally {
     actionLoading.value = false;
   }
@@ -103,6 +111,100 @@ function openAnswerDetail(answerId: number) {
   openAnswerDetailPage(answerId);
 }
 
+async function setSelfOnly() {
+  if (!question.value || actionLoading.value) return;
+  actionLoading.value = true;
+  try {
+    await questionApi.setQuestionSelfOnly(question.value.id);
+    uni.showToast({ title: "已设为仅自己可见", icon: "success" });
+    await loadDetail();
+  } catch (err: any) {
+    uni.showToast({ title: err?.message || "设置失败", icon: "none" });
+  } finally {
+    actionLoading.value = false;
+  }
+}
+
+async function setPublic() {
+  if (!question.value || actionLoading.value) return;
+  actionLoading.value = true;
+  try {
+    await questionApi.setQuestionPublic(question.value.id);
+    uni.showToast({ title: "已设为公开", icon: "success" });
+    await loadDetail();
+  } catch (err: any) {
+    uni.showToast({ title: err?.message || "设置失败", icon: "none" });
+  } finally {
+    actionLoading.value = false;
+  }
+}
+
+async function deleteQuestion() {
+  if (!question.value || actionLoading.value) return;
+  uni.showModal({
+    title: "删除问题",
+    content: "删除后不可恢复，是否继续？",
+    success: async (res) => {
+      if (!res.confirm) return;
+      actionLoading.value = true;
+      try {
+        await questionApi.deleteQuestion(question.value!.id);
+        uni.showToast({ title: "删除成功", icon: "success" });
+        setTimeout(() => uni.navigateBack(), 220);
+      } catch (err: any) {
+        uni.showToast({ title: err?.message || "删除失败", icon: "none" });
+      } finally {
+        actionLoading.value = false;
+      }
+    }
+  });
+}
+
+function reportQuestion() {
+  if (!question.value) return;
+  const title = encodeURIComponent(question.value.title || "");
+  uni.navigateTo({ url: `/pages/question/report?questionId=${question.value.id}&title=${title}` });
+}
+
+function showMoreMenu() {
+  if (!question.value) return;
+  if (isMine.value) {
+    const visibilityAction = isSelfOnly.value ? "设为公开" : "仅自己可见";
+    uni.showActionSheet({
+      itemList: [visibilityAction, "删除问题"],
+      success: (res) => {
+        if (res.tapIndex === 0) {
+          if (isSelfOnly.value) setPublic();
+          else setSelfOnly();
+          return;
+        }
+        if (res.tapIndex === 1) deleteQuestion();
+      }
+    });
+    return;
+  }
+  uni.showActionSheet({
+    itemList: ["举报问题"],
+    success: (res) => {
+      if (res.tapIndex === 0) reportQuestion();
+    }
+  });
+}
+
+function openAuthorHome() {
+  if (!question.value?.authorId) return;
+  if (isMine.value) {
+    uni.switchTab({ url: "/pages/mine/index" });
+    return;
+  }
+  openUserHomePage(Number(question.value.authorId));
+}
+
+function openAnswerAuthorHome(item: AppQuestionAnswerVO) {
+  if (!item?.authorId) return;
+  openUserHomePage(Number(item.authorId));
+}
+
 onLoad((options) => {
   questionId.value = Number(options?.id || 0);
   loadDetail();
@@ -121,10 +223,12 @@ onShow(() => {
 <template>
   <view class="page">
     <view v-if="loading" class="state">加载中...</view>
-    <view v-else-if="!question" class="state">{{ loadFailed ? "问题不存在或已删除" : "未找到问题" }}</view>
+    <view v-else-if="!question" class="state">{{ loadFailed ? "加载失败，请重试" : "问题不存在" }}</view>
     <view v-else>
       <view class="question-card">
-        <view class="author-row">
+        <view class="more-btn" @click.stop="showMoreMenu">...</view>
+
+        <view class="author-row" @click="openAuthorHome">
           <image v-if="question.authorAvatar" class="avatar" :src="question.authorAvatar" mode="aspectFill" />
           <view v-else class="avatar-fallback">{{ defaultAvatarText }}</view>
           <view class="author-info">
@@ -140,7 +244,7 @@ onShow(() => {
         </swiper>
 
         <view class="title">{{ question.title }}</view>
-        <view class="content">{{ question.content || "暂无详细描述" }}</view>
+        <view class="content">{{ question.content || "暂无内容" }}</view>
 
         <view v-if="question.tags?.length" class="tags">
           <text v-for="tag in question.tags || []" :key="tag" class="tag-chip">#{{ tag }}</text>
@@ -153,11 +257,11 @@ onShow(() => {
           </view>
           <view class="actions">
             <view class="action-btn like-btn" :class="{ active: question.liked }" @click="toggleLike">
-              <text class="action-icon">❤</text>
+              <text class="action-icon">赞</text>
               <text>{{ question.likeCount || 0 }}</text>
             </view>
             <view class="action-btn" :class="{ active: question.favorited }" @click="toggleFavorite">
-              <text class="action-icon">⭐</text>
+              <text class="action-icon">藏</text>
               <text>{{ question.favoriteCount || 0 }}</text>
             </view>
           </view>
@@ -170,12 +274,16 @@ onShow(() => {
       <view v-if="!answers.length" class="empty-card">还没有回答，来抢沙发吧</view>
 
       <view v-for="item in answers" :key="item.id" class="answer-card" @tap="openAnswerDetail(item.id)">
-        <view v-if="item.canRecommend" class="best-top" :class="{ active: item.bestAnswer }" @click.stop="toggleBest(item.id, item.bestAnswer)">
-          <text class="best-icon">👑</text>
-          <text>{{ item.bestAnswer ? "取消" : "最佳" }}</text>
+        <view
+          v-if="item.canRecommend"
+          class="best-top"
+          :class="{ active: item.bestAnswer }"
+          @click.stop="toggleBest(item.id, item.bestAnswer)"
+        >
+          <text>{{ item.bestAnswer ? "取消最佳" : "设为最佳" }}</text>
         </view>
 
-        <view class="answer-author">
+        <view class="answer-author" @click.stop="openAnswerAuthorHome(item)">
           <image v-if="item.authorAvatar" class="avatar mini" :src="item.authorAvatar" mode="aspectFill" />
           <view v-else class="avatar-fallback mini">{{ defaultAvatarText }}</view>
           <view class="author-info">
@@ -193,15 +301,15 @@ onShow(() => {
 
         <view class="answer-actions" @click.stop>
           <view class="mini-action like-btn" :class="{ active: item.liked }" @tap="toggleAnswerLike(item.id)">
-            <text class="mini-icon">❤</text>
+            <text class="mini-icon">赞</text>
             <text>{{ item.likeCount || 0 }}</text>
           </view>
           <view class="mini-action" @tap="openAnswerDetail(item.id)">
-            <text class="mini-icon">💬</text>
+            <text class="mini-icon">评</text>
             <text>{{ item.commentCount || 0 }}</text>
           </view>
           <view class="mini-action" :class="{ active: item.favorited }" @tap="toggleAnswerFavorite(item.id)">
-            <text class="mini-icon">⭐</text>
+            <text class="mini-icon">藏</text>
             <text>{{ item.favoriteCount || 0 }}</text>
           </view>
         </view>
@@ -226,7 +334,23 @@ onShow(() => {
 }
 
 .question-card {
+  position: relative;
   padding: 20rpx;
+}
+
+.more-btn {
+  position: absolute;
+  right: 14rpx;
+  top: 10rpx;
+  width: 66rpx;
+  height: 46rpx;
+  border-radius: 24rpx;
+  border: 2rpx solid #d8dfe8;
+  background: #f4f6f9;
+  color: #72859a;
+  text-align: center;
+  line-height: 42rpx;
+  font-size: 34rpx;
 }
 
 .author-row,

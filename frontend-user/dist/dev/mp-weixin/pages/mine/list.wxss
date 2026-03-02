@@ -13,6 +13,9 @@
   padding: 18rpx 18rpx 14rpx;
   margin-bottom: 14rpx;
 }
+.question-card-disabled.data-v-688829fb {
+  opacity: 0.55;
+}
 .question-row.data-v-688829fb {
   display: flex;
   align-items: center;
@@ -27,9 +30,7 @@
 .dot.solved.data-v-688829fb {
   background: #35b16a;
 }
-.dot.waiting.data-v-688829fb {
-  background: #f2b230;
-}
+.dot.waiting.data-v-688829fb,
 .dot.empty-answer.data-v-688829fb {
   background: #f2b230;
 }
@@ -43,6 +44,11 @@
 .chevron.data-v-688829fb {
   color: #97aab9;
   font-size: 34rpx;
+}
+.lock-flag.data-v-688829fb {
+  font-size: 24rpx;
+  color: #7c8ea1;
+  margin-right: 4rpx;
 }
 .tags-row.data-v-688829fb {
   display: flex;
@@ -89,28 +95,88 @@
 .status-text.solved.data-v-688829fb {
   color: #54ae76;
 }
-.status-text.waiting.data-v-688829fb {
-  color: #e1a43f;
-}
+.status-text.waiting.data-v-688829fb,
 .status-text.empty-answer.data-v-688829fb {
   color: #e1a43f;
+}
+.status-text.status-offline.data-v-688829fb {
+  color: #a96f6f;
 }
 .card.data-v-688829fb {
   padding: 20rpx;
   margin-bottom: 12rpx;
 }
+.card-disabled.data-v-688829fb {
+  opacity: 0.55;
+}
+.main-row.data-v-688829fb {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
 .main.data-v-688829fb {
+  flex: 1;
   font-size: 32rpx;
   font-weight: 700;
+}
+.invalid-badge.data-v-688829fb {
+  font-size: 22rpx;
+  color: #a96f6f;
+  background: #f7e9e9;
+  border: 1rpx solid #e8caca;
+  border-radius: 999rpx;
+  padding: 4rpx 12rpx;
+  white-space: nowrap;
 }
 .sub.data-v-688829fb {
   margin-top: 8rpx;
   color: #6e8599;
 }
+.sub-danger.data-v-688829fb {
+  color: #a96f6f;
+}
 .time.data-v-688829fb {
   margin-top: 10rpx;
   color: #9ab0bf;
   font-size: 24rpx;
+}
+.follow-card.data-v-688829fb {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  padding: 16rpx;
+  border-radius: 18rpx;
+  background: #fff;
+  border: 2rpx solid #e3edf7;
+  margin-bottom: 12rpx;
+}
+.follow-avatar.data-v-688829fb {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  background: #f0f3f8;
+}
+.follow-avatar--fallback.data-v-688829fb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6f7d8c;
+  font-size: 28rpx;
+  font-weight: 700;
+}
+.follow-info.data-v-688829fb {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+.follow-name.data-v-688829fb {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #2a3340;
+}
+.follow-time.data-v-688829fb {
+  font-size: 24rpx;
+  color: #8ea1b2;
 }
 .loading.data-v-688829fb,
 .empty.data-v-688829fb {

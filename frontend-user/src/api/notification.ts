@@ -9,17 +9,17 @@ export interface PageInfo<T> {
 
 export interface AppNotificationItemVO {
   id: number;
-  type: string;
-  bizType: string;
+  type: number;
+  bizType: number;
   bizId: number;
   title: string;
   content: string;
-  isRead: boolean;
+  isRead: number;
   createdAt: string;
 }
 
 export interface AppNotificationTypeCountVO {
-  type: string;
+  type: number;
   cnt: number;
 }
 
@@ -28,8 +28,29 @@ export interface AppNotificationUnreadCountVO {
   byType: AppNotificationTypeCountVO[];
 }
 
+export interface AppReportFeedbackDetailVO {
+  reportId: number;
+  bizType: number;
+  bizId: number;
+  contentTitle: string;
+  contentText: string;
+  reasonCode: string;
+  reasonDetail: string;
+  status: number;
+  handleAction: number;
+  handleResult: string;
+  reporterId: number;
+  reporterName: string;
+  authorId: number;
+  authorName: string;
+  handlerId: number;
+  handlerName: string;
+  createdAt: string;
+  handledAt: string;
+}
+
 export const notificationApi = {
-  list(params: { type?: string; isRead?: boolean; page?: number; pageSize?: number }) {
+  list(params: { type?: number; types?: string; isRead?: number; page?: number; pageSize?: number }) {
     return request<PageInfo<AppNotificationItemVO>>({
       url: "/api/customer/notifications",
       params
@@ -50,6 +71,11 @@ export const notificationApi = {
     return request<void>({
       url: "/api/customer/notifications/read-all",
       method: "POST"
+    });
+  },
+  reportFeedbackDetail(reportId: number) {
+    return request<AppReportFeedbackDetailVO>({
+      url: `/api/customer/notifications/report-feedback/${reportId}`
     });
   }
 };

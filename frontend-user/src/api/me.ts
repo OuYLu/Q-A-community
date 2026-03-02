@@ -13,6 +13,10 @@ export interface AppMeOverviewVO {
   nickname: string | null;
   avatar: string | null;
   slogan: string;
+  expertStatus?: number | null;
+  expertTitle?: string | null;
+  expertExpertise?: string | null;
+  expertPostCount?: number | null;
   passwordSet?: number;
   email?: string | null;
   joinedAt: string;
@@ -57,6 +61,9 @@ export interface AppMyAnswerItemVO {
   questionTitle: string;
   likeCount: number;
   contentPreview: string;
+  answerStatus?: number;
+  questionStatus?: number;
+  effective?: number;
   createdAt: string;
 }
 
