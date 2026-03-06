@@ -65,4 +65,7 @@ public class AppQuestionAnswerVO {
 
     @Schema(description = "Current user can edit")
     private Boolean canEdit;
+
+    @Schema(description = "Current user can delete")
+    private Boolean canDelete;
 }

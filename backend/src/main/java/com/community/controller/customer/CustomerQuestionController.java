@@ -158,6 +158,13 @@ public class CustomerQuestionController {
         return Result.success(null);
     }
 
+    @DeleteMapping("/api/customer/questions/{questionId}/best-answer")
+    @Operation(summary = "Cancel best answer")
+    public Result<Void> cancelBestAnswer(@PathVariable Long questionId) {
+        customerQuestionService.cancelBestAnswer(questionId);
+        return Result.success(null);
+    }
+
     @GetMapping("/api/customer/answers/{id}/comments")
     @Operation(summary = "Answer comment list")
     public Result<List<AppAnswerCommentVO>> answerComments(@PathVariable Long id) {

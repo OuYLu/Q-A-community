@@ -56,6 +56,8 @@ public interface CustomerQuestionService {
 
     void recommendBestAnswer(Long questionId, Long answerId);
 
+    void cancelBestAnswer(Long questionId);
+
     List<AppAnswerCommentVO> answerComments(Long answerId);
 
     Long createAnswerComment(Long answerId, AppAnswerCommentCreateDTO dto);

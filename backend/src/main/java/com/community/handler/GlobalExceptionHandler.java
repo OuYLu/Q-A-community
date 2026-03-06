@@ -10,6 +10,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -54,6 +55,12 @@ public class GlobalExceptionHandler {
     public Result<Void> handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {
         log.warn("Http message not readable: {}", ex.getMessage());
         return Result.error(ResultCode.BAD_REQUEST, "request body format is invalid");
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public Result<Void> handleMethodNotSupported(HttpRequestMethodNotSupportedException ex) {
+        log.warn("Method not supported: {}", ex.getMessage());
+        return Result.error(ResultCode.BAD_REQUEST, "request method is not supported");
     }
 
     @ExceptionHandler(DisabledException.class)

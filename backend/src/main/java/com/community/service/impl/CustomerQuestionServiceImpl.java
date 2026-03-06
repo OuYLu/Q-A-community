@@ -166,6 +166,7 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
         for (AppQuestionAnswerVO answer : answers) {
             fillImageUrls(answer);
             answer.setCanEdit(userId.equals(answer.getAuthorId()));
+            answer.setCanDelete(userId.equals(answer.getAuthorId()) || userId.equals(question.getUserId()));
             answer.setCommentCount(countAnswerComments(answer.getId()));
             answer.setFavoriteCount(countAnswerFavorites(answer.getId()));
             answer.setLiked(isAnswerLikedByUser(answer.getId(), userId));
@@ -464,21 +465,40 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
         if (answer == null || answer.getDeleteFlag() == null || answer.getDeleteFlag() != 0) {
             throw new BizException(ResultCode.BAD_REQUEST, "answer not found");
         }
-        if (!userId.equals(answer.getUserId())) {
+        QaQuestion question = qaQuestionMapper.selectById(answer.getQuestionId());
+        if (question == null || question.getDeleteFlag() == null || question.getDeleteFlag() != 0) {
+            throw new BizException(ResultCode.BAD_REQUEST, "question not found");
+        }
+        boolean canDelete = userId.equals(answer.getUserId()) || userId.equals(question.getUserId());
+        if (!canDelete) {
             throw new BizException(ResultCode.FORBIDDEN, "no permission to delete this answer");
         }
 
         qaAnswerMapper.update(null, new LambdaUpdateWrapper<QaAnswer>()
             .eq(QaAnswer::getId, answerId)
             .set(QaAnswer::getDeleteFlag, 1)
+            .set(QaAnswer::getStatus, 0)
             .set(QaAnswer::getUpdatedAt, LocalDateTime.now()));
 
-        qaQuestionMapper.updateAnswerCount(answer.getQuestionId(), -1);
-        qaQuestionMapper.update(null, new LambdaUpdateWrapper<QaQuestion>()
-            .eq(QaQuestion::getId, answer.getQuestionId())
-            .set(QaQuestion::getLastActiveAt, LocalDateTime.now()));
-        adjustUserAnswerCount(userId, -1);
-        adjustUserAnswerLikeReceivedCount(userId, -(answer.getLikeCount() == null ? 0 : answer.getLikeCount()));
+        if (answer.getStatus() != null && answer.getStatus() == 1) {
+            qaQuestionMapper.updateAnswerCount(answer.getQuestionId(), -1);
+        }
+        if (question.getAcceptedAnswerId() != null && question.getAcceptedAnswerId().equals(answerId)) {
+            qaQuestionMapper.update(
+                null,
+                new LambdaUpdateWrapper<QaQuestion>()
+                    .eq(QaQuestion::getId, question.getId())
+                    .set(QaQuestion::getAcceptedAnswerId, null)
+                    .set(QaQuestion::getAcceptedAt, null)
+                    .set(QaQuestion::getLastActiveAt, LocalDateTime.now())
+            );
+        } else {
+            qaQuestionMapper.update(null, new LambdaUpdateWrapper<QaQuestion>()
+                .eq(QaQuestion::getId, answer.getQuestionId())
+                .set(QaQuestion::getLastActiveAt, LocalDateTime.now()));
+        }
+        adjustUserAnswerCount(answer.getUserId(), -1);
+        adjustUserAnswerLikeReceivedCount(answer.getUserId(), -(answer.getLikeCount() == null ? 0 : answer.getLikeCount()));
     }
 
     @Override
@@ -569,6 +589,7 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
 
         fillImageUrls(answer);
         answer.setCanEdit(userId.equals(answer.getAuthorId()));
+        answer.setCanDelete(userId.equals(answer.getAuthorId()) || userId.equals(question.getUserId()));
         answer.setCommentCount(countAnswerComments(answer.getId()));
         answer.setFavoriteCount(countAnswerFavorites(answer.getId()));
         answer.setLiked(isAnswerLikedByUser(answer.getId(), userId));
@@ -677,8 +698,13 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
 
         boolean cancelBest = question.getAcceptedAnswerId() != null && question.getAcceptedAnswerId().equals(answerId);
         if (cancelBest) {
-            question.setAcceptedAnswerId(null);
-            question.setAcceptedAt(null);
+            qaQuestionMapper.update(
+                null,
+                new LambdaUpdateWrapper<QaQuestion>()
+                    .eq(QaQuestion::getId, questionId)
+                    .set(QaQuestion::getAcceptedAnswerId, null)
+                    .set(QaQuestion::getAcceptedAt, null)
+            );
             createNotifyIfNeeded(
                 answer.getUserId(),
                 1,
@@ -698,8 +724,49 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
                 "最佳回答",
                 "你的回答被采纳为最佳"
             );
+            qaQuestionMapper.update(
+                null,
+                new LambdaUpdateWrapper<QaQuestion>()
+                    .eq(QaQuestion::getId, questionId)
+                    .set(QaQuestion::getAcceptedAnswerId, answerId)
+                    .set(QaQuestion::getAcceptedAt, LocalDateTime.now())
+            );
         }
-        qaQuestionMapper.updateById(question);
+    }
+
+    @Override
+    @Transactional
+    public void cancelBestAnswer(Long questionId) {
+        Long userId = requireUserId();
+        QaQuestion question = qaQuestionMapper.selectById(questionId);
+        if (question == null || question.getDeleteFlag() == null || question.getDeleteFlag() != 0) {
+            throw new BizException(ResultCode.BAD_REQUEST, "question not found");
+        }
+        if (!userId.equals(question.getUserId())) {
+            throw new BizException(ResultCode.FORBIDDEN, "only question author can cancel best answer");
+        }
+        if (question.getAcceptedAnswerId() == null) {
+            return;
+        }
+
+        QaAnswer accepted = qaAnswerMapper.selectById(question.getAcceptedAnswerId());
+        if (accepted != null && accepted.getUserId() != null) {
+            createNotifyIfNeeded(
+                accepted.getUserId(),
+                1,
+                2,
+                accepted.getId(),
+                "最佳回答变更",
+                "你的回答已取消最佳"
+            );
+        }
+        qaQuestionMapper.update(
+            null,
+            new LambdaUpdateWrapper<QaQuestion>()
+                .eq(QaQuestion::getId, questionId)
+                .set(QaQuestion::getAcceptedAnswerId, null)
+                .set(QaQuestion::getAcceptedAt, null)
+        );
     }
 
     @Override
@@ -780,14 +847,27 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
     }
 
     private void replaceQuestionTags(Long questionId, List<Long> tagIds) {
-        Set<Long> uniqueTagIds = tagIds == null ? Collections.emptySet() : new LinkedHashSet<>(tagIds);
-        List<QaTag> tags = qaTagMapper.selectBatchIds(uniqueTagIds);
-        if (tags.size() != uniqueTagIds.size()) {
-            throw new BizException(ResultCode.BAD_REQUEST, "tagIds contain invalid tag");
+        Set<Long> uniqueTagIds;
+        if (tagIds == null || tagIds.isEmpty()) {
+            uniqueTagIds = Collections.emptySet();
+        } else {
+            LinkedHashSet<Long> sanitized = new LinkedHashSet<>();
+            for (Long tagId : tagIds) {
+                if (tagId != null && tagId > 0) {
+                    sanitized.add(tagId);
+                }
+            }
+            uniqueTagIds = sanitized;
         }
-        for (QaTag tag : tags) {
-            if (tag.getStatus() == null || tag.getStatus() != 1) {
-                throw new BizException(ResultCode.BAD_REQUEST, "tag is disabled");
+        if (!uniqueTagIds.isEmpty()) {
+            List<QaTag> tags = qaTagMapper.selectBatchIds(uniqueTagIds);
+            if (tags.size() != uniqueTagIds.size()) {
+                throw new BizException(ResultCode.BAD_REQUEST, "tagIds contain invalid tag");
+            }
+            for (QaTag tag : tags) {
+                if (tag.getStatus() == null || tag.getStatus() != 1) {
+                    throw new BizException(ResultCode.BAD_REQUEST, "tag is disabled");
+                }
             }
         }
 
@@ -862,7 +942,7 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
         LinkedHashSet<Long> result = new LinkedHashSet<>();
         if (tagIds != null) {
             for (Long id : tagIds) {
-                if (id != null) {
+                if (id != null && id > 0) {
                     result.add(id);
                 }
             }
