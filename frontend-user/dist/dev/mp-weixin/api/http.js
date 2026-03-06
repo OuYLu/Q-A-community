@@ -15,12 +15,14 @@ function request(options) {
     header.Authorization = `Bearer ${authStore.token}`;
   }
   const url = `${utils_constants.BASE_URL}${options.url}${toQuery(options.params)}`;
+  const method = options.method || "GET";
   return new Promise((resolve, reject) => {
     common_vendor.index.request({
       url,
-      method: options.method || "GET",
+      method,
       data: options.data,
       header,
+      timeout: options.timeout ?? 15e3,
       success: (res) => {
         const statusCode = res.statusCode || 500;
         if (statusCode < 200 || statusCode >= 300) {
@@ -38,7 +40,10 @@ function request(options) {
         }
         resolve(res.data);
       },
-      fail: (err) => reject(err)
+      fail: (err) => {
+        const errMsg = (err == null ? void 0 : err.errMsg) || "network request failed";
+        reject(new Error(`${method} ${url} failed: ${errMsg}`));
+      }
     });
   });
 }

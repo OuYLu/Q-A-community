@@ -11,6 +11,7 @@
     "es6": true,
     "postcss": true,
     "minified": true,
+    "urlCheck": false,
     "enhance": true,
     "showShadowRootInWxmlPanel": true,
     "packNpmRelationList": [],

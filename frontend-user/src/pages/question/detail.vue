@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, nextTick, ref } from "vue";
 import { onLoad, onShow } from "@dcloudio/uni-app";
 import { ensurePageAuth } from "@/utils/auth-guard";
 import { openAnswerPage, openAnswerDetailPage, openUserHomePage } from "@/utils/nav";
@@ -14,6 +14,7 @@ const actionLoading = ref(false);
 const question = ref<AppQuestionDetailVO | null>(null);
 const entered = ref(false);
 const defaultAvatarText = "用户";
+const targetAnswerId = ref(0);
 
 const answers = computed(() => question.value?.answers || []);
 const bannerImages = computed(() => question.value?.imageUrls || []);
@@ -39,6 +40,7 @@ async function loadDetail() {
   loadFailed.value = false;
   try {
     question.value = await questionApi.detail(questionId.value);
+    await scrollToTargetAnswer();
   } catch (err: any) {
     loadFailed.value = true;
     uni.showToast({ title: err?.message || "加载失败", icon: "none" });
@@ -71,8 +73,21 @@ async function toggleAnswerLike(answerId: number) {
   if (actionLoading.value) return;
   actionLoading.value = true;
   try {
-    await questionApi.toggleAnswerLike(answerId);
-    await loadDetail();
+    const updated = await questionApi.toggleAnswerLike(answerId);
+    const latest = updated?.answer;
+    if (latest && question.value?.answers?.length) {
+      question.value.answers = question.value.answers.map((item) =>
+        item.id === answerId
+          ? {
+              ...item,
+              likeCount: latest.likeCount,
+              liked: latest.liked,
+              commentCount: latest.commentCount,
+              favoriteCount: latest.favoriteCount
+            }
+          : item
+      );
+    }
   } catch (err: any) {
     uni.showToast({ title: err?.message || "点赞失败", icon: "none" });
   } finally {
@@ -84,8 +99,21 @@ async function toggleAnswerFavorite(answerId: number) {
   if (actionLoading.value) return;
   actionLoading.value = true;
   try {
-    await questionApi.toggleAnswerFavorite(answerId);
-    await loadDetail();
+    const updated = await questionApi.toggleAnswerFavorite(answerId);
+    const latest = updated?.answer;
+    if (latest && question.value?.answers?.length) {
+      question.value.answers = question.value.answers.map((item) =>
+        item.id === answerId
+          ? {
+              ...item,
+              favoriteCount: latest.favoriteCount,
+              favorited: latest.favorited,
+              likeCount: latest.likeCount,
+              commentCount: latest.commentCount
+            }
+          : item
+      );
+    }
   } catch (err: any) {
     uni.showToast({ title: err?.message || "收藏失败", icon: "none" });
   } finally {
@@ -93,13 +121,45 @@ async function toggleAnswerFavorite(answerId: number) {
   }
 }
 
+async function reloadAnswersOnly() {
+  if (!question.value?.id) return;
+  try {
+    const latest = await questionApi.detail(question.value.id);
+    if (!question.value) return;
+    question.value = {
+      ...question.value,
+      answers: latest.answers || [],
+      answerCount: latest.answerCount
+    };
+    await scrollToTargetAnswer();
+  } catch (err: any) {
+    uni.showToast({ title: err?.message || "回答刷新失败", icon: "none" });
+  }
+}
+
+async function scrollToTargetAnswer() {
+  if (!targetAnswerId.value) return;
+  await nextTick();
+  setTimeout(() => {
+    uni.pageScrollTo({
+      selector: `#answer-${targetAnswerId.value}`,
+      duration: 280
+    });
+  }, 30);
+}
+
 async function toggleBest(answerId: number, isBest?: boolean) {
   if (!question.value || actionLoading.value) return;
   actionLoading.value = true;
   try {
-    await questionApi.recommendBest(question.value.id, answerId);
+    targetAnswerId.value = answerId;
+    if (isBest) {
+      await questionApi.cancelBest(question.value.id);
+    } else {
+      await questionApi.recommendBest(question.value.id, answerId);
+    }
     uni.showToast({ title: isBest ? "已取消最佳" : "已设为最佳", icon: "success" });
-    await loadDetail();
+    await reloadAnswersOnly();
   } catch (err: any) {
     uni.showToast({ title: err?.message || "操作失败", icon: "none" });
   } finally {
@@ -205,8 +265,39 @@ function openAnswerAuthorHome(item: AppQuestionAnswerVO) {
   openUserHomePage(Number(item.authorId));
 }
 
+function onAnswerLongPress(item: AppQuestionAnswerVO) {
+  if (!item?.id || !item.canDelete) {
+    return;
+  }
+  uni.showActionSheet({
+    itemList: ["删除回答"],
+    success: (res) => {
+      if (res.tapIndex !== 0) return;
+      uni.showModal({
+        title: "删除回答",
+        content: "确认删除该回答吗？删除后将不计入有效回答统计。",
+        success: async (modalRes) => {
+          if (!modalRes.confirm) return;
+          if (actionLoading.value || !question.value?.id) return;
+          actionLoading.value = true;
+          try {
+            await questionApi.deleteAnswer(item.id);
+            uni.showToast({ title: "删除成功", icon: "success" });
+            await reloadAnswersOnly();
+          } catch (err: any) {
+            uni.showToast({ title: err?.message || "删除失败", icon: "none" });
+          } finally {
+            actionLoading.value = false;
+          }
+        }
+      });
+    }
+  });
+}
+
 onLoad((options) => {
   questionId.value = Number(options?.id || 0);
+  targetAnswerId.value = Number(options?.answerId || 0);
   loadDetail();
 });
 
@@ -273,7 +364,14 @@ onShow(() => {
       <view class="section-title">全部回答 ({{ answers.length }})</view>
       <view v-if="!answers.length" class="empty-card">还没有回答，来抢沙发吧</view>
 
-      <view v-for="item in answers" :key="item.id" class="answer-card" @tap="openAnswerDetail(item.id)">
+      <view
+        v-for="item in answers"
+        :id="`answer-${item.id}`"
+        :key="item.id"
+        class="answer-card"
+        @tap="openAnswerDetail(item.id)"
+        @longpress.stop="onAnswerLongPress(item)"
+      >
         <view
           v-if="item.canRecommend"
           class="best-top"

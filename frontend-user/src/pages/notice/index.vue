@@ -6,6 +6,7 @@ import {
   type AppNotificationItemVO,
   type AppNotificationUnreadCountVO
 } from "@/api/notification";
+import { questionApi } from "@/api/question";
 import { useAuthStore } from "@/stores/auth";
 import { refreshNoticeTabDot, syncNoticeTabDot } from "@/utils/notice-badge";
 
@@ -119,7 +120,7 @@ async function markRead(id: number) {
   }
 }
 
-function jumpBiz(item: AppNotificationItemVO) {
+async function jumpBiz(item: AppNotificationItemVO) {
   if (item.type === 7 && item.bizId) {
     uni.navigateTo({ url: `/pages/notice/report-feedback?id=${item.bizId}` });
     return;
@@ -129,6 +130,18 @@ function jumpBiz(item: AppNotificationItemVO) {
     return;
   }
   if (item.bizType === 2 && item.bizId) {
+    if (item.type === 1) {
+      try {
+        const answer = await questionApi.answerDetail(item.bizId);
+        const qid = Number(answer?.questionId || 0);
+        if (qid > 0) {
+          uni.navigateTo({ url: `/pages/question/detail?id=${qid}&answerId=${item.bizId}` });
+          return;
+        }
+      } catch {
+        // fallback to answer detail
+      }
+    }
     uni.navigateTo({ url: `/pages/question/answer-detail?id=${item.bizId}` });
   }
 }
@@ -137,7 +150,7 @@ async function onClickItem(item: AppNotificationItemVO) {
   if (item.isRead !== 1) {
     await markRead(item.id);
   }
-  jumpBiz(item);
+  await jumpBiz(item);
 }
 
 async function markReadAll() {

@@ -40,6 +40,7 @@ export interface AppQuestionAnswerVO {
   canRecommend?: boolean;
   createdAt?: string;
   canEdit?: boolean;
+  canDelete?: boolean;
 }
 
 export interface AppAnswerCommentVO {
@@ -224,6 +225,12 @@ export const questionApi = {
       data
     });
   },
+  deleteAnswer(answerId: number) {
+    return request<void>({
+      url: `/api/customer/answers/${answerId}`,
+      method: "DELETE"
+    });
+  },
   toggleLike(questionId: number) {
     return request<AppQuestionDetailVO>({
       url: `/api/customer/questions/${questionId}/like`,
@@ -257,6 +264,12 @@ export const questionApi = {
     return request<void>({
       url: `/api/customer/questions/${questionId}/answers/${answerId}/recommend`,
       method: "POST"
+    });
+  },
+  cancelBest(questionId: number) {
+    return request<void>({
+      url: `/api/customer/questions/${questionId}/best-answer`,
+      method: "DELETE"
     });
   },
   answerComments(answerId: number) {

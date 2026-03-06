@@ -1,6 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const api_notification = require("../../api/notification.js");
+const api_question = require("../../api/question.js");
 const stores_auth = require("../../stores/auth.js");
 const utils_noticeBadge = require("../../utils/notice-badge.js");
 const pageSize = 10;
@@ -110,7 +111,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         common_vendor.index.showToast({ title: "操作失败", icon: "none" });
       }
     }
-    function jumpBiz(item) {
+    async function jumpBiz(item) {
       if (item.type === 7 && item.bizId) {
         common_vendor.index.navigateTo({ url: `/pages/notice/report-feedback?id=${item.bizId}` });
         return;
@@ -120,6 +121,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         return;
       }
       if (item.bizType === 2 && item.bizId) {
+        if (item.type === 1) {
+          try {
+            const answer = await api_question.questionApi.answerDetail(item.bizId);
+            const qid = Number((answer == null ? void 0 : answer.questionId) || 0);
+            if (qid > 0) {
+              common_vendor.index.navigateTo({ url: `/pages/question/detail?id=${qid}&answerId=${item.bizId}` });
+              return;
+            }
+          } catch {
+          }
+        }
         common_vendor.index.navigateTo({ url: `/pages/question/answer-detail?id=${item.bizId}` });
       }
     }
@@ -127,7 +139,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (item.isRead !== 1) {
         await markRead(item.id);
       }
-      jumpBiz(item);
+      await jumpBiz(item);
     }
     async function markReadAll() {
       try {

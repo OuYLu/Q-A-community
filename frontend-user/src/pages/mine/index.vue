@@ -1,4 +1,4 @@
-﻿<script setup lang="ts">
+﻿﻿﻿<script setup lang="ts">
 import { computed, ref } from "vue";
 import { onShow } from "@dcloudio/uni-app";
 import { useAuthStore } from "@/stores/auth";

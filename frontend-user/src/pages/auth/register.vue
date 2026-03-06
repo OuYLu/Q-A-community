@@ -1,4 +1,4 @@
-﻿<script setup lang="ts">
+﻿﻿﻿<script setup lang="ts">
 import { computed, ref } from "vue";
 import { authApi } from "@/api/auth";
 import { useAuthStore } from "@/stores/auth";

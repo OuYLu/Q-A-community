@@ -100,8 +100,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       var _a;
       if (!topicId.value)
         return;
-      const t = encodeURIComponent(((_a = topic.value) == null ? void 0 : _a.title) || "");
-      common_vendor.index.navigateTo({ url: `/pages/question/ask?topicId=${topicId.value}&topicTitle=${t}` });
+      utils_nav.openAskPage({ topicId: topicId.value, topicTitle: ((_a = topic.value) == null ? void 0 : _a.title) || "" });
     }
     common_vendor.onLoad(async (options) => {
       var _a;

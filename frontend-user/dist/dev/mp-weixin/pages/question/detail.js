@@ -15,6 +15,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const actionLoading = common_vendor.ref(false);
     const question = common_vendor.ref(null);
     const entered = common_vendor.ref(false);
+    const targetAnswerId = common_vendor.ref(0);
     const answers = common_vendor.computed(() => {
       var _a;
       return ((_a = question.value) == null ? void 0 : _a.answers) || [];
@@ -49,6 +50,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       loadFailed.value = false;
       try {
         question.value = await api_question.questionApi.detail(questionId.value);
+        await scrollToTargetAnswer();
       } catch (err) {
         loadFailed.value = true;
         common_vendor.index.showToast({ title: (err == null ? void 0 : err.message) || "加载失败", icon: "none" });
@@ -77,12 +79,24 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     }
     async function toggleAnswerLike(answerId) {
+      var _a, _b;
       if (actionLoading.value)
         return;
       actionLoading.value = true;
       try {
-        await api_question.questionApi.toggleAnswerLike(answerId);
-        await loadDetail();
+        const updated = await api_question.questionApi.toggleAnswerLike(answerId);
+        const latest = updated == null ? void 0 : updated.answer;
+        if (latest && ((_b = (_a = question.value) == null ? void 0 : _a.answers) == null ? void 0 : _b.length)) {
+          question.value.answers = question.value.answers.map(
+            (item) => item.id === answerId ? {
+              ...item,
+              likeCount: latest.likeCount,
+              liked: latest.liked,
+              commentCount: latest.commentCount,
+              favoriteCount: latest.favoriteCount
+            } : item
+          );
+        }
       } catch (err) {
         common_vendor.index.showToast({ title: (err == null ? void 0 : err.message) || "点赞失败", icon: "none" });
       } finally {
@@ -90,26 +104,72 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     }
     async function toggleAnswerFavorite(answerId) {
+      var _a, _b;
       if (actionLoading.value)
         return;
       actionLoading.value = true;
       try {
-        await api_question.questionApi.toggleAnswerFavorite(answerId);
-        await loadDetail();
+        const updated = await api_question.questionApi.toggleAnswerFavorite(answerId);
+        const latest = updated == null ? void 0 : updated.answer;
+        if (latest && ((_b = (_a = question.value) == null ? void 0 : _a.answers) == null ? void 0 : _b.length)) {
+          question.value.answers = question.value.answers.map(
+            (item) => item.id === answerId ? {
+              ...item,
+              favoriteCount: latest.favoriteCount,
+              favorited: latest.favorited,
+              likeCount: latest.likeCount,
+              commentCount: latest.commentCount
+            } : item
+          );
+        }
       } catch (err) {
         common_vendor.index.showToast({ title: (err == null ? void 0 : err.message) || "收藏失败", icon: "none" });
       } finally {
         actionLoading.value = false;
       }
     }
+    async function reloadAnswersOnly() {
+      var _a;
+      if (!((_a = question.value) == null ? void 0 : _a.id))
+        return;
+      try {
+        const latest = await api_question.questionApi.detail(question.value.id);
+        if (!question.value)
+          return;
+        question.value = {
+          ...question.value,
+          answers: latest.answers || [],
+          answerCount: latest.answerCount
+        };
+        await scrollToTargetAnswer();
+      } catch (err) {
+        common_vendor.index.showToast({ title: (err == null ? void 0 : err.message) || "回答刷新失败", icon: "none" });
+      }
+    }
+    async function scrollToTargetAnswer() {
+      if (!targetAnswerId.value)
+        return;
+      await common_vendor.nextTick$1();
+      setTimeout(() => {
+        common_vendor.index.pageScrollTo({
+          selector: `#answer-${targetAnswerId.value}`,
+          duration: 280
+        });
+      }, 30);
+    }
     async function toggleBest(answerId, isBest) {
       if (!question.value || actionLoading.value)
         return;
       actionLoading.value = true;
       try {
-        await api_question.questionApi.recommendBest(question.value.id, answerId);
+        targetAnswerId.value = answerId;
+        if (isBest) {
+          await api_question.questionApi.cancelBest(question.value.id);
+        } else {
+          await api_question.questionApi.recommendBest(question.value.id, answerId);
+        }
         common_vendor.index.showToast({ title: isBest ? "已取消最佳" : "已设为最佳", icon: "success" });
-        await loadDetail();
+        await reloadAnswersOnly();
       } catch (err) {
         common_vendor.index.showToast({ title: (err == null ? void 0 : err.message) || "操作失败", icon: "none" });
       } finally {
@@ -219,8 +279,42 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         return;
       utils_nav.openUserHomePage(Number(item.authorId));
     }
+    function onAnswerLongPress(item) {
+      if (!(item == null ? void 0 : item.id) || !item.canDelete) {
+        return;
+      }
+      common_vendor.index.showActionSheet({
+        itemList: ["删除回答"],
+        success: (res) => {
+          if (res.tapIndex !== 0)
+            return;
+          common_vendor.index.showModal({
+            title: "删除回答",
+            content: "确认删除该回答吗？删除后将不计入有效回答统计。",
+            success: async (modalRes) => {
+              var _a;
+              if (!modalRes.confirm)
+                return;
+              if (actionLoading.value || !((_a = question.value) == null ? void 0 : _a.id))
+                return;
+              actionLoading.value = true;
+              try {
+                await api_question.questionApi.deleteAnswer(item.id);
+                common_vendor.index.showToast({ title: "删除成功", icon: "success" });
+                await reloadAnswersOnly();
+              } catch (err) {
+                common_vendor.index.showToast({ title: (err == null ? void 0 : err.message) || "删除失败", icon: "none" });
+              } finally {
+                actionLoading.value = false;
+              }
+            }
+          });
+        }
+      });
+    }
     common_vendor.onLoad((options) => {
       questionId.value = Number((options == null ? void 0 : options.id) || 0);
+      targetAnswerId.value = Number((options == null ? void 0 : options.answerId) || 0);
       loadDetail();
     });
     common_vendor.onShow(() => {
@@ -315,8 +409,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             w: common_vendor.o(($event) => toggleAnswerFavorite(item.id), item.id),
             x: common_vendor.o(() => {
             }, item.id),
-            y: item.id,
-            z: common_vendor.o(($event) => openAnswerDetail(item.id), item.id)
+            y: `answer-${item.id}`,
+            z: item.id,
+            A: common_vendor.o(($event) => openAnswerDetail(item.id), item.id),
+            B: common_vendor.o(($event) => onAnswerLongPress(item), item.id)
           });
         })
       }), {

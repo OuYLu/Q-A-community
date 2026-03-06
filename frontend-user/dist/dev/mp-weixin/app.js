@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 const common_vendor = require("./common/vendor.js");
-const utils_noticeBadge = require("./utils/notice-badge.js");
+const utils_constants = require("./utils/constants.js");
 if (!Math) {
   "./pages/home/index.js";
   "./pages/search/index.js";
@@ -31,10 +31,9 @@ if (!Math) {
 }
 const _sfc_main = {
   onLaunch() {
-    utils_noticeBadge.refreshNoticeTabDot();
+    console.log("[app-config] BASE_URL =", utils_constants.BASE_URL);
   },
   onShow() {
-    utils_noticeBadge.refreshNoticeTabDot();
   },
   onHide() {
   }

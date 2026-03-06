@@ -91,6 +91,12 @@ const questionApi = {
       data
     });
   },
+  deleteAnswer(answerId) {
+    return api_http.request({
+      url: `/api/customer/answers/${answerId}`,
+      method: "DELETE"
+    });
+  },
   toggleLike(questionId) {
     return api_http.request({
       url: `/api/customer/questions/${questionId}/like`,
@@ -124,6 +130,12 @@ const questionApi = {
     return api_http.request({
       url: `/api/customer/questions/${questionId}/answers/${answerId}/recommend`,
       method: "POST"
+    });
+  },
+  cancelBest(questionId) {
+    return api_http.request({
+      url: `/api/customer/questions/${questionId}/best-answer`,
+      method: "DELETE"
     });
   },
   answerComments(answerId) {

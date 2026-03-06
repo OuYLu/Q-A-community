@@ -24,10 +24,34 @@ function openQuestionDetail(id) {
     }
   });
 }
-function openAskPage() {
-  if (!utils_authGuard.requireAuth("/pages/question/ask"))
+function openAskPage(params) {
+  const askUrl = (() => {
+    if (!(params == null ? void 0 : params.topicId)) {
+      return "/pages/question/ask";
+    }
+    const topicId = encodeURIComponent(String(params.topicId));
+    const topicTitle = encodeURIComponent(params.topicTitle || "");
+    return `/pages/question/ask?topicId=${topicId}&topicTitle=${topicTitle}`;
+  })();
+  const authStore = stores_auth.useAuthStore();
+  if (!authStore.isLogin) {
+    common_vendor.index.showModal({
+      title: "提示",
+      content: "未登录，登录后才能发起提问",
+      confirmText: "去登录",
+      cancelText: "取消",
+      success: (res) => {
+        if (!res.confirm)
+          return;
+        const target = encodeURIComponent(askUrl);
+        common_vendor.index.navigateTo({ url: `/pages/auth/login?redirect=${target}` });
+      }
+    });
     return;
-  common_vendor.index.navigateTo({ url: "/pages/question/ask" });
+  }
+  if (!utils_authGuard.requireAuth(askUrl))
+    return;
+  common_vendor.index.navigateTo({ url: askUrl });
 }
 function openExpertPostCreatePage() {
   if (!utils_authGuard.requireAuth("/pages/expert/post-create"))

@@ -16,6 +16,7 @@ interface RequestOptions {
   params?: Record<string, unknown>;
   data?: Record<string, unknown> | string;
   withAuth?: boolean;
+  timeout?: number;
 }
 
 function toQuery(params?: Record<string, unknown>) {
@@ -35,12 +36,14 @@ export function request<T>(options: RequestOptions): Promise<T> {
   }
 
   const url = `${BASE_URL}${options.url}${toQuery(options.params)}`;
+  const method = options.method || "GET";
   return new Promise((resolve, reject) => {
     uni.request({
       url,
-      method: options.method || "GET",
+      method,
       data: options.data,
       header,
+      timeout: options.timeout ?? 15000,
       success: (res) => {
         const statusCode = res.statusCode || 500;
         if (statusCode < 200 || statusCode >= 300) {
@@ -58,7 +61,10 @@ export function request<T>(options: RequestOptions): Promise<T> {
         }
         resolve(res.data as T);
       },
-      fail: (err) => reject(err)
+      fail: (err: any) => {
+        const errMsg = err?.errMsg || "network request failed";
+        reject(new Error(`${method} ${url} failed: ${errMsg}`));
+      }
     });
   });
 }

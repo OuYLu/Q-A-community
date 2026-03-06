@@ -1,13 +1,11 @@
 <script lang="ts">
-import { refreshNoticeTabDot } from "@/utils/notice-badge";
+import { BASE_URL } from "@/utils/constants";
 
 export default {
   onLaunch() {
-    refreshNoticeTabDot();
+    console.log("[app-config] BASE_URL =", BASE_URL);
   },
-  onShow() {
-    refreshNoticeTabDot();
-  },
+  onShow() {},
   onHide() {}
 }
 </script>
