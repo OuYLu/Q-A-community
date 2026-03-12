@@ -318,4 +318,72 @@
     WHERE id = #{id}
       AND delete_flag = 0
   </update>
+
+  <select id="selectAdminQaQuestionPage" resultType="com.community.vo.AdminQaQuestionPageItemVO">
+    SELECT
+      q.id,
+      q.title,
+      LEFT(COALESCE(q.content, ''), 140) AS summary,
+      q.status,
+      q.delete_flag AS deleteFlag,
+      q.category_id AS categoryId,
+      c.name AS categoryName,
+      q.topic_id AS topicId,
+      t.title AS topicTitle,
+      q.user_id AS authorId,
+      u.nickname AS authorName,
+      q.answer_count AS answerCount,
+      q.view_count AS viewCount,
+      q.like_count AS likeCount,
+      q.favorite_count AS favoriteCount,
+      q.created_at AS createdAt,
+      q.updated_at AS updatedAt
+    FROM qa_question q
+    LEFT JOIN qa_category c ON c.id = q.category_id
+    LEFT JOIN qa_topic t ON t.id = q.topic_id
+    LEFT JOIN user u ON u.id = q.user_id
+    WHERE 1 = 1
+      AND q.status <> 5
+    <if test="keyword != null and keyword != ''">
+      AND (
+        q.title LIKE CONCAT('%', #{keyword}, '%')
+        OR q.content LIKE CONCAT('%', #{keyword}, '%')
+        OR u.nickname LIKE CONCAT('%', #{keyword}, '%')
+      )
+    </if>
+    <if test="status != null">
+      AND q.status = #{status}
+    </if>
+    <if test="deleteFlag != null">
+      AND q.delete_flag = #{deleteFlag}
+    </if>
+    <if test="categoryId != null">
+      AND q.category_id = #{categoryId}
+    </if>
+    <if test="topicId != null">
+      AND q.topic_id = #{topicId}
+    </if>
+    <if test="userId != null">
+      AND q.user_id = #{userId}
+    </if>
+    <if test="startTime != null">
+      AND q.created_at &gt;= #{startTime}
+    </if>
+    <if test="endTime != null">
+      AND q.created_at &lt;= #{endTime}
+    </if>
+    ORDER BY
+      <choose>
+        <when test="sortBy == 'updatedAt'">q.updated_at</when>
+        <when test="sortBy == 'answerCount'">q.answer_count</when>
+        <when test="sortBy == 'viewCount'">q.view_count</when>
+        <when test="sortBy == 'likeCount'">q.like_count</when>
+        <otherwise>q.created_at</otherwise>
+      </choose>
+      <choose>
+        <when test="sortOrder == 'asc'">ASC</when>
+        <otherwise>DESC</otherwise>
+      </choose>,
+      q.id DESC
+  </select>
 </mapper>

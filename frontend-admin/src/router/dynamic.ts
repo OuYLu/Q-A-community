@@ -7,6 +7,7 @@ import RoleManage from "../views/rbac/RoleManage.vue";
 import PermManage from "../views/rbac/PermManage.vue";
 import ReportHandle from "../views/content/ReportHandle.vue";
 import AuditHandle from "../views/content/AuditHandle.vue";
+import QaManage from "../views/content/QaManage.vue";
 import CategoryManage from "../views/operation/CategoryManage.vue";
 import TagManage from "../views/operation/TagManage.vue";
 import TopicManage from "../views/operation/TopicManage.vue";
@@ -67,6 +68,12 @@ const routeByCode: Record<string, RouteRecordRaw> = {
     component: AuditHandle,
     meta: { title: "审核队列" }
   },
+  "menu:content:qa": {
+    path: "qa",
+    name: "QaManage",
+    component: QaManage,
+    meta: { title: "问答管理" }
+  },
   "menu:operation": {
     path: "/operation",
     name: "OperationRoot",
@@ -106,6 +113,7 @@ const parentByCode: Record<string, string> = {
   "menu:rbac:perm": "menu:rbac",
   "menu:content:report": "menu:content",
   "menu:content:audit": "menu:content",
+  "menu:content:qa": "menu:content",
   "menu:operation:category": "menu:operation",
   "menu:operation:tag": "menu:operation",
   "menu:operation:topic": "menu:operation",

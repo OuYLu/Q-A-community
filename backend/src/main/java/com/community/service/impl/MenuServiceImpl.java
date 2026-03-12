@@ -16,10 +16,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class MenuServiceImpl implements MenuService {
+    private static final String CONTENT_MENU_CODE = "menu:content";
+    private static final String QA_MANAGE_MENU_CODE = "menu:content:qa";
+    private static final Set<String> CONTENT_RELATED_MENU_CODES = Set.of(
+        "menu:content:report",
+        "menu:content:audit"
+    );
+
     private final PermissionMapper permissionMapper;
 
     @Override
@@ -30,6 +38,7 @@ public class MenuServiceImpl implements MenuService {
         }
 
         List<Permission> menus = permissionMapper.selectMenusByUserId(securityUser.getId());
+        appendQaManageMenu(menus);
         return buildTree(menus);
     }
 
@@ -75,5 +84,36 @@ public class MenuServiceImpl implements MenuService {
         vo.setSort(menu.getSort());
         vo.setVisible(menu.getVisible());
         return vo;
+    }
+
+    private void appendQaManageMenu(List<Permission> menus) {
+        if (menus == null || menus.isEmpty()) {
+            return;
+        }
+        boolean qaMenuExists = menus.stream().anyMatch(item -> QA_MANAGE_MENU_CODE.equals(item.getCode()));
+        if (qaMenuExists) {
+            return;
+        }
+        Permission contentRoot = menus.stream()
+            .filter(item -> CONTENT_MENU_CODE.equals(item.getCode()))
+            .findFirst()
+            .orElse(null);
+        if (contentRoot == null || contentRoot.getId() == null) {
+            return;
+        }
+        boolean hasContentMenu = menus.stream().anyMatch(item -> CONTENT_RELATED_MENU_CODES.contains(item.getCode()));
+        if (!hasContentMenu) {
+            return;
+        }
+        Permission qaMenu = new Permission();
+        qaMenu.setId(-1001L);
+        qaMenu.setCode(QA_MANAGE_MENU_CODE);
+        qaMenu.setName("问答管理");
+        qaMenu.setType("menu");
+        qaMenu.setParentId(contentRoot.getId());
+        qaMenu.setPathOrApi("/content/qa");
+        qaMenu.setSort(15);
+        qaMenu.setVisible(1);
+        menus.add(qaMenu);
     }
 }

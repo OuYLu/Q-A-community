@@ -156,4 +156,62 @@
       AND q.delete_flag = 0
       AND q.status IN (1, 5)
   </select>
+
+  <select id="selectAdminQaAnswerPage" resultType="com.community.vo.AdminQaAnswerPageItemVO">
+    SELECT
+      a.id,
+      a.question_id AS questionId,
+      q.title AS questionTitle,
+      LEFT(COALESCE(a.content, ''), 140) AS contentPreview,
+      a.status,
+      a.delete_flag AS deleteFlag,
+      a.user_id AS authorId,
+      u.nickname AS authorName,
+      q.user_id AS questionAuthorId,
+      qu.nickname AS questionAuthorName,
+      a.like_count AS likeCount,
+      a.created_at AS createdAt,
+      a.updated_at AS updatedAt
+    FROM qa_answer a
+    LEFT JOIN qa_question q ON q.id = a.question_id
+    LEFT JOIN user u ON u.id = a.user_id
+    LEFT JOIN user qu ON qu.id = q.user_id
+    WHERE 1 = 1
+    <if test="keyword != null and keyword != ''">
+      AND (
+        a.content LIKE CONCAT('%', #{keyword}, '%')
+        OR q.title LIKE CONCAT('%', #{keyword}, '%')
+        OR u.nickname LIKE CONCAT('%', #{keyword}, '%')
+      )
+    </if>
+    <if test="status != null">
+      AND a.status = #{status}
+    </if>
+    <if test="deleteFlag != null">
+      AND a.delete_flag = #{deleteFlag}
+    </if>
+    <if test="questionId != null">
+      AND a.question_id = #{questionId}
+    </if>
+    <if test="userId != null">
+      AND a.user_id = #{userId}
+    </if>
+    <if test="startTime != null">
+      AND a.created_at &gt;= #{startTime}
+    </if>
+    <if test="endTime != null">
+      AND a.created_at &lt;= #{endTime}
+    </if>
+    ORDER BY
+      <choose>
+        <when test="sortBy == 'updatedAt'">a.updated_at</when>
+        <when test="sortBy == 'likeCount'">a.like_count</when>
+        <otherwise>a.created_at</otherwise>
+      </choose>
+      <choose>
+        <when test="sortOrder == 'asc'">ASC</when>
+        <otherwise>DESC</otherwise>
+      </choose>,
+      a.id DESC
+  </select>
 </mapper>

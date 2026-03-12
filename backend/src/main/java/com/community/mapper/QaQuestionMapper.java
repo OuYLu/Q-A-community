@@ -8,6 +8,7 @@ import com.community.vo.AppQuestionHotItemVO;
 import com.community.vo.AppQuestionListItemVO;
 import com.community.vo.AppSearchQuestionVO;
 import com.community.vo.AppTopicQuestionItemVO;
+import com.community.vo.AdminQaQuestionPageItemVO;
 import com.community.vo.SearchQuestionDoc;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -48,6 +49,17 @@ public interface QaQuestionMapper extends BaseMapper<QaQuestion> {
                                                       @Param("onlyUnsolved") Boolean onlyUnsolved,
                                                       @Param("userId") Long userId,
                                                       @Param("personalized") Boolean personalized);
+
+    List<AdminQaQuestionPageItemVO> selectAdminQaQuestionPage(@Param("keyword") String keyword,
+                                                              @Param("status") Integer status,
+                                                              @Param("deleteFlag") Integer deleteFlag,
+                                                              @Param("categoryId") Long categoryId,
+                                                              @Param("topicId") Long topicId,
+                                                              @Param("userId") Long userId,
+                                                              @Param("startTime") java.time.LocalDateTime startTime,
+                                                              @Param("endTime") java.time.LocalDateTime endTime,
+                                                              @Param("sortBy") String sortBy,
+                                                              @Param("sortOrder") String sortOrder);
 
     AppQuestionDetailVO selectAppQuestionDetail(@Param("id") Long id);
 

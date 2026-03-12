@@ -2,6 +2,7 @@ package com.community.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.community.entity.QaAnswer;
+import com.community.vo.AdminQaAnswerPageItemVO;
 import com.community.vo.AppMyAnswerItemVO;
 import com.community.vo.AppQuestionAnswerVO;
 import com.community.vo.AppSearchAnswerVO;
@@ -25,6 +26,16 @@ public interface QaAnswerMapper extends BaseMapper<QaAnswer> {
                                                    @Param("sortBy") String sortBy,
                                                    @Param("limit") Integer limit,
                                                    @Param("offset") Integer offset);
+
+    List<AdminQaAnswerPageItemVO> selectAdminQaAnswerPage(@Param("keyword") String keyword,
+                                                          @Param("status") Integer status,
+                                                          @Param("deleteFlag") Integer deleteFlag,
+                                                          @Param("questionId") Long questionId,
+                                                          @Param("userId") Long userId,
+                                                          @Param("startTime") java.time.LocalDateTime startTime,
+                                                          @Param("endTime") java.time.LocalDateTime endTime,
+                                                          @Param("sortBy") String sortBy,
+                                                          @Param("sortOrder") String sortOrder);
 
     Long sumLikeCountByUserId(@Param("userId") Long userId);
 
