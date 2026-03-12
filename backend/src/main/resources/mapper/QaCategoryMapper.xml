@@ -93,6 +93,29 @@
     ORDER BY c.sort ASC, c.created_at DESC
   </select>
 
+  <select id="selectAppPreferredCategoriesByInterest" resultType="com.community.vo.AppCategoryVO">
+    SELECT
+      c.id,
+      c.name,
+      c.icon,
+      COALESCE(qc.cnt, 0) AS questionCount
+    FROM rec_user_interest ri
+    JOIN qa_category c ON c.id = ri.category_id
+    LEFT JOIN (
+      SELECT category_id, COUNT(1) AS cnt
+      FROM qa_question
+      WHERE delete_flag = 0
+      GROUP BY category_id
+    ) qc ON qc.category_id = c.id
+    WHERE ri.user_id = #{userId}
+      AND ri.score > 0
+      AND c.delete_flag = 0
+      AND c.status = 1
+      AND c.parent_id IS NULL
+    ORDER BY ri.score DESC, ri.updated_at DESC, c.sort ASC
+    LIMIT #{limit}
+  </select>
+
   <select id="selectAppPreferredCategories" resultType="com.community.vo.AppCategoryVO">
     SELECT
       c.id,

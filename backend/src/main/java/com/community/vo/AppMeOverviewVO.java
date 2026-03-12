@@ -26,6 +26,7 @@ public class AppMeOverviewVO {
     private Integer likeReceivedCount;
     private Integer followerCount;
     private Integer followingCount;
+    private Integer topicFollowCount;
 
     private Integer favoriteCount;
     private Integer historyCount;

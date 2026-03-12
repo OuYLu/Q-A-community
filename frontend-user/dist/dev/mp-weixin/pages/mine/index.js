@@ -55,18 +55,19 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return base;
     });
     const myContent = common_vendor.computed(() => {
-      var _a, _b, _c, _d, _e;
+      var _a, _b, _c, _d, _e, _f;
       const rows = [
         { icon: "🔖", title: "我的收藏", value: String(((_a = overview.value) == null ? void 0 : _a.favoriteCount) ?? 0), type: "favorites" },
         { icon: "🕒", title: "浏览历史", value: String(((_b = overview.value) == null ? void 0 : _b.historyCount) ?? 0), type: "history" },
         { icon: "💬", title: "我的提问", value: String(((_c = overview.value) == null ? void 0 : _c.questionCount) ?? 0), type: "questions" },
-        { icon: "⭐", title: "我的回答", value: String(((_d = overview.value) == null ? void 0 : _d.answerCount) ?? 0), type: "answers" }
+        { icon: "⭐", title: "我的回答", value: String(((_d = overview.value) == null ? void 0 : _d.answerCount) ?? 0), type: "answers" },
+        { icon: "🗂️", title: "专题关注", value: String(((_e = overview.value) == null ? void 0 : _e.topicFollowCount) ?? 0), type: "topic-following" }
       ];
       if (isVerifiedExpert.value) {
         rows.push({
           icon: "📚",
           title: "我的科普",
-          value: String(((_e = overview.value) == null ? void 0 : _e.expertPostCount) ?? 0),
+          value: String(((_f = overview.value) == null ? void 0 : _f.expertPostCount) ?? 0),
           type: "expert-posts"
         });
       }

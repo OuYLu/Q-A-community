@@ -7,6 +7,7 @@ import com.community.dto.AppMeProfileUpdateDTO;
 import com.community.dto.AppPageQueryDTO;
 import com.community.service.CustomerMeService;
 import com.community.vo.AppDocVO;
+import com.community.vo.AppFollowTopicItemVO;
 import com.community.vo.AppFollowUserItemVO;
 import com.community.vo.AppMeOverviewVO;
 import com.community.vo.AppMyAnswerItemVO;
@@ -95,6 +96,12 @@ public class CustomerMeController {
     @Operation(summary = "我的粉丝")
     public Result<PageInfo<AppFollowUserItemVO>> followers(@ModelAttribute AppPageQueryDTO query) {
         return Result.success(customerMeService.followers(query));
+    }
+
+    @GetMapping("/topics/following")
+    @Operation(summary = "我关注的专题")
+    public Result<PageInfo<AppFollowTopicItemVO>> followedTopics(@ModelAttribute AppPageQueryDTO query) {
+        return Result.success(customerMeService.followedTopics(query));
     }
 
     @GetMapping("/docs/{type}")

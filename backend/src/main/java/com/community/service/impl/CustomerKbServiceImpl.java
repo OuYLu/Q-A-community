@@ -17,6 +17,7 @@ import com.community.mapper.QaVoteMapper;
 import com.community.mapper.UserMapper;
 import com.community.service.CustomerKbService;
 import com.community.service.EsSearchService;
+import com.community.service.RecommendationBehaviorService;
 import com.community.vo.AppKbCommentVO;
 import com.community.vo.AppKbInteractVO;
 import lombok.RequiredArgsConstructor;
@@ -45,6 +46,7 @@ public class CustomerKbServiceImpl implements CustomerKbService {
     private final UserMapper userMapper;
     private final CmsSensitiveWordMapper sensitiveWordMapper;
     private final EsSearchService esSearchService;
+    private final RecommendationBehaviorService recommendationBehaviorService;
 
     @Override
     public AppKbInteractVO interaction(Long kbEntryId) {
@@ -74,10 +76,12 @@ public class CustomerKbServiceImpl implements CustomerKbService {
             vote.setVoteType(VOTE_TYPE_DEFAULT);
             qaVoteMapper.insert(vote);
             entry.setLikeCount((entry.getLikeCount() == null ? 0 : entry.getLikeCount()) + 1);
+            recommendationBehaviorService.recordKbLike(userId, kbEntryId, entry.getCategoryId(), true);
         } else {
             qaVoteMapper.deleteById(existed.getId());
             int old = entry.getLikeCount() == null ? 0 : entry.getLikeCount();
             entry.setLikeCount(Math.max(0, old - 1));
+            recommendationBehaviorService.recordKbLike(userId, kbEntryId, entry.getCategoryId(), false);
         }
         expertPostMapper.updateById(entry);
         syncKbForEs(kbEntryId);
@@ -105,10 +109,12 @@ public class CustomerKbServiceImpl implements CustomerKbService {
             vote.setVoteType(VOTE_TYPE_DEFAULT);
             qaVoteMapper.insert(vote);
             entry.setFavoriteCount((entry.getFavoriteCount() == null ? 0 : entry.getFavoriteCount()) + 1);
+            recommendationBehaviorService.recordKbFavorite(userId, kbEntryId, entry.getCategoryId(), true);
         } else {
             qaVoteMapper.deleteById(existed.getId());
             int old = entry.getFavoriteCount() == null ? 0 : entry.getFavoriteCount();
             entry.setFavoriteCount(Math.max(0, old - 1));
+            recommendationBehaviorService.recordKbFavorite(userId, kbEntryId, entry.getCategoryId(), false);
         }
         expertPostMapper.updateById(entry);
         syncKbForEs(kbEntryId);

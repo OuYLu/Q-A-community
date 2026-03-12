@@ -8,17 +8,22 @@ import {
   type AppQuestionHotItemVO,
   type AppTopicListItemVO
 } from "@/api/discover";
+import { expertApi, type AppExpertPostCategoryVO } from "@/api/expert";
 import { useAuthStore } from "@/stores/auth";
 import { openQuestionDetail, openUserHomePage } from "@/utils/nav";
 
 type DiscoverTab = "category" | "rank" | "expert";
+type CategoryBizType = "qa" | "kb";
+type CategoryCard = AppCategoryVO | AppExpertPostCategoryVO;
 
 const authStore = useAuthStore();
 const needLogin = computed(() => !authStore.isLogin);
 const loading = ref(false);
 const activeTab = ref<DiscoverTab>("category");
+const categoryBizType = ref<CategoryBizType>("qa");
 
-const categories = ref<AppCategoryVO[]>([]);
+const qaCategories = ref<AppCategoryVO[]>([]);
+const kbCategories = ref<AppExpertPostCategoryVO[]>([]);
 const topics = ref<AppTopicListItemVO[]>([]);
 const hotQuestions = ref<AppQuestionHotItemVO[]>([]);
 const experts = ref<AppExpertCardVO[]>([]);
@@ -31,17 +36,27 @@ const tabs: Array<{ key: DiscoverTab; label: string; icon: string; activeIcon: s
   { key: "rank", label: "热榜", icon: "/static/tabbar/hot.png", activeIcon: "/static/tabbar/hot-active.png" },
   { key: "expert", label: "专家", icon: "/static/tabbar/expert.png", activeIcon: "/static/tabbar/expert-active.png" }
 ];
+const categoryCards = computed<CategoryCard[]>(() => {
+  if (categoryBizType.value === "qa") {
+    return qaCategories.value || [];
+  }
+  const rows = kbCategories.value || [];
+  const hasParent = rows.some((item) => Number(item.parentId || 0) > 0);
+  return hasParent ? rows.filter((item) => Number(item.parentId || 0) <= 0) : rows;
+});
 
 async function loadData() {
   loading.value = true;
   try {
-    const [categoryData, topicData, rankData, expertData] = await Promise.all([
+    const [categoryData, kbCategoryData, topicData, rankData, expertData] = await Promise.all([
       discoverApi.getCategories(),
+      expertApi.categories(),
       discoverApi.getHotTopics(12),
       discoverApi.getHotQuestions(20),
       discoverApi.getExperts(20)
     ]);
-    categories.value = categoryData || [];
+    qaCategories.value = categoryData || [];
+    kbCategories.value = kbCategoryData || [];
     topics.value = topicData || [];
     hotQuestions.value = rankData || [];
     experts.value = expertData || [];
@@ -59,18 +74,32 @@ function setTab(tab: DiscoverTab) {
   activeTab.value = tab;
 }
 
-function hasCategoryIcon(item: AppCategoryVO) {
-  return !!item.icon && !failedCategoryIconIds.value.includes(item.id);
+function setCategoryBizType(type: CategoryBizType) {
+  categoryBizType.value = type;
 }
 
-function onCategoryIconError(categoryId: number) {
-  if (failedCategoryIconIds.value.includes(categoryId)) return;
-  failedCategoryIconIds.value = [...failedCategoryIconIds.value, categoryId];
+function hasCategoryIcon(item: CategoryCard) {
+  if (categoryBizType.value !== "qa") return false;
+  const row = item as AppCategoryVO;
+  return !!row.icon && !failedCategoryIconIds.value.includes(Number(row.id));
 }
 
-function openCategory(item: AppCategoryVO) {
+function categoryIcon(item: CategoryCard) {
+  if (categoryBizType.value !== "qa") return "";
+  return (item as AppCategoryVO).icon || "";
+}
+
+function onCategoryIconError(categoryId: number | string) {
+  const id = Number(categoryId);
+  if (!id) return;
+  if (failedCategoryIconIds.value.includes(id)) return;
+  failedCategoryIconIds.value = [...failedCategoryIconIds.value, id];
+}
+
+function openCategory(item: CategoryCard) {
+  const type = categoryBizType.value;
   uni.navigateTo({
-    url: `/pages/discover/category-detail?categoryId=${item.id}&categoryName=${encodeURIComponent(item.name || "")}`
+    url: `/pages/discover/category-detail?categoryId=${item.id}&categoryName=${encodeURIComponent(item.name || "")}&categoryType=${type}`
   });
 }
 
@@ -144,18 +173,43 @@ onShow(async () => {
       <view v-if="loading" class="state">加载中...</view>
       <view v-else>
         <view v-if="activeTab === 'category'">
-          <view class="section-title">分类浏览</view>
-          <view v-if="!categories.length" class="state">暂无分类</view>
+          <view class="section-head section-head--compact">
+            <view class="section-title">分类浏览</view>
+            <view class="category-switch">
+              <view
+                class="category-switch-item"
+                :class="{ active: categoryBizType === 'qa' }"
+                @click="setCategoryBizType('qa')"
+              >
+                问答分类
+              </view>
+              <view
+                class="category-switch-item"
+                :class="{ active: categoryBizType === 'kb' }"
+                @click="setCategoryBizType('kb')"
+              >
+                知识库分类
+              </view>
+            </view>
+          </view>
+          <view v-if="!categoryCards.length" class="state">暂无分类</view>
           <view v-else class="category-grid">
-            <view v-for="item in categories" :key="item.id" class="app-card category-item" @click="openCategory(item)">
+            <view
+              v-for="item in categoryCards"
+              :key="`${categoryBizType}-${item.id}`"
+              class="app-card category-item"
+              @click="openCategory(item)"
+            >
               <image
                 v-if="hasCategoryIcon(item)"
                 class="category-icon"
-                :src="item.icon"
+                :src="categoryIcon(item)"
                 mode="aspectFill"
                 @error="onCategoryIconError(item.id)"
               />
-              <view v-else class="category-icon category-icon--fallback">图</view>
+              <view v-else class="category-icon category-icon--fallback">
+                <text>{{ (item.name || "分").slice(0, 1) }}</text>
+              </view>
               <view class="category-name">{{ item.name }}</view>
             </view>
           </view>
@@ -344,6 +398,36 @@ onShow(async () => {
   font-weight: 700;
   color: #1f3f55;
   margin: 8rpx 0 12rpx;
+}
+
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.section-head--compact {
+  margin-bottom: 6rpx;
+}
+
+.category-switch {
+  display: flex;
+  gap: 8rpx;
+}
+
+.category-switch-item {
+  padding: 6rpx 14rpx;
+  border-radius: 16rpx;
+  border: 2rpx solid #d2deea;
+  color: #7f94a8;
+  font-size: 24rpx;
+  background: #fff;
+}
+
+.category-switch-item.active {
+  border-color: #4ba7d9;
+  color: #2d89be;
+  background: #eaf6fd;
 }
 
 .section-gap {

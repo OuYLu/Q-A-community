@@ -63,6 +63,12 @@ const meApi = {
       params
     });
   },
+  followedTopics(params) {
+    return api_http.request({
+      url: "/api/customer/me/topics/following",
+      params
+    });
+  },
   doc(type) {
     return api_http.request({
       url: `/api/customer/me/docs/${type}`

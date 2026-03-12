@@ -23,6 +23,9 @@ public interface QaCategoryMapper extends BaseMapper<QaCategory> {
 
     List<AppCategoryVO> selectAppCategoryList();
 
+    List<AppCategoryVO> selectAppPreferredCategoriesByInterest(@Param("userId") Long userId,
+                                                               @Param("limit") Integer limit);
+
     List<AppCategoryVO> selectAppPreferredCategories(@Param("userId") Long userId,
                                                      @Param("limit") Integer limit);
 }

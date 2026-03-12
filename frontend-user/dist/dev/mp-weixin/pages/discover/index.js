@@ -1,6 +1,7 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
 const api_discover = require("../../api/discover.js");
+const api_expert = require("../../api/expert.js");
 const stores_auth = require("../../stores/auth.js");
 const utils_nav = require("../../utils/nav.js");
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
@@ -10,7 +11,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const needLogin = common_vendor.computed(() => !authStore.isLogin);
     const loading = common_vendor.ref(false);
     const activeTab = common_vendor.ref("category");
-    const categories = common_vendor.ref([]);
+    const categoryBizType = common_vendor.ref("qa");
+    const qaCategories = common_vendor.ref([]);
+    const kbCategories = common_vendor.ref([]);
     const topics = common_vendor.ref([]);
     const hotQuestions = common_vendor.ref([]);
     const experts = common_vendor.ref([]);
@@ -22,16 +25,26 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       { key: "rank", label: "热榜", icon: "/static/tabbar/hot.png", activeIcon: "/static/tabbar/hot-active.png" },
       { key: "expert", label: "专家", icon: "/static/tabbar/expert.png", activeIcon: "/static/tabbar/expert-active.png" }
     ];
+    const categoryCards = common_vendor.computed(() => {
+      if (categoryBizType.value === "qa") {
+        return qaCategories.value || [];
+      }
+      const rows = kbCategories.value || [];
+      const hasParent = rows.some((item) => Number(item.parentId || 0) > 0);
+      return hasParent ? rows.filter((item) => Number(item.parentId || 0) <= 0) : rows;
+    });
     async function loadData() {
       loading.value = true;
       try {
-        const [categoryData, topicData, rankData, expertData] = await Promise.all([
+        const [categoryData, kbCategoryData, topicData, rankData, expertData] = await Promise.all([
           api_discover.discoverApi.getCategories(),
+          api_expert.expertApi.categories(),
           api_discover.discoverApi.getHotTopics(12),
           api_discover.discoverApi.getHotQuestions(20),
           api_discover.discoverApi.getExperts(20)
         ]);
-        categories.value = categoryData || [];
+        qaCategories.value = categoryData || [];
+        kbCategories.value = kbCategoryData || [];
         topics.value = topicData || [];
         hotQuestions.value = rankData || [];
         experts.value = expertData || [];
@@ -47,17 +60,32 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     function setTab(tab) {
       activeTab.value = tab;
     }
+    function setCategoryBizType(type) {
+      categoryBizType.value = type;
+    }
     function hasCategoryIcon(item) {
-      return !!item.icon && !failedCategoryIconIds.value.includes(item.id);
+      if (categoryBizType.value !== "qa")
+        return false;
+      const row = item;
+      return !!row.icon && !failedCategoryIconIds.value.includes(Number(row.id));
+    }
+    function categoryIcon(item) {
+      if (categoryBizType.value !== "qa")
+        return "";
+      return item.icon || "";
     }
     function onCategoryIconError(categoryId) {
-      if (failedCategoryIconIds.value.includes(categoryId))
+      const id = Number(categoryId);
+      if (!id)
         return;
-      failedCategoryIconIds.value = [...failedCategoryIconIds.value, categoryId];
+      if (failedCategoryIconIds.value.includes(id))
+        return;
+      failedCategoryIconIds.value = [...failedCategoryIconIds.value, id];
     }
     function openCategory(item) {
+      const type = categoryBizType.value;
       common_vendor.index.navigateTo({
-        url: `/pages/discover/category-detail?categoryId=${item.id}&categoryName=${encodeURIComponent(item.name || "")}`
+        url: `/pages/discover/category-detail?categoryId=${item.id}&categoryName=${encodeURIComponent(item.name || "")}&categoryType=${type}`
       });
     }
     function hasTopicCover(item) {
@@ -118,24 +146,30 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, loading.value ? {} : common_vendor.e({
         e: activeTab.value === "category"
       }, activeTab.value === "category" ? common_vendor.e({
-        f: !categories.value.length
-      }, !categories.value.length ? {} : {
-        g: common_vendor.f(categories.value, (item, k0, i0) => {
+        f: categoryBizType.value === "qa" ? 1 : "",
+        g: common_vendor.o(($event) => setCategoryBizType("qa")),
+        h: categoryBizType.value === "kb" ? 1 : "",
+        i: common_vendor.o(($event) => setCategoryBizType("kb")),
+        j: !categoryCards.value.length
+      }, !categoryCards.value.length ? {} : {
+        k: common_vendor.f(categoryCards.value, (item, k0, i0) => {
           return common_vendor.e({
             a: hasCategoryIcon(item)
           }, hasCategoryIcon(item) ? {
-            b: item.icon,
-            c: common_vendor.o(($event) => onCategoryIconError(item.id), item.id)
-          } : {}, {
-            d: common_vendor.t(item.name),
-            e: item.id,
-            f: common_vendor.o(($event) => openCategory(item), item.id)
+            b: categoryIcon(item),
+            c: common_vendor.o(($event) => onCategoryIconError(item.id), `${categoryBizType.value}-${item.id}`)
+          } : {
+            d: common_vendor.t((item.name || "分").slice(0, 1))
+          }, {
+            e: common_vendor.t(item.name),
+            f: `${categoryBizType.value}-${item.id}`,
+            g: common_vendor.o(($event) => openCategory(item), `${categoryBizType.value}-${item.id}`)
           });
         })
       }, {
-        h: !topics.value.length
+        l: !topics.value.length
       }, !topics.value.length ? {} : {
-        i: common_vendor.f(topics.value, (item, k0, i0) => {
+        m: common_vendor.f(topics.value, (item, k0, i0) => {
           return common_vendor.e({
             a: hasTopicCover(item)
           }, hasTopicCover(item) ? {
@@ -151,9 +185,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           });
         })
       }) : activeTab.value === "rank" ? common_vendor.e({
-        k: !hotQuestions.value.length
+        o: !hotQuestions.value.length
       }, !hotQuestions.value.length ? {} : {
-        l: common_vendor.f(hotQuestions.value, (item, idx, i0) => {
+        p: common_vendor.f(hotQuestions.value, (item, idx, i0) => {
           return {
             a: common_vendor.t(idx + 1),
             b: idx < 3 ? 1 : "",
@@ -167,9 +201,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           };
         })
       }) : common_vendor.e({
-        m: !experts.value.length
+        q: !experts.value.length
       }, !experts.value.length ? {} : {
-        n: common_vendor.f(experts.value, (item, k0, i0) => {
+        r: common_vendor.f(experts.value, (item, k0, i0) => {
           return common_vendor.e({
             a: avatarAvailable(item.userId, item.avatar)
           }, avatarAvailable(item.userId, item.avatar) ? {
@@ -186,7 +220,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           });
         })
       }), {
-        j: activeTab.value === "rank"
+        n: activeTab.value === "rank"
       })));
     };
   }

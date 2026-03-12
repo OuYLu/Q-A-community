@@ -15,6 +15,7 @@ import com.community.mapper.QaTopicMapper;
 import com.community.mapper.SearchQueryLogMapper;
 import com.community.service.CustomerSearchService;
 import com.community.service.EsSearchService;
+import com.community.service.RecommendationBehaviorService;
 import com.community.vo.AppSearchAnswerVO;
 import com.community.vo.AppSearchHistoryVO;
 import com.community.vo.AppSearchHotVO;
@@ -57,6 +58,7 @@ public class CustomerSearchServiceImpl implements CustomerSearchService {
     private final SearchQueryLogMapper searchQueryLogMapper;
     private final EsSearchService esSearchService;
     private final EsProperties esProperties;
+    private final RecommendationBehaviorService recommendationBehaviorService;
 
     @Override
     public AppSearchResultVO search(AppSearchQueryDTO query) {
@@ -514,6 +516,7 @@ public class CustomerSearchServiceImpl implements CustomerSearchService {
         log.setSearchType(dto.getSearchType() == null ? 1 : dto.getSearchType());
         log.setHitCount(dto.getHitCount() == null ? 0 : dto.getHitCount());
         searchQueryLogMapper.insert(log);
+        recommendationBehaviorService.recordSearch(userId, log.getHitCount());
     }
 
     private int resolveLimit(Integer limit, int def, int max) {

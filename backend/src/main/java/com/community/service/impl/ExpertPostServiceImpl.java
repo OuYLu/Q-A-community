@@ -21,6 +21,7 @@ import com.community.mapper.QaTagMapper;
 import com.community.mapper.UserMapper;
 import com.community.service.EsSearchService;
 import com.community.service.ExpertPostService;
+import com.community.service.RecommendationBehaviorService;
 import com.community.vo.AppExpertContentBlockVO;
 import com.community.vo.AppExpertPostDetailVO;
 import com.community.vo.AppExpertPostItemVO;
@@ -60,6 +61,7 @@ public class ExpertPostServiceImpl implements ExpertPostService {
     private final QaTagMapper qaTagMapper;
     private final ObjectMapper objectMapper;
     private final EsSearchService esSearchService;
+    private final RecommendationBehaviorService recommendationBehaviorService;
 
     @Override
     public List<AppKbCategoryVO> categories() {
@@ -175,11 +177,15 @@ public class ExpertPostServiceImpl implements ExpertPostService {
     public PageInfo<AppExpertPostItemVO> page(AppExpertPostPageQueryDTO query) {
         int page = resolvePage(query);
         int pageSize = resolvePageSize(query);
+        Long userId = currentUserIdOrNull();
+        boolean personalized = shouldPersonalize(query, userId);
         PageHelper.startPage(page, pageSize);
         List<AppExpertPostItemVO> rows = expertPostMapper.selectPublishedPage(
             query == null ? null : query.getKeyword(),
             query == null ? null : query.getSortBy(),
-            query == null ? null : query.getCategoryId()
+            query == null ? null : query.getCategoryId(),
+            userId,
+            personalized
         );
         rows.forEach(this::fillRefAndTags);
         return new PageInfo<>(rows);
@@ -211,6 +217,9 @@ public class ExpertPostServiceImpl implements ExpertPostService {
         if (currentUserId == null || !currentUserId.equals(vo.getAuthorUserId())) {
             expertPostMapper.increaseViewCount(id);
             vo.setViewCount((vo.getViewCount() == null ? 0 : vo.getViewCount()) + 1);
+            if (currentUserId != null) {
+                recommendationBehaviorService.recordKbView(currentUserId, id, vo.getCategoryId());
+            }
         }
         fillRefAndTags(vo);
         return vo;
@@ -465,6 +474,17 @@ public class ExpertPostServiceImpl implements ExpertPostService {
             return 10;
         }
         return Math.min(query.getPageSize(), 50);
+    }
+
+    private boolean shouldPersonalize(AppExpertPostPageQueryDTO query, Long userId) {
+        if (userId == null || query == null) {
+            return false;
+        }
+        if (StringUtils.hasText(query.getKeyword())) {
+            return false;
+        }
+        String sortBy = StringUtils.hasText(query.getSortBy()) ? query.getSortBy().trim().toLowerCase() : "hot";
+        return !"latest".equals(sortBy);
     }
 
     private Long currentUserIdOrNull() {

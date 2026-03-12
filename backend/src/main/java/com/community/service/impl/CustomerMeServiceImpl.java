@@ -16,12 +16,14 @@ import com.community.mapper.ExpertProfileMapper;
 import com.community.mapper.QaAnswerMapper;
 import com.community.mapper.QaFavoriteMapper;
 import com.community.mapper.QaQuestionMapper;
+import com.community.mapper.QaTopicFollowMapper;
 import com.community.mapper.UserBrowseHistoryMapper;
 import com.community.mapper.UserFollowMapper;
 import com.community.mapper.UserMapper;
 import com.community.mapper.UserStatMapper;
 import com.community.service.CustomerMeService;
 import com.community.vo.AppDocVO;
+import com.community.vo.AppFollowTopicItemVO;
 import com.community.vo.AppFollowUserItemVO;
 import com.community.vo.AppMeOverviewVO;
 import com.community.vo.AppMyAnswerItemVO;
@@ -51,6 +53,7 @@ public class CustomerMeServiceImpl implements CustomerMeService {
     private final QaQuestionMapper qaQuestionMapper;
     private final QaAnswerMapper qaAnswerMapper;
     private final UserFollowMapper userFollowMapper;
+    private final QaTopicFollowMapper qaTopicFollowMapper;
     private final ExpertProfileMapper expertProfileMapper;
     private final ExpertPostMapper expertPostMapper;
     private final PasswordEncoder passwordEncoder;
@@ -80,6 +83,10 @@ public class CustomerMeServiceImpl implements CustomerMeService {
         int followingCount = stat != null && stat.getFollowingCount() != null
             ? stat.getFollowingCount()
             : (user.getFollowingCount() == null ? 0 : user.getFollowingCount());
+        int topicFollowCount = Math.toIntExact(qaTopicFollowMapper.selectCount(
+            new LambdaQueryWrapper<com.community.entity.QaTopicFollow>()
+                .eq(com.community.entity.QaTopicFollow::getUserId, userId)
+        ));
 
         int favoriteCount = Math.toIntExact(qaFavoriteMapper.selectCount(new LambdaQueryWrapper<com.community.entity.QaFavorite>()
             .eq(com.community.entity.QaFavorite::getUserId, userId)));
@@ -112,6 +119,7 @@ public class CustomerMeServiceImpl implements CustomerMeService {
         vo.setLikeReceivedCount(likeReceivedCount);
         vo.setFollowerCount(followerCount);
         vo.setFollowingCount(followingCount);
+        vo.setTopicFollowCount(topicFollowCount);
         vo.setFavoriteCount(favoriteCount);
         vo.setHistoryCount(historyCount);
         if (user.getExpertStatus() != null && user.getExpertStatus() == 3) {
@@ -229,6 +237,13 @@ public class CustomerMeServiceImpl implements CustomerMeService {
         Long userId = requireUserId();
         PageHelper.startPage(resolvePage(query), resolvePageSize(query));
         return new PageInfo<>(userFollowMapper.selectMyFollowers(userId));
+    }
+
+    @Override
+    public PageInfo<AppFollowTopicItemVO> followedTopics(AppPageQueryDTO query) {
+        Long userId = requireUserId();
+        PageHelper.startPage(resolvePage(query), resolvePageSize(query));
+        return new PageInfo<>(qaTopicFollowMapper.selectMyFollowedTopics(userId));
     }
 
     @Override

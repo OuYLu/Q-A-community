@@ -46,6 +46,12 @@
   color: #7f95a8;
   font-size: 24rpx;
 }
+.article-summary.data-v-226451ce {
+  margin-top: 10rpx;
+  color: #7f95a8;
+  font-size: 24rpx;
+  line-height: 1.4;
+}
 .question-time.data-v-226451ce {
   margin-top: 8rpx;
   color: #98abba;

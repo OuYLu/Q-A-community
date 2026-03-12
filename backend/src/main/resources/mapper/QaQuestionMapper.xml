@@ -226,6 +226,11 @@
       q.created_at AS createdAt,
       q.last_active_at AS lastActiveAt
     FROM qa_question q
+    <if test="personalized != null and personalized and userId != null">
+      LEFT JOIN rec_user_interest ri
+        ON ri.user_id = #{userId}
+       AND ri.category_id = q.category_id
+    </if>
     LEFT JOIN qa_category c ON c.id = q.category_id
     LEFT JOIN qa_topic t ON t.id = q.topic_id
     LEFT JOIN user u ON u.id = q.user_id
@@ -247,7 +252,24 @@
     ORDER BY
     <choose>
       <when test="sortBy == 'latest'">q.created_at DESC, q.id DESC</when>
-      <otherwise>q.view_count DESC, q.answer_count DESC, q.like_count DESC, q.id DESC</otherwise>
+      <when test="personalized != null and personalized and userId != null">
+        (
+          COALESCE(ri.score, 0) * 5
+          + q.like_count * 3
+          + q.favorite_count * 2
+          + q.answer_count * 2
+          + q.view_count
+        ) DESC,
+        COALESCE(ri.updated_at, '1970-01-01 00:00:00') DESC,
+        q.last_active_at DESC,
+        q.id DESC
+      </when>
+      <otherwise>
+        q.view_count DESC,
+        q.answer_count DESC,
+        q.like_count DESC,
+        q.id DESC
+      </otherwise>
     </choose>
   </select>
 

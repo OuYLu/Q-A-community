@@ -45,7 +45,8 @@ const myContent = computed(() => {
     { icon: "🔖", title: "我的收藏", value: String(overview.value?.favoriteCount ?? 0), type: "favorites" },
     { icon: "🕒", title: "浏览历史", value: String(overview.value?.historyCount ?? 0), type: "history" },
     { icon: "💬", title: "我的提问", value: String(overview.value?.questionCount ?? 0), type: "questions" },
-    { icon: "⭐", title: "我的回答", value: String(overview.value?.answerCount ?? 0), type: "answers" }
+    { icon: "⭐", title: "我的回答", value: String(overview.value?.answerCount ?? 0), type: "answers" },
+    { icon: "🗂️", title: "专题关注", value: String(overview.value?.topicFollowCount ?? 0), type: "topic-following" }
   ];
   if (isVerifiedExpert.value) {
     rows.push({
@@ -63,7 +64,7 @@ type SocialItem = {
   iconImage?: string;
   title: string;
   value?: string;
-  type: "following" | "followers" | "expert-apply";
+  type: "following" | "followers" | "topic-following" | "expert-apply";
   disabled?: boolean;
 };
 

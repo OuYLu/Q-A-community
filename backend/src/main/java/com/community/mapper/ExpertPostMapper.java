@@ -13,7 +13,9 @@ import java.util.List;
 public interface ExpertPostMapper extends BaseMapper<KbEntry> {
     List<AppExpertPostItemVO> selectPublishedPage(@Param("keyword") String keyword,
                                                   @Param("sortBy") String sortBy,
-                                                  @Param("categoryId") Long categoryId);
+                                                  @Param("categoryId") Long categoryId,
+                                                  @Param("userId") Long userId,
+                                                  @Param("personalized") Boolean personalized);
 
     List<AppExpertPostItemVO> selectMyPage(@Param("authorUserId") Long authorUserId,
                                            @Param("keyword") String keyword,

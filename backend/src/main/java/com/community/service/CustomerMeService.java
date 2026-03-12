@@ -5,6 +5,7 @@ import com.community.dto.AppMePasswordSetFirstDTO;
 import com.community.dto.AppMeProfileUpdateDTO;
 import com.community.dto.AppPageQueryDTO;
 import com.community.vo.AppDocVO;
+import com.community.vo.AppFollowTopicItemVO;
 import com.community.vo.AppFollowUserItemVO;
 import com.community.vo.AppMeOverviewVO;
 import com.community.vo.AppMyAnswerItemVO;
@@ -24,5 +25,6 @@ public interface CustomerMeService {
     PageInfo<AppMyAnswerItemVO> myAnswers(AppPageQueryDTO query);
     PageInfo<AppFollowUserItemVO> following(AppPageQueryDTO query);
     PageInfo<AppFollowUserItemVO> followers(AppPageQueryDTO query);
+    PageInfo<AppFollowTopicItemVO> followedTopics(AppPageQueryDTO query);
     AppDocVO doc(String type);
 }

@@ -22,6 +22,19 @@
       e.favorite_count AS favoriteCount,
       e.created_at AS createdAt
     FROM kb_entry e
+    <if test="personalized != null and personalized and userId != null">
+      LEFT JOIN (
+        SELECT
+          category_id,
+          SUM(weight) AS interestScore,
+          MAX(created_at) AS lastBehaviorAt
+        FROM rec_user_behavior
+        WHERE user_id = #{userId}
+          AND category_id IS NOT NULL
+          AND action_type IN (1, 2, 3)
+        GROUP BY category_id
+      ) rb ON rb.category_id = e.category_id
+    </if>
     LEFT JOIN user u ON u.id = e.author_user_id
     LEFT JOIN expert_profile ep ON ep.user_id = e.author_user_id
     LEFT JOIN kb_category c ON c.id = e.category_id
@@ -35,6 +48,17 @@
     </if>
     ORDER BY
       <choose>
+        <when test="sortBy == 'hot' and personalized != null and personalized and userId != null">
+          (
+            COALESCE(rb.interestScore, 0) * 8
+            + e.like_count * 3
+            + e.favorite_count * 2
+            + e.view_count
+          ) DESC,
+          COALESCE(rb.lastBehaviorAt, '1970-01-01 00:00:00') DESC,
+          e.created_at DESC,
+          e.id DESC
+        </when>
         <when test="sortBy == 'hot'">e.like_count DESC, e.view_count DESC, e.created_at DESC</when>
         <otherwise>e.created_at DESC, e.id DESC</otherwise>
       </choose>

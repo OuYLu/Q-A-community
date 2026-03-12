@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.community.mapper.QaTopicFollowMapper">
+  <select id="selectMyFollowedTopics" resultType="com.community.vo.AppFollowTopicItemVO">
+    SELECT
+      t.id AS topicId,
+      t.title,
+      t.subtitle,
+      t.cover_img AS coverImg,
+      t.follow_count AS followCount,
+      t.question_count AS questionCount,
+      f.created_at AS followedAt
+    FROM qa_topic_follow f
+    JOIN qa_topic t ON t.id = f.topic_id
+    WHERE f.user_id = #{userId}
+      AND t.status = 1
+    ORDER BY f.created_at DESC, f.id DESC
+  </select>
+</mapper>

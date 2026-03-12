@@ -27,6 +27,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       answers: "我的回答",
       following: "关注",
       followers: "粉丝",
+      "topic-following": "专题关注",
       "expert-posts": "我的科普"
     };
     const isQuestionList = common_vendor.computed(() => type.value === "questions");
@@ -41,7 +42,16 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return `共 ${total.value} 条`;
     });
     function normalizeType(raw) {
-      const valid = ["favorites", "history", "questions", "answers", "following", "followers", "expert-posts"];
+      const valid = [
+        "favorites",
+        "history",
+        "questions",
+        "answers",
+        "following",
+        "followers",
+        "topic-following",
+        "expert-posts"
+      ];
       if (raw && valid.includes(raw))
         return raw;
       return "favorites";
@@ -82,6 +92,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         return `状态：${item.status}，${item.answerCount} 回答`;
       if (type.value === "answers")
         return isInvalidAnswerRow(item) ? "该回答因违规已删除" : item.contentPreview || "";
+      if (type.value === "topic-following")
+        return item.subtitle || "点击查看专题详情";
       if (type.value === "expert-posts")
         return `${item.likeCount || 0} 点赞 ${item.viewCount || 0} 浏览`;
       return `专家状态：${item.expertStatus ?? "普通"}`;
@@ -92,6 +104,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (type.value === "history")
         return item.viewedAt;
       if (type.value === "following" || type.value === "followers")
+        return item.followedAt;
+      if (type.value === "topic-following")
         return item.followedAt;
       return item.createdAt;
     }
@@ -176,6 +190,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           case "followers":
             resp = await api_me.meApi.followers(query);
             break;
+          case "topic-following":
+            resp = await api_me.meApi.followedTopics(query);
+            break;
           case "expert-posts":
             resp = await api_expert.expertApi.myPosts(query);
             break;
@@ -221,6 +238,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
       if (type.value === "expert-posts" && (item == null ? void 0 : item.id)) {
         utils_nav.openExpertPostDetailPage(Number(item.id));
+        return;
+      }
+      if (type.value === "topic-following" && (item == null ? void 0 : item.topicId)) {
+        common_vendor.index.navigateTo({
+          url: `/pages/discover/topic-detail?topicId=${item.topicId}&topicTitle=${encodeURIComponent(item.title || "")}`
+        });
         return;
       }
       if ((type.value === "following" || type.value === "followers") && (item == null ? void 0 : item.userId)) {

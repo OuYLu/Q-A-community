@@ -45,7 +45,9 @@ public interface QaQuestionMapper extends BaseMapper<QaQuestion> {
                                                       @Param("categoryId") Long categoryId,
                                                       @Param("topicId") Long topicId,
                                                       @Param("sortBy") String sortBy,
-                                                      @Param("onlyUnsolved") Boolean onlyUnsolved);
+                                                      @Param("onlyUnsolved") Boolean onlyUnsolved,
+                                                      @Param("userId") Long userId,
+                                                      @Param("personalized") Boolean personalized);
 
     AppQuestionDetailVO selectAppQuestionDetail(@Param("id") Long id);
 

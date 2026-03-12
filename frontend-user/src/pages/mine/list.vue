@@ -6,7 +6,8 @@ import {
   type AppMyFavoriteItemVO,
   type AppMyHistoryItemVO,
   type AppMyAnswerItemVO,
-  type AppFollowUserItemVO
+  type AppFollowUserItemVO,
+  type AppFollowTopicItemVO
 } from "@/api/me";
 import { expertApi, type AppExpertPostItemVO } from "@/api/expert";
 import { ensurePageAuth } from "@/utils/auth-guard";
@@ -14,13 +15,22 @@ import { questionApi, type AppMyQuestionItemVO } from "@/api/question";
 import { openExpertPostDetailPage, openQuestionDetail, openUserHomePage } from "@/utils/nav";
 import { BASE_URL } from "@/utils/constants";
 
-type ListType = "favorites" | "history" | "questions" | "answers" | "following" | "followers" | "expert-posts";
+type ListType =
+  | "favorites"
+  | "history"
+  | "questions"
+  | "answers"
+  | "following"
+  | "followers"
+  | "topic-following"
+  | "expert-posts";
 type MixedItem =
   | AppMyFavoriteItemVO
   | AppMyHistoryItemVO
   | AppMyQuestionItemVO
   | AppMyAnswerItemVO
   | AppFollowUserItemVO
+  | AppFollowTopicItemVO
   | AppExpertPostItemVO;
 
 const type = ref<ListType>("favorites");
@@ -42,6 +52,7 @@ const titleMap: Record<ListType, string> = {
   answers: "我的回答",
   following: "关注",
   followers: "粉丝",
+  "topic-following": "专题关注",
   "expert-posts": "我的科普"
 };
 
@@ -56,7 +67,16 @@ const headText = computed(() => {
 });
 
 function normalizeType(raw?: string): ListType {
-  const valid: ListType[] = ["favorites", "history", "questions", "answers", "following", "followers", "expert-posts"];
+  const valid: ListType[] = [
+    "favorites",
+    "history",
+    "questions",
+    "answers",
+    "following",
+    "followers",
+    "topic-following",
+    "expert-posts"
+  ];
   if (raw && valid.includes(raw as ListType)) return raw as ListType;
   return "favorites";
 }
@@ -90,6 +110,7 @@ function rowSubText(item: any) {
   if (type.value === "history") return item.subTitle || "";
   if (type.value === "questions") return `状态：${item.status}，${item.answerCount} 回答`;
   if (type.value === "answers") return isInvalidAnswerRow(item) ? "该回答因违规已删除" : item.contentPreview || "";
+  if (type.value === "topic-following") return item.subtitle || "点击查看专题详情";
   if (type.value === "expert-posts") return `${item.likeCount || 0} 点赞 ${item.viewCount || 0} 浏览`;
   return `专家状态：${item.expertStatus ?? "普通"}`;
 }
@@ -98,6 +119,7 @@ function rowTimeText(item: any) {
   if (type.value === "favorites") return item.favoriteAt;
   if (type.value === "history") return item.viewedAt;
   if (type.value === "following" || type.value === "followers") return item.followedAt;
+  if (type.value === "topic-following") return item.followedAt;
   return item.createdAt;
 }
 
@@ -179,6 +201,9 @@ async function fetchPage(reset = false) {
       case "followers":
         resp = await meApi.followers(query);
         break;
+      case "topic-following":
+        resp = await meApi.followedTopics(query);
+        break;
       case "expert-posts":
         resp = await expertApi.myPosts(query);
         break;
@@ -224,6 +249,12 @@ function openRow(item: any) {
   }
   if (type.value === "expert-posts" && item?.id) {
     openExpertPostDetailPage(Number(item.id));
+    return;
+  }
+  if (type.value === "topic-following" && item?.topicId) {
+    uni.navigateTo({
+      url: `/pages/discover/topic-detail?topicId=${item.topicId}&topicTitle=${encodeURIComponent(item.title || "")}`
+    });
     return;
   }
   if ((type.value === "following" || type.value === "followers") && item?.userId) {

@@ -45,6 +45,7 @@ import com.community.mapper.UserBrowseHistoryMapper;
 import com.community.mapper.UserStatMapper;
 import com.community.service.EsSearchService;
 import com.community.service.CustomerQuestionService;
+import com.community.service.RecommendationBehaviorService;
 import com.community.vo.AppMyQuestionItemVO;
 import com.community.vo.AppAnswerCommentVO;
 import com.community.vo.AppAnswerDetailVO;
@@ -93,6 +94,7 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
     private final UserStatMapper userStatMapper;
     private final ObjectMapper objectMapper;
     private final EsSearchService esSearchService;
+    private final RecommendationBehaviorService recommendationBehaviorService;
 
     private static final int QUESTION_BROWSE_BIZ_TYPE = 1;
 
@@ -109,7 +111,9 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
             query == null ? null : query.getCategoryId(),
             query == null ? null : query.getTopicId(),
             query == null ? null : query.getSortBy(),
-            query == null ? null : query.getOnlyUnsolved()
+            query == null ? null : query.getOnlyUnsolved(),
+            requireUserId(),
+            false
         );
         rows.forEach(this::fillImageUrls);
         return new PageInfo<>(rows);
@@ -154,6 +158,7 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
             if (counted) {
                 qaQuestionMapper.incrementViewCount(id);
                 vo.setViewCount((vo.getViewCount() == null ? 0 : vo.getViewCount()) + 1);
+                recommendationBehaviorService.recordQuestionView(userId, id, question.getCategoryId());
             }
         }
 
@@ -533,10 +538,12 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
                 "收到点赞",
                 actorName(userId) + " 点赞了你的问题：" + shorten(question.getTitle(), 26)
             );
+            recommendationBehaviorService.recordQuestionLike(userId, questionId, question.getCategoryId(), true);
         } else {
             qaVoteMapper.deleteById(existed.getId());
             int old = question.getLikeCount() == null ? 0 : question.getLikeCount();
             question.setLikeCount(Math.max(0, old - 1));
+            recommendationBehaviorService.recordQuestionLike(userId, questionId, question.getCategoryId(), false);
         }
         qaQuestionMapper.updateById(question);
         return detail(questionId);
@@ -566,10 +573,12 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
                 "收到收藏",
                 actorName(userId) + " 收藏了你的问题：" + shorten(question.getTitle(), 26)
             );
+            recommendationBehaviorService.recordQuestionFavorite(userId, questionId, question.getCategoryId(), true);
         } else {
             qaFavoriteMapper.deleteById(existed.getId());
             int old = question.getFavoriteCount() == null ? 0 : question.getFavoriteCount();
             question.setFavoriteCount(Math.max(0, old - 1));
+            recommendationBehaviorService.recordQuestionFavorite(userId, questionId, question.getCategoryId(), false);
         }
         qaQuestionMapper.updateById(question);
         return detail(questionId);
@@ -638,11 +647,13 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
                 "收到点赞",
                 actorName(userId) + " 点赞了你的回答"
             );
+            recommendationBehaviorService.recordAnswerLike(userId, answerId, resolveQuestionCategoryId(answer.getQuestionId()), true);
         } else {
             qaVoteMapper.deleteById(existed.getId());
             int old = answer.getLikeCount() == null ? 0 : answer.getLikeCount();
             answer.setLikeCount(Math.max(0, old - 1));
             adjustUserAnswerLikeReceivedCount(answer.getUserId(), -1);
+            recommendationBehaviorService.recordAnswerLike(userId, answerId, resolveQuestionCategoryId(answer.getQuestionId()), false);
         }
         qaAnswerMapper.updateById(answer);
         return answerDetail(answerId);
@@ -674,8 +685,10 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
                 "收到收藏",
                 actorName(userId) + " 收藏了你的回答"
             );
+            recommendationBehaviorService.recordAnswerFavorite(userId, answerId, resolveQuestionCategoryId(answer.getQuestionId()), true);
         } else {
             qaVoteMapper.deleteById(existed.getId());
+            recommendationBehaviorService.recordAnswerFavorite(userId, answerId, resolveQuestionCategoryId(answer.getQuestionId()), false);
         }
         return answerDetail(answerId);
     }
@@ -1249,6 +1262,14 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
             .eq(QaVote::getBizId, answerId)
             .eq(QaVote::getVoteType, 2)
             .eq(QaVote::getUserId, userId)) > 0;
+    }
+
+    private Long resolveQuestionCategoryId(Long questionId) {
+        if (questionId == null) {
+            return null;
+        }
+        QaQuestion question = qaQuestionMapper.selectById(questionId);
+        return question == null ? null : question.getCategoryId();
     }
 
     private boolean recordQuestionBrowseIfNeeded(Long userId, Long questionId) {

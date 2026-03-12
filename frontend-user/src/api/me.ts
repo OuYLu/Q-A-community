@@ -25,6 +25,7 @@ export interface AppMeOverviewVO {
   likeReceivedCount: number;
   followerCount: number;
   followingCount: number;
+  topicFollowCount?: number;
   favoriteCount: number;
   historyCount: number;
 }
@@ -72,6 +73,16 @@ export interface AppFollowUserItemVO {
   nickname: string | null;
   avatar: string | null;
   expertStatus: number | null;
+  followedAt: string;
+}
+
+export interface AppFollowTopicItemVO {
+  topicId: number;
+  title: string;
+  subtitle?: string;
+  coverImg?: string;
+  followCount?: number;
+  questionCount?: number;
   followedAt: string;
 }
 
@@ -167,6 +178,12 @@ export const meApi = {
   followers(params: PageQuery) {
     return request<PageInfo<AppFollowUserItemVO>>({
       url: "/api/customer/me/followers",
+      params
+    });
+  },
+  followedTopics(params: PageQuery) {
+    return request<PageInfo<AppFollowTopicItemVO>>({
+      url: "/api/customer/me/topics/following",
       params
     });
   },
