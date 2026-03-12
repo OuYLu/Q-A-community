@@ -73,8 +73,9 @@ public class CustomerSearchServiceImpl implements CustomerSearchService {
         vo.setQuery(query.getQuery());
 
         if ("question".equals(type) || "all".equals(type)) {
-            vo.setQuestions(searchQuestions(query, pageSize, offset, highlightKeywords));
-            vo.setSimilarQuestions(searchSimilarQuestions(query, highlightKeywords));
+            List<AppSearchQuestionVO> questionRows = searchQuestions(query, pageSize, offset, highlightKeywords);
+            vo.setQuestions(questionRows);
+            vo.setSimilarQuestions(searchSimilarQuestions(query, highlightKeywords, extractQuestionIds(questionRows)));
         } else {
             vo.setQuestions(Collections.emptyList());
             vo.setSimilarQuestions(Collections.emptyList());
@@ -199,16 +200,18 @@ public class CustomerSearchServiceImpl implements CustomerSearchService {
         return rows;
     }
 
-    private List<AppSearchSimilarQuestionVO> searchSimilarQuestions(AppSearchQueryDTO query, List<String> highlightKeywords) {
+    private List<AppSearchSimilarQuestionVO> searchSimilarQuestions(AppSearchQueryDTO query, List<String> highlightKeywords,
+                                                                    Set<Long> excludedQuestionIds) {
         List<AppSearchQuestionVO> candidatePool = new ArrayList<>();
         Set<Long> candidateIds = new LinkedHashSet<>();
+        Set<Long> excluded = excludedQuestionIds == null ? Collections.emptySet() : excludedQuestionIds;
 
         if (useEsSearch()) {
             try {
                 List<Long> ids = esSearchService.searchQuestionIds(
                     query.getQuery(),
                     0,
-                    SIMILAR_QUESTION_LIMIT * 2,
+                    SIMILAR_QUESTION_LIMIT * 4,
                     query.getCategoryId(),
                     query.getTopicId(),
                     query.getOnlyUnsolved(),
@@ -221,7 +224,7 @@ public class CustomerSearchServiceImpl implements CustomerSearchService {
                         query.getTopicId(),
                         query.getOnlyUnsolved()
                     );
-                    mergeCandidatePool(candidatePool, candidateIds, esCandidates);
+                    mergeCandidatePool(candidatePool, candidateIds, esCandidates, excluded);
                 }
             } catch (Exception ignored) {
                 // fallback to mysql below
@@ -235,10 +238,10 @@ public class CustomerSearchServiceImpl implements CustomerSearchService {
                 query.getCategoryId(),
                 query.getTopicId(),
                 query.getOnlyUnsolved(),
-                SIMILAR_QUESTION_LIMIT * 2,
+                SIMILAR_QUESTION_LIMIT * 4,
                 0
             );
-            mergeCandidatePool(candidatePool, candidateIds, mysqlCandidates);
+            mergeCandidatePool(candidatePool, candidateIds, mysqlCandidates, excluded);
         }
 
         if (candidatePool.size() < SIMILAR_QUESTION_LIMIT) {
@@ -261,11 +264,11 @@ public class CustomerSearchServiceImpl implements CustomerSearchService {
                         query.getCategoryId(),
                         query.getTopicId(),
                         query.getOnlyUnsolved(),
-                        SIMILAR_QUESTION_LIMIT,
+                        SIMILAR_QUESTION_LIMIT * 2,
                         0
                     );
-                    mergeCandidatePool(candidatePool, candidateIds, termCandidates);
-                    if (candidatePool.size() >= SIMILAR_QUESTION_LIMIT * 2) {
+                    mergeCandidatePool(candidatePool, candidateIds, termCandidates, excluded);
+                    if (candidatePool.size() >= SIMILAR_QUESTION_LIMIT * 4) {
                         break;
                     }
                 }
@@ -300,7 +303,8 @@ public class CustomerSearchServiceImpl implements CustomerSearchService {
         return result;
     }
 
-    private void mergeCandidatePool(List<AppSearchQuestionVO> pool, Set<Long> idSet, List<AppSearchQuestionVO> incoming) {
+    private void mergeCandidatePool(List<AppSearchQuestionVO> pool, Set<Long> idSet, List<AppSearchQuestionVO> incoming,
+                                    Set<Long> excludedIds) {
         if (incoming == null || incoming.isEmpty()) {
             return;
         }
@@ -308,10 +312,26 @@ public class CustomerSearchServiceImpl implements CustomerSearchService {
             if (row == null || row.getId() == null) {
                 continue;
             }
+            if (excludedIds != null && excludedIds.contains(row.getId())) {
+                continue;
+            }
             if (idSet.add(row.getId())) {
                 pool.add(row);
             }
         }
+    }
+
+    private Set<Long> extractQuestionIds(List<AppSearchQuestionVO> rows) {
+        if (rows == null || rows.isEmpty()) {
+            return Collections.emptySet();
+        }
+        Set<Long> ids = new LinkedHashSet<>();
+        for (AppSearchQuestionVO row : rows) {
+            if (row != null && row.getId() != null) {
+                ids.add(row.getId());
+            }
+        }
+        return ids;
     }
 
     private List<String> buildHighlightKeywords(String query) {

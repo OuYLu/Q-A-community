@@ -437,13 +437,13 @@ onShow(async () => {
           <view v-if="similarQuestionList.length" class="result-section section-similar">
             <view class="section-title">相似问题推荐</view>
             <view class="chips">
-              <text
+              <view
                 v-for="item in similarQuestionList"
                 :key="item.id"
-                class="app-chip"
+                class="app-chip similar-chip"
                 @click="openQuestionDetail(item.id)"
                 v-html="item.titleHighlight || item.title"
-              ></text>
+              ></view>
             </view>
           </view>
           <view v-if="answerList.length" class="result-section section-answer">
@@ -608,6 +608,10 @@ onShow(async () => {
 
 .hot {
   background: #f3ecd1;
+}
+
+.similar-chip {
+  display: inline-block;
 }
 
 .result-body {
