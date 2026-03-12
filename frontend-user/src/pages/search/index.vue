@@ -7,7 +7,8 @@ import {
   type AppSearchHotVO,
   type AppSearchAnswerVO,
   type AppSearchKbVO,
-  type AppSearchQuestionVO
+  type AppSearchQuestionVO,
+  type AppSearchSimilarQuestionVO
 } from "@/api/search";
 import { useAuthStore } from "@/stores/auth";
 import { openAnswerDetailPage, openExpertPostDetailPage, openQuestionDetail } from "@/utils/nav";
@@ -25,6 +26,7 @@ const historyList = ref<AppSearchHistoryVO[]>([]);
 const questionList = ref<AppSearchQuestionVO[]>([]);
 const answerList = ref<AppSearchAnswerVO[]>([]);
 const kbList = ref<AppSearchKbVO[]>([]);
+const similarQuestionList = ref<AppSearchSimilarQuestionVO[]>([]);
 const KB_INIT_LIMIT = 5;
 const QUESTION_INIT_LIMIT = 5;
 const ANSWER_INIT_LIMIT = 5;
@@ -155,6 +157,7 @@ async function fetchQuestionRows() {
   if (!text) {
     questionList.value = [];
     questionHasMore.value = false;
+    similarQuestionList.value = [];
     return 0;
   }
   questionLoading.value = true;
@@ -169,6 +172,7 @@ async function fetchQuestionRows() {
     const rows = data.questions || [];
     questionList.value = rows.slice(0, questionLimit.value);
     questionHasMore.value = rows.length > questionLimit.value;
+    similarQuestionList.value = data.similarQuestions || [];
     return questionList.value.length;
   } finally {
     questionLoading.value = false;
@@ -212,6 +216,7 @@ async function search(reset = true) {
     questionList.value = [];
     answerList.value = [];
     kbList.value = [];
+    similarQuestionList.value = [];
     kbHasMore.value = false;
     questionHasMore.value = false;
     answerHasMore.value = false;
@@ -275,6 +280,7 @@ function resetPanel() {
   questionList.value = [];
   answerList.value = [];
   kbList.value = [];
+  similarQuestionList.value = [];
   kbLimit.value = KB_INIT_LIMIT;
   questionLimit.value = QUESTION_INIT_LIMIT;
   answerLimit.value = ANSWER_INIT_LIMIT;
@@ -394,8 +400,8 @@ onShow(async () => {
                 <view class="kb-author-name">问问官方</view>
                 <view class="kb-official">官方</view>
               </view>
-              <view class="result-title">{{ item.title }}</view>
-              <view class="result-desc">{{ item.summary || "暂无摘要" }}</view>
+              <view class="result-title" v-html="item.titleHighlight || item.title"></view>
+              <view class="result-desc" v-html="item.summaryHighlight || item.summary || 'No summary'"></view>
               <view class="meta">
                 <text>{{ item.viewCount || 0 }}浏览</text>
                 <text>{{ item.likeCount || 0 }}点赞</text>
@@ -414,8 +420,8 @@ onShow(async () => {
               class="app-card result-item"
               @click="openQuestionDetail(item.id)"
             >
-              <view class="result-title">{{ item.title }}</view>
-              <view class="result-desc">{{ item.summary || "暂无摘要" }}</view>
+              <view class="result-title" v-html="item.titleHighlight || item.title"></view>
+              <view class="result-desc" v-html="item.summaryHighlight || item.summary || 'No summary'"></view>
               <view class="meta">
                 <text>{{ item.answerCount || 0 }}回答</text>
                 <text>{{ item.viewCount || 0 }}浏览</text>
@@ -427,6 +433,19 @@ onShow(async () => {
             </view>
           </view>
 
+
+          <view v-if="similarQuestionList.length" class="result-section section-similar">
+            <view class="section-title">相似问题推荐</view>
+            <view class="chips">
+              <text
+                v-for="item in similarQuestionList"
+                :key="item.id"
+                class="app-chip"
+                @click="openQuestionDetail(item.id)"
+                v-html="item.titleHighlight || item.title"
+              ></text>
+            </view>
+          </view>
           <view v-if="answerList.length" class="result-section section-answer">
             <view class="section-title">回答结果</view>
             <view
@@ -435,8 +454,8 @@ onShow(async () => {
               class="app-card result-item"
               @click="openAnswerDetailPage(item.answerId)"
             >
-              <view class="result-title" @click.stop="openAnswerQuestion(item.questionId)">{{ item.questionTitle }}</view>
-              <view class="result-desc">{{ item.contentPreview || "暂无回答内容" }}</view>
+              <view class="result-title" @click.stop="openAnswerQuestion(item.questionId)" v-html="item.questionTitleHighlight || item.questionTitle"></view>
+              <view class="result-desc" v-html="item.contentPreviewHighlight || item.contentPreview || 'No answer content'"></view>
               <view class="meta">
                 <text>{{ item.likeCount || 0 }}点赞</text>
               </view>
@@ -608,16 +627,12 @@ onShow(async () => {
   order: 2;
 }
 
-.section-answer {
+.section-similar {
   order: 3;
 }
 
-.section-topic {
+.section-answer {
   order: 4;
-}
-
-.section-tag {
-  order: 5;
 }
 
 .section-title {
@@ -667,6 +682,12 @@ onShow(async () => {
 .result-desc {
   color: #5f7488;
   margin-top: 10rpx;
+}
+
+:deep(.search-hit) {
+  color: #d9480f;
+  font-style: normal;
+  font-weight: 700;
 }
 
 .meta {

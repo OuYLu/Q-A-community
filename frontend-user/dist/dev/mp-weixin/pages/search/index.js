@@ -22,6 +22,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const questionList = common_vendor.ref([]);
     const answerList = common_vendor.ref([]);
     const kbList = common_vendor.ref([]);
+    const similarQuestionList = common_vendor.ref([]);
     const kbLimit = common_vendor.ref(KB_INIT_LIMIT);
     const questionLimit = common_vendor.ref(QUESTION_INIT_LIMIT);
     const answerLimit = common_vendor.ref(ANSWER_INIT_LIMIT);
@@ -137,6 +138,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (!text) {
         questionList.value = [];
         questionHasMore.value = false;
+        similarQuestionList.value = [];
         return 0;
       }
       questionLoading.value = true;
@@ -151,6 +153,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         const rows = data.questions || [];
         questionList.value = rows.slice(0, questionLimit.value);
         questionHasMore.value = rows.length > questionLimit.value;
+        similarQuestionList.value = data.similarQuestions || [];
         return questionList.value.length;
       } finally {
         questionLoading.value = false;
@@ -192,6 +195,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         questionList.value = [];
         answerList.value = [];
         kbList.value = [];
+        similarQuestionList.value = [];
         kbHasMore.value = false;
         questionHasMore.value = false;
         answerHasMore.value = false;
@@ -248,6 +252,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       questionList.value = [];
       answerList.value = [];
       kbList.value = [];
+      similarQuestionList.value = [];
       kbLimit.value = KB_INIT_LIMIT;
       questionLimit.value = QUESTION_INIT_LIMIT;
       answerLimit.value = ANSWER_INIT_LIMIT;
@@ -343,8 +348,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }, isOfficialKb(item) ? {
             b: officialAvatar
           } : {}, {
-            c: common_vendor.t(item.title),
-            d: common_vendor.t(item.summary || "暂无摘要"),
+            c: item.titleHighlight || item.title,
+            d: item.summaryHighlight || item.summary || "No summary",
             e: common_vendor.t(item.viewCount || 0),
             f: common_vendor.t(item.likeCount || 0),
             g: item.id,
@@ -360,8 +365,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }, questionList.value.length ? common_vendor.e({
         r: common_vendor.f(questionList.value, (item, k0, i0) => {
           return {
-            a: common_vendor.t(item.title),
-            b: common_vendor.t(item.summary || "暂无摘要"),
+            a: item.titleHighlight || item.title,
+            b: item.summaryHighlight || item.summary || "No summary",
             c: common_vendor.t(item.answerCount || 0),
             d: common_vendor.t(item.viewCount || 0),
             e: common_vendor.t(item.likeCount || 0),
@@ -374,34 +379,44 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         t: common_vendor.t(questionLoading.value ? "加载中..." : "展示更多"),
         v: common_vendor.o(loadMoreQuestions)
       } : {}) : {}, {
-        w: answerList.value.length
-      }, answerList.value.length ? common_vendor.e({
-        x: common_vendor.f(answerList.value, (item, k0, i0) => {
+        w: similarQuestionList.value.length
+      }, similarQuestionList.value.length ? {
+        x: common_vendor.f(similarQuestionList.value, (item, k0, i0) => {
           return {
-            a: common_vendor.t(item.questionTitle),
+            a: item.titleHighlight || item.title,
+            b: item.id,
+            c: common_vendor.o(($event) => common_vendor.unref(utils_nav.openQuestionDetail)(item.id), item.id)
+          };
+        })
+      } : {}, {
+        y: answerList.value.length
+      }, answerList.value.length ? common_vendor.e({
+        z: common_vendor.f(answerList.value, (item, k0, i0) => {
+          return {
+            a: item.questionTitleHighlight || item.questionTitle,
             b: common_vendor.o(($event) => openAnswerQuestion(item.questionId), item.answerId),
-            c: common_vendor.t(item.contentPreview || "暂无回答内容"),
+            c: item.contentPreviewHighlight || item.contentPreview || "No answer content",
             d: common_vendor.t(item.likeCount || 0),
             e: item.answerId,
             f: common_vendor.o(($event) => common_vendor.unref(utils_nav.openAnswerDetailPage)(item.answerId), item.answerId)
           };
         }),
-        y: answerHasMore.value
+        A: answerHasMore.value
       }, answerHasMore.value ? {
-        z: common_vendor.t(answerLoading.value ? "加载中..." : "展示更多"),
-        A: common_vendor.o(loadMoreAnswers)
+        B: common_vendor.t(answerLoading.value ? "加载中..." : "展示更多"),
+        C: common_vendor.o(loadMoreAnswers)
       } : {}) : {}), {
         k: !hasResult.value
       }) : {
-        B: common_vendor.o(clearHistory),
-        C: common_vendor.f(historyList.value, (item, k0, i0) => {
+        D: common_vendor.o(clearHistory),
+        E: common_vendor.f(historyList.value, (item, k0, i0) => {
           return {
             a: common_vendor.t(item.queryText),
             b: item.queryText,
             c: common_vendor.o(($event) => chooseWord(item.queryText), item.queryText)
           };
         }),
-        D: common_vendor.f(hotList.value, (item, k0, i0) => {
+        F: common_vendor.f(hotList.value, (item, k0, i0) => {
           return {
             a: common_vendor.t(item.queryText),
             b: item.queryText,

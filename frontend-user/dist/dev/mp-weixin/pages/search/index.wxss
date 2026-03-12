@@ -109,14 +109,11 @@
 .section-question.data-v-308a4d57 {
   order: 2;
 }
-.section-answer.data-v-308a4d57 {
+.section-similar.data-v-308a4d57 {
   order: 3;
 }
-.section-topic.data-v-308a4d57 {
+.section-answer.data-v-308a4d57 {
   order: 4;
-}
-.section-tag.data-v-308a4d57 {
-  order: 5;
 }
 .section-title.data-v-308a4d57 {
   font-size: 30rpx;
@@ -158,6 +155,11 @@
 .result-desc.data-v-308a4d57 {
   color: #5f7488;
   margin-top: 10rpx;
+}
+.data-v-308a4d57 .search-hit {
+  color: #d9480f;
+  font-style: normal;
+  font-weight: 700;
 }
 .meta.data-v-308a4d57 {
   margin-top: 12rpx;

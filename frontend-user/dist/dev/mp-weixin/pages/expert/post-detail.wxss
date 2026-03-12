@@ -10,10 +10,6 @@
 .article-content.data-v-b25f2227 {
   margin-top: 14rpx;
 }
-.article-actions.data-v-b25f2227 {
-  padding: 14rpx 18rpx;
-  margin-bottom: 12rpx;
-}
 .author-row.data-v-b25f2227 {
   display: flex;
   align-items: center;
@@ -83,6 +79,9 @@
   display: flex;
   gap: 10rpx;
   justify-content: flex-end;
+}
+.article-actions-inline.data-v-b25f2227 {
+  margin-top: 14rpx;
 }
 .action-btn.data-v-b25f2227 {
   min-width: 72rpx;

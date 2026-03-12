@@ -239,10 +239,7 @@ onLoad((options) => {
           </template>
           <view v-else class="text-block">{{ detail.content || "暂无正文" }}</view>
         </view>
-      </view>
-
-      <view class="app-card article-actions">
-        <view class="actions">
+        <view class="article-actions-inline actions">
           <view class="action-btn like-btn" :class="{ active: liked }" @click="toggleLike">
             <text class="action-icon">👍</text>
             <text>{{ likeCount }}</text>
@@ -317,11 +314,6 @@ onLoad((options) => {
 
 .article-content {
   margin-top: 14rpx;
-}
-
-.article-actions {
-  padding: 14rpx 18rpx;
-  margin-bottom: 12rpx;
 }
 
 .author-row {
@@ -404,6 +396,10 @@ onLoad((options) => {
   display: flex;
   gap: 10rpx;
   justify-content: flex-end;
+}
+
+.article-actions-inline {
+  margin-top: 14rpx;
 }
 
 .action-btn {

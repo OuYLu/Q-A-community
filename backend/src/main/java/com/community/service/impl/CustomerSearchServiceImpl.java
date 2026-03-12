@@ -200,7 +200,9 @@ public class CustomerSearchServiceImpl implements CustomerSearchService {
     }
 
     private List<AppSearchSimilarQuestionVO> searchSimilarQuestions(AppSearchQueryDTO query, List<String> highlightKeywords) {
-        List<AppSearchQuestionVO> candidates = Collections.emptyList();
+        List<AppSearchQuestionVO> candidatePool = new ArrayList<>();
+        Set<Long> candidateIds = new LinkedHashSet<>();
+
         if (useEsSearch()) {
             try {
                 List<Long> ids = esSearchService.searchQuestionIds(
@@ -213,20 +215,21 @@ public class CustomerSearchServiceImpl implements CustomerSearchService {
                     "comprehensive"
                 );
                 if (ids != null && !ids.isEmpty()) {
-                    candidates = qaQuestionMapper.selectAppSearchQuestionsByIds(
+                    List<AppSearchQuestionVO> esCandidates = qaQuestionMapper.selectAppSearchQuestionsByIds(
                         ids,
                         query.getCategoryId(),
                         query.getTopicId(),
                         query.getOnlyUnsolved()
                     );
+                    mergeCandidatePool(candidatePool, candidateIds, esCandidates);
                 }
             } catch (Exception ignored) {
                 // fallback to mysql below
             }
         }
 
-        if (candidates == null || candidates.isEmpty()) {
-            candidates = qaQuestionMapper.selectAppSearchQuestions(
+        if (candidatePool.isEmpty()) {
+            List<AppSearchQuestionVO> mysqlCandidates = qaQuestionMapper.selectAppSearchQuestions(
                 query.getQuery(),
                 "comprehensive",
                 query.getCategoryId(),
@@ -235,15 +238,48 @@ public class CustomerSearchServiceImpl implements CustomerSearchService {
                 SIMILAR_QUESTION_LIMIT * 2,
                 0
             );
+            mergeCandidatePool(candidatePool, candidateIds, mysqlCandidates);
         }
-        if (candidates == null || candidates.isEmpty()) {
+
+        if (candidatePool.size() < SIMILAR_QUESTION_LIMIT) {
+            List<String> terms = Collections.emptyList();
+            try {
+                terms = esSearchService.buildSemanticTerms(query.getQuery(), 6);
+            } catch (Exception ignored) {
+                // keep current candidates
+            }
+            if (terms != null) {
+                String queryNorm = normalizeText(query.getQuery());
+                for (String term : terms) {
+                    String termNorm = normalizeText(term);
+                    if (!StringUtils.hasText(termNorm) || termNorm.equals(queryNorm)) {
+                        continue;
+                    }
+                    List<AppSearchQuestionVO> termCandidates = qaQuestionMapper.selectAppSearchQuestions(
+                        term,
+                        "comprehensive",
+                        query.getCategoryId(),
+                        query.getTopicId(),
+                        query.getOnlyUnsolved(),
+                        SIMILAR_QUESTION_LIMIT,
+                        0
+                    );
+                    mergeCandidatePool(candidatePool, candidateIds, termCandidates);
+                    if (candidatePool.size() >= SIMILAR_QUESTION_LIMIT * 2) {
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (candidatePool.isEmpty()) {
             return Collections.emptyList();
         }
 
         String queryNorm = normalizeText(query.getQuery());
         Set<String> dedup = new LinkedHashSet<>();
         List<AppSearchSimilarQuestionVO> result = new ArrayList<>();
-        for (AppSearchQuestionVO candidate : candidates) {
+        for (AppSearchQuestionVO candidate : candidatePool) {
             if (candidate == null || !StringUtils.hasText(candidate.getTitle()) || candidate.getId() == null) {
                 continue;
             }
@@ -262,6 +298,20 @@ public class CustomerSearchServiceImpl implements CustomerSearchService {
             }
         }
         return result;
+    }
+
+    private void mergeCandidatePool(List<AppSearchQuestionVO> pool, Set<Long> idSet, List<AppSearchQuestionVO> incoming) {
+        if (incoming == null || incoming.isEmpty()) {
+            return;
+        }
+        for (AppSearchQuestionVO row : incoming) {
+            if (row == null || row.getId() == null) {
+                continue;
+            }
+            if (idSet.add(row.getId())) {
+                pool.add(row);
+            }
+        }
     }
 
     private List<String> buildHighlightKeywords(String query) {
