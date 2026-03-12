@@ -1,8 +1,8 @@
 package com.community.entity;
 
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -13,6 +13,12 @@ public class User {
     // 用户状态：1-正常，0-禁用
     public static final int STATUS_ENABLED = 1;
     public static final int STATUS_DISABLED = 0;
+
+    public static final int EXPERT_STATUS_UNVERIFIED = 1;
+    public static final int EXPERT_STATUS_REVIEWING = 2;
+    public static final int EXPERT_STATUS_VERIFIED = 3;
+    public static final int EXPERT_STATUS_REJECTED = 4;
+    public static final int EXPERT_STATUS_DISABLED = 5;
 
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
@@ -45,7 +51,7 @@ public class User {
     private Integer likeReceivedCount;
 
     /**
-     * 专家状态：1-未认证，2-审核中，3-已认证，4-驳回，5-停用/取消认证
+     * 专家状态：1-未认证，2-审核中，3-已认证，4-驳回，5-禁用/取消认证
      */
     private Integer expertStatus;
 
@@ -55,7 +61,7 @@ public class User {
     private LocalDateTime expertVerifiedAt;
 
     /**
-     * 发布封禁截止时间：当前时间 < banUntil 时，禁止发提问/回答/评论
+     * 发布封禁截止时间：当前时间 < banUntil 时，禁止发布提问/回答/评论
      */
     private LocalDateTime banUntil;
 

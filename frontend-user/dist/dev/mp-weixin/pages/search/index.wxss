@@ -96,8 +96,27 @@
 .hot.data-v-308a4d57 {
   background: #f3ecd1;
 }
+.result-body.data-v-308a4d57 {
+  display: flex;
+  flex-direction: column;
+}
 .result-section.data-v-308a4d57 {
   margin-bottom: 20rpx;
+}
+.section-kb.data-v-308a4d57 {
+  order: 1;
+}
+.section-question.data-v-308a4d57 {
+  order: 2;
+}
+.section-answer.data-v-308a4d57 {
+  order: 3;
+}
+.section-topic.data-v-308a4d57 {
+  order: 4;
+}
+.section-tag.data-v-308a4d57 {
+  order: 5;
 }
 .section-title.data-v-308a4d57 {
   font-size: 30rpx;

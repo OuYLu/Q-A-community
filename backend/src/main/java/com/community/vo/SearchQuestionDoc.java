@@ -9,9 +9,13 @@ public class SearchQuestionDoc {
     private Long id;
     private String title;
     private String content;
+    private String answerContent;
     private Long categoryId;
     private Long topicId;
     private Integer answerCount;
+    private Integer viewCount;
+    private Integer likeCount;
+    private Integer favoriteCount;
     private Integer status;
     private LocalDateTime createdAt;
 }

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.community.entity.QaAnswer;
 import com.community.vo.AppMyAnswerItemVO;
 import com.community.vo.AppQuestionAnswerVO;
+import com.community.vo.AppSearchAnswerVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -18,6 +19,11 @@ public interface QaAnswerMapper extends BaseMapper<QaAnswer> {
     List<AppQuestionAnswerVO> selectAppQuestionAnswers(@Param("questionId") Long questionId);
 
     AppQuestionAnswerVO selectAppAnswerById(@Param("answerId") Long answerId);
+
+    List<AppSearchAnswerVO> selectAppSearchAnswers(@Param("query") String query,
+                                                   @Param("sortBy") String sortBy,
+                                                   @Param("limit") Integer limit,
+                                                   @Param("offset") Integer offset);
 
     Long sumLikeCountByUserId(@Param("userId") Long userId);
 

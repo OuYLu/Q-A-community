@@ -23,6 +23,7 @@ import com.community.mapper.QaCommentMapper;
 import com.community.mapper.QaQuestionMapper;
 import com.community.mapper.UserMapper;
 import com.community.service.CmsReportAdminService;
+import com.community.service.EsSearchService;
 import com.community.vo.CmsReportAuthorVO;
 import com.community.vo.CmsReportContentVO;
 import com.community.vo.CmsReportDetailRowVO;
@@ -52,6 +53,7 @@ public class CmsReportAdminServiceImpl implements CmsReportAdminService {
     private final KbEntryMapper kbEntryMapper;
     private final UserMapper userMapper;
     private final NotifyMessageMapper notifyMessageMapper;
+    private final EsSearchService esSearchService;
 
     @Override
     public PageInfo<CmsReportPageItemVO> page(CmsReportPageQueryDTO query) {
@@ -208,6 +210,7 @@ public class CmsReportAdminServiceImpl implements CmsReportAdminService {
                 }
                 q.setStatus(status);
                 qaQuestionMapper.updateById(q);
+                esSearchService.syncQuestionById(bizId);
             }
             case CmsReport.BIZ_TYPE_ANSWER -> {
                 QaAnswer a = qaAnswerMapper.selectById(bizId);
@@ -232,6 +235,7 @@ public class CmsReportAdminServiceImpl implements CmsReportAdminService {
                 }
                 e.setStatus(status);
                 kbEntryMapper.updateById(e);
+                esSearchService.syncKbById(bizId);
             }
             default -> throw new BizException(ResultCode.BAD_REQUEST, "不支持的业务类型");
         }

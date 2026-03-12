@@ -33,4 +33,9 @@ public class EsProperties {
      * 启动时是否重建索引
      */
     private boolean reindexOnStartup = false;
+
+    /**
+     * 搜索策略: mysql/es_lexical/es_hybrid
+     */
+    private String searchStrategy = "es_lexical";
 }

@@ -8,7 +8,13 @@ import java.util.List;
 public interface EsSearchService {
     boolean isEnabled();
 
-    List<Long> searchQuestionIds(String query, int from, int size, Long categoryId, Long topicId, Boolean onlyUnsolved);
+    void prepareIndices();
+
+    void syncQuestionById(Long questionId);
+
+    void syncKbById(Long kbId);
+
+    List<Long> searchQuestionIds(String query, int from, int size, Long categoryId, Long topicId, Boolean onlyUnsolved, String sortBy);
 
     List<Long> searchKbIds(String query, int from, int size);
 

@@ -14,7 +14,11 @@ public class EsReindexRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (esProperties != null && esProperties.isReindexOnStartup() && esSearchService.isEnabled()) {
+        if (!esSearchService.isEnabled()) {
+            return;
+        }
+        esSearchService.prepareIndices();
+        if (esProperties != null && esProperties.isReindexOnStartup()) {
             esSearchService.reindexAll();
         }
     }

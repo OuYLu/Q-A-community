@@ -1,6 +1,5 @@
 package com.community.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.community.common.BizException;
 import com.community.common.ResultCode;
@@ -49,12 +48,14 @@ public class ExpertUserServiceImpl extends ServiceImpl<UserMapper, User> impleme
         }
 
         Integer status = dto == null ? null : dto.getExpertStatus();
-        if (status == null || (status != 0 && status != 3)) {
+        if (status == null || (status != User.EXPERT_STATUS_DISABLED && status != User.EXPERT_STATUS_VERIFIED)) {
             throw new BizException(ResultCode.BAD_REQUEST, "专家状态不合法");
         }
 
-        if (user.getExpertStatus() == null || (user.getExpertStatus() != 3 && user.getExpertStatus() != 0)) {
-            throw new BizException(ResultCode.BAD_REQUEST, "该用户不是认证专家");
+        if (user.getExpertStatus() == null
+            || (user.getExpertStatus() != User.EXPERT_STATUS_VERIFIED
+            && user.getExpertStatus() != User.EXPERT_STATUS_DISABLED)) {
+            throw new BizException(ResultCode.BAD_REQUEST, "该用户不是已认证专家");
         }
 
         user.setExpertStatus(status);

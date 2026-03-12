@@ -17,7 +17,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const hotList = common_vendor.ref([]);
     const historyList = common_vendor.ref([]);
     const questionList = common_vendor.ref([]);
+    const answerList = common_vendor.ref([]);
     const kbList = common_vendor.ref([]);
+    const topicList = common_vendor.ref([]);
+    const tagList = common_vendor.ref([]);
     const page = common_vendor.ref(1);
     const hasMore = common_vendor.ref(false);
     const inResult = common_vendor.ref(false);
@@ -28,6 +31,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       { key: "latest", label: "最新" },
       { key: "hot", label: "最热" }
     ];
+    const hasResult = common_vendor.computed(
+      () => kbList.value.length > 0 || questionList.value.length > 0 || answerList.value.length > 0 || topicList.value.length > 0 || tagList.value.length > 0
+    );
     function localHistoryKey() {
       var _a;
       return `${LOCAL_HISTORY_KEY_PREFIX}${((_a = authStore.user) == null ? void 0 : _a.userId) || "guest"}`;
@@ -102,7 +108,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (reset) {
         page.value = 1;
         questionList.value = [];
+        answerList.value = [];
         kbList.value = [];
+        topicList.value = [];
+        tagList.value = [];
         hasMore.value = false;
         inResult.value = true;
       }
@@ -116,11 +125,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           pageSize
         });
         const questionRows = data.questions || [];
+        const answerRows = data.answers || [];
         const kbRows = data.kbEntries || [];
+        const topicRows = data.topics || [];
+        const tagRows = data.tags || [];
         questionList.value = reset ? questionRows : [...questionList.value, ...questionRows];
+        answerList.value = reset ? answerRows : [...answerList.value, ...answerRows];
         kbList.value = reset ? kbRows : [...kbList.value, ...kbRows];
-        hasMore.value = questionRows.length >= pageSize || kbRows.length >= pageSize;
-        if (questionRows.length > 0 || kbRows.length > 0) {
+        topicList.value = reset ? topicRows : topicList.value;
+        tagList.value = reset ? tagRows : tagList.value;
+        hasMore.value = questionRows.length >= pageSize || kbRows.length >= pageSize || answerRows.length >= pageSize;
+        if (questionRows.length > 0 || kbRows.length > 0 || answerRows.length > 0) {
           page.value += 1;
         }
         if (reset) {
@@ -130,7 +145,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             await api_search.searchApi.logSearch({
               queryText: text,
               searchType: 1,
-              hitCount: questionRows.length + kbRows.length
+              hitCount: questionRows.length + kbRows.length + answerRows.length + topicRows.length + tagRows.length
             });
             await loadPanels();
           } catch {
@@ -165,7 +180,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     function resetPanel() {
       inResult.value = false;
       questionList.value = [];
+      answerList.value = [];
       kbList.value = [];
+      topicList.value = [];
+      tagList.value = [];
       page.value = 1;
       hasMore.value = false;
     }
@@ -176,6 +194,24 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       if (!(item == null ? void 0 : item.id))
         return;
       utils_nav.openExpertPostDetailPage(item.id);
+    }
+    function openTopic(topicId) {
+      if (!topicId)
+        return;
+      common_vendor.index.navigateTo({
+        url: `/pages/discover/topic-detail?topicId=${topicId}`
+      });
+    }
+    function chooseTag(tagName) {
+      if (!tagName)
+        return;
+      query.value = tagName;
+      search(true);
+    }
+    function openAnswerQuestion(questionId) {
+      if (!questionId)
+        return;
+      utils_nav.openQuestionDetail(questionId);
     }
     function goLogin() {
       common_vendor.index.navigateTo({
@@ -217,25 +253,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           };
         }),
         i: common_vendor.o(resetPanel),
-        j: searching.value && !questionList.value.length && !kbList.value.length
-      }, searching.value && !questionList.value.length && !kbList.value.length ? {} : !questionList.value.length && !kbList.value.length ? {} : common_vendor.e({
-        l: !questionList.value.length
-      }, !questionList.value.length ? {} : {
-        m: common_vendor.f(questionList.value, (item, k0, i0) => {
-          return {
-            a: common_vendor.t(item.title),
-            b: common_vendor.t(item.summary || "暂无摘要"),
-            c: common_vendor.t(item.answerCount || 0),
-            d: common_vendor.t(item.viewCount || 0),
-            e: common_vendor.t(item.likeCount || 0),
-            f: item.id,
-            g: common_vendor.o(($event) => common_vendor.unref(utils_nav.openQuestionDetail)(item.id), item.id)
-          };
-        })
-      }, {
-        n: !kbList.value.length
+        j: searching.value && !hasResult.value
+      }, searching.value && !hasResult.value ? {} : !hasResult.value ? {} : common_vendor.e({
+        l: !kbList.value.length
       }, !kbList.value.length ? {} : {
-        o: common_vendor.f(kbList.value, (item, k0, i0) => {
+        m: common_vendor.f(kbList.value, (item, k0, i0) => {
           return common_vendor.e({
             a: isOfficialKb(item)
           }, isOfficialKb(item) ? {
@@ -250,19 +272,70 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           });
         })
       }, {
-        p: common_vendor.t(hasMore.value ? "上拉加载更多" : "没有更多了")
+        n: !questionList.value.length
+      }, !questionList.value.length ? {} : {
+        o: common_vendor.f(questionList.value, (item, k0, i0) => {
+          return {
+            a: common_vendor.t(item.title),
+            b: common_vendor.t(item.summary || "暂无摘要"),
+            c: common_vendor.t(item.answerCount || 0),
+            d: common_vendor.t(item.viewCount || 0),
+            e: common_vendor.t(item.likeCount || 0),
+            f: item.id,
+            g: common_vendor.o(($event) => common_vendor.unref(utils_nav.openQuestionDetail)(item.id), item.id)
+          };
+        })
+      }, {
+        p: !answerList.value.length
+      }, !answerList.value.length ? {} : {
+        q: common_vendor.f(answerList.value, (item, k0, i0) => {
+          return {
+            a: common_vendor.t(item.questionTitle),
+            b: common_vendor.o(($event) => openAnswerQuestion(item.questionId), item.answerId),
+            c: common_vendor.t(item.contentPreview || "暂无回答内容"),
+            d: common_vendor.t(item.likeCount || 0),
+            e: item.answerId,
+            f: common_vendor.o(($event) => common_vendor.unref(utils_nav.openAnswerDetailPage)(item.answerId), item.answerId)
+          };
+        })
+      }, {
+        r: !topicList.value.length
+      }, !topicList.value.length ? {} : {
+        s: common_vendor.f(topicList.value, (item, k0, i0) => {
+          return {
+            a: common_vendor.t(item.title),
+            b: common_vendor.t(item.subtitle || "暂无简介"),
+            c: common_vendor.t(item.followCount || 0),
+            d: common_vendor.t(item.questionCount || 0),
+            e: item.id,
+            f: common_vendor.o(($event) => openTopic(item.id), item.id)
+          };
+        })
+      }, {
+        t: !tagList.value.length
+      }, !tagList.value.length ? {} : {
+        v: common_vendor.f(tagList.value, (item, k0, i0) => {
+          return {
+            a: common_vendor.t(item.name),
+            b: common_vendor.t(item.useCount || 0),
+            c: item.id,
+            d: common_vendor.o(($event) => chooseTag(item.name), item.id)
+          };
+        })
+      }, {
+        w: common_vendor.t(hasMore.value ? "上拉加载更多" : "没有更多了")
       }), {
-        k: !questionList.value.length && !kbList.value.length
+        k: !hasResult.value
       }) : {
-        q: common_vendor.o(clearHistory),
-        r: common_vendor.f(historyList.value, (item, k0, i0) => {
+        x: common_vendor.o(clearHistory),
+        y: common_vendor.f(historyList.value, (item, k0, i0) => {
           return {
             a: common_vendor.t(item.queryText),
             b: item.queryText,
             c: common_vendor.o(($event) => chooseWord(item.queryText), item.queryText)
           };
         }),
-        s: common_vendor.f(hotList.value, (item, k0, i0) => {
+        z: common_vendor.f(hotList.value, (item, k0, i0) => {
           return {
             a: common_vendor.t(item.queryText),
             b: item.queryText,

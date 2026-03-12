@@ -278,6 +278,7 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
             increaseTopicQuestionCount(question.getTopicId(), -1);
         }
         adjustUserQuestionCount(userId, -1);
+        esSearchService.syncQuestionById(id);
     }
 
     @Override
@@ -304,6 +305,7 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
         if (question.getStatus() != null && question.getStatus() == QaQuestion.STATUS_PUBLISHED) {
             increaseTopicQuestionCount(question.getTopicId(), -1);
         }
+        esSearchService.syncQuestionById(id);
     }
 
     @Override
@@ -330,6 +332,7 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
         if (question.getStatus() != null && question.getStatus() == QaQuestion.STATUS_SELF_ONLY) {
             increaseTopicQuestionCount(question.getTopicId(), 1);
         }
+        esSearchService.syncQuestionById(id);
     }
 
     @Override
@@ -498,6 +501,7 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
                 .set(QaQuestion::getLastActiveAt, LocalDateTime.now()));
         }
         adjustUserAnswerCount(answer.getUserId(), -1);
+        esSearchService.syncQuestionById(answer.getQuestionId());
         adjustUserAnswerLikeReceivedCount(answer.getUserId(), -(answer.getLikeCount() == null ? 0 : answer.getLikeCount()));
     }
 
@@ -1109,19 +1113,10 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
     }
 
     private void indexQuestionForEs(QaQuestion question) {
-        if (esSearchService == null || !esSearchService.isEnabled() || question == null) {
+        if (esSearchService == null || !esSearchService.isEnabled() || question == null || question.getId() == null) {
             return;
         }
-        SearchQuestionDoc doc = new SearchQuestionDoc();
-        doc.setId(question.getId());
-        doc.setTitle(question.getTitle());
-        doc.setContent(question.getContent());
-        doc.setCategoryId(question.getCategoryId());
-        doc.setTopicId(question.getTopicId());
-        doc.setAnswerCount(question.getAnswerCount());
-        doc.setStatus(question.getStatus());
-        doc.setCreatedAt(question.getCreatedAt());
-        esSearchService.indexQuestion(doc);
+        esSearchService.syncQuestionById(question.getId());
     }
 
     private void fillImageUrls(AppQuestionDetailVO vo) {

@@ -79,12 +79,12 @@ public class UserAdminServiceImpl extends ServiceImpl<UserMapper, User> implemen
         ensureNotAdmin(user.getId());
 
         // Keep expert status in sync with user freeze/unfreeze state.
-        if (dto.getStatus() != null && dto.getStatus() == 0
-            && user.getExpertStatus() != null && user.getExpertStatus() == 3) {
-            user.setExpertStatus(0);
+        if (dto.getStatus() != null && dto.getStatus() == User.STATUS_DISABLED
+            && user.getExpertStatus() != null && user.getExpertStatus() == User.EXPERT_STATUS_VERIFIED) {
+            user.setExpertStatus(User.EXPERT_STATUS_DISABLED);
         } else if (dto.getStatus() != null && dto.getStatus() == 1
-            && user.getExpertStatus() != null && user.getExpertStatus() == 0) {
-            user.setExpertStatus(3);
+            && user.getExpertStatus() != null && user.getExpertStatus() == User.EXPERT_STATUS_DISABLED) {
+            user.setExpertStatus(User.EXPERT_STATUS_VERIFIED);
         }
         if (dto.getStatus() != null && dto.getStatus() == 1) {
             user.setBanUntil(null);

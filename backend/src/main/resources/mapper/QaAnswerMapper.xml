@@ -83,6 +83,37 @@
     LIMIT 1
   </select>
 
+  <select id="selectAppSearchAnswers" resultType="com.community.vo.AppSearchAnswerVO">
+    SELECT
+      a.id AS answerId,
+      a.question_id AS questionId,
+      q.title AS questionTitle,
+      LEFT(a.content, 140) AS contentPreview,
+      a.like_count AS likeCount,
+      a.created_at AS createdAt
+    FROM qa_answer a
+    JOIN qa_question q ON q.id = a.question_id
+    WHERE a.delete_flag = 0
+      AND a.status = 1
+      AND q.delete_flag = 0
+      AND q.status = 1
+      AND (a.content LIKE CONCAT('%', #{query}, '%')
+        OR q.title LIKE CONCAT('%', #{query}, '%'))
+    ORDER BY
+      <choose>
+        <when test="sortBy == 'latest'">a.created_at DESC, a.id DESC</when>
+        <when test="sortBy == 'hot'">(a.like_count * 3 + q.view_count * 0.3) DESC, a.created_at DESC, a.id DESC</when>
+        <otherwise>
+          (CASE WHEN a.content LIKE CONCAT('%', #{query}, '%') THEN 8 ELSE 0 END
+          + CASE WHEN q.title LIKE CONCAT('%', #{query}, '%') THEN 2 ELSE 0 END
+          + a.like_count * 2 + q.view_count * 0.2) DESC,
+          a.created_at DESC,
+          a.id DESC
+        </otherwise>
+      </choose>
+    LIMIT #{limit} OFFSET #{offset}
+  </select>
+
   <select id="sumLikeCountByUserId" resultType="long">
     SELECT COALESCE(SUM(a.like_count), 0)
     FROM qa_answer a

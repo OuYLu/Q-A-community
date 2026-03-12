@@ -3,10 +3,12 @@ package com.community.service.impl;
 import com.community.common.BizException;
 import com.community.common.ResultCode;
 import com.community.common.SecurityUser;
+import com.community.config.EsProperties;
 import com.community.dto.AppSearchLogDTO;
 import com.community.dto.AppSearchQueryDTO;
 import com.community.entity.SearchQueryLog;
 import com.community.mapper.KbEntryMapper;
+import com.community.mapper.QaAnswerMapper;
 import com.community.mapper.QaQuestionMapper;
 import com.community.mapper.QaTagMapper;
 import com.community.mapper.QaTopicMapper;
@@ -14,6 +16,7 @@ import com.community.mapper.SearchQueryLogMapper;
 import com.community.service.CustomerSearchService;
 import com.community.service.EsSearchService;
 import com.community.vo.AppSearchHistoryVO;
+import com.community.vo.AppSearchAnswerVO;
 import com.community.vo.AppSearchHotVO;
 import com.community.vo.AppSearchKbVO;
 import com.community.vo.AppSearchQuestionVO;
@@ -33,11 +36,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CustomerSearchServiceImpl implements CustomerSearchService {
     private final QaQuestionMapper qaQuestionMapper;
+    private final QaAnswerMapper qaAnswerMapper;
     private final QaTopicMapper qaTopicMapper;
     private final QaTagMapper qaTagMapper;
     private final KbEntryMapper kbEntryMapper;
     private final SearchQueryLogMapper searchQueryLogMapper;
     private final EsSearchService esSearchService;
+    private final EsProperties esProperties;
 
     @Override
     public AppSearchResultVO search(AppSearchQueryDTO query) {
@@ -56,6 +61,12 @@ public class CustomerSearchServiceImpl implements CustomerSearchService {
             vo.setQuestions(searchQuestions(query, pageSize, offset));
         } else {
             vo.setQuestions(Collections.emptyList());
+        }
+
+        if ("answer".equals(type) || "all".equals(type)) {
+            vo.setAnswers(searchAnswers(query, pageSize, offset));
+        } else {
+            vo.setAnswers(Collections.emptyList());
         }
 
         if ("kb".equals(type) || "all".equals(type)) {
@@ -80,7 +91,7 @@ public class CustomerSearchServiceImpl implements CustomerSearchService {
     }
 
     private List<AppSearchQuestionVO> searchQuestions(AppSearchQueryDTO query, int pageSize, int offset) {
-        if (esSearchService != null && esSearchService.isEnabled()) {
+        if (useEsSearch()) {
             try {
                 List<Long> ids = esSearchService.searchQuestionIds(
                     query.getQuery(),
@@ -88,7 +99,8 @@ public class CustomerSearchServiceImpl implements CustomerSearchService {
                     pageSize,
                     query.getCategoryId(),
                     query.getTopicId(),
-                    query.getOnlyUnsolved()
+                    query.getOnlyUnsolved(),
+                    query.getSortBy()
                 );
                 if (ids != null && !ids.isEmpty()) {
                     return qaQuestionMapper.selectAppSearchQuestionsByIds(
@@ -98,7 +110,16 @@ public class CustomerSearchServiceImpl implements CustomerSearchService {
                         query.getOnlyUnsolved()
                     );
                 }
-                return Collections.emptyList();
+                // ES 未命中时回退 MySQL，避免索引延迟导致结果为空
+                return qaQuestionMapper.selectAppSearchQuestions(
+                    query.getQuery(),
+                    query.getSortBy(),
+                    query.getCategoryId(),
+                    query.getTopicId(),
+                    query.getOnlyUnsolved(),
+                    pageSize,
+                    offset
+                );
             } catch (Exception ignored) {
                 // fall back to mysql
             }
@@ -115,18 +136,36 @@ public class CustomerSearchServiceImpl implements CustomerSearchService {
     }
 
     private List<AppSearchKbVO> searchKb(AppSearchQueryDTO query, int pageSize, int offset) {
-        if (esSearchService != null && esSearchService.isEnabled()) {
+        if (useEsSearch()) {
             try {
                 List<Long> ids = esSearchService.searchKbIds(query.getQuery(), offset, pageSize);
                 if (ids != null && !ids.isEmpty()) {
                     return kbEntryMapper.selectAppSearchKbByIds(ids);
                 }
-                return Collections.emptyList();
+                // ES 未命中时回退 MySQL，避免索引延迟导致结果为空
+                return kbEntryMapper.selectAppSearchKb(query.getQuery(), pageSize, offset);
             } catch (Exception ignored) {
                 // fall back to mysql
             }
         }
         return kbEntryMapper.selectAppSearchKb(query.getQuery(), pageSize, offset);
+    }
+
+    private List<AppSearchAnswerVO> searchAnswers(AppSearchQueryDTO query, int pageSize, int offset) {
+        return qaAnswerMapper.selectAppSearchAnswers(
+            query.getQuery(),
+            query.getSortBy(),
+            pageSize,
+            offset
+        );
+    }
+
+    private boolean useEsSearch() {
+        if (esSearchService == null || !esSearchService.isEnabled()) {
+            return false;
+        }
+        String strategy = esProperties == null ? null : esProperties.getSearchStrategy();
+        return strategy == null || !"mysql".equalsIgnoreCase(strategy.trim());
     }
 
     @Override

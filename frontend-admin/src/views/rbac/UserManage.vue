@@ -113,7 +113,7 @@
           <el-table-column label="操作" width="180">
             <template #default="scope">
               <el-button size="small" @click="toggleFreeze(scope.row)">
-                {{ scope.row.status === 1 ? "冻结" : "解冻" }}
+                {{ scope.row.status === 1 ? "停用专家" : "恢复专家" }}
               </el-button>
             </template>
           </el-table-column>
@@ -148,7 +148,7 @@
               <el-form-item label="状态">
                 <el-select v-model="expertQuery.expertStatus" placeholder="全部" clearable style="width: 120px">
                   <el-option label="已认证" :value="3" />
-                  <el-option label="已冻结" :value="0" />
+                  <el-option label="已停用" :value="5" />
                 </el-select>
               </el-form-item>
               <el-form-item>
@@ -165,14 +165,14 @@
             <el-table-column prop="expertStatus" label="状态" width="120">
               <template #default="scope">
                 <el-tag v-if="scope.row.expertStatus === 3" type="success">已认证</el-tag>
-                <el-tag v-else type="danger">已冻结</el-tag>
+                <el-tag v-else type="danger">已停用</el-tag>
               </template>
             </el-table-column>
             <el-table-column label="操作" width="250">
               <template #default="scope">
                 <el-button size="small" @click="openExpertDetail(scope.row)">详情</el-button>
                 <el-button size="small" @click="toggleExpertStatus(scope.row)">
-                  {{ scope.row.expertStatus === 3 ? "冻结" : "解冻" }}
+                  {{ scope.row.expertStatus === 3 ? "停用专家" : "恢复专家" }}
                 </el-button>
               </template>
             </el-table-column>
@@ -821,7 +821,7 @@ const toggleFreeze = async (row: UserManageVO) => {
 };
 
 const toggleExpertStatus = async (row: ExpertManageVO) => {
-  const nextStatus = row.expertStatus === 3 ? 0 : 3;
+  const nextStatus = row.expertStatus === 3 ? 5 : 3;
   await updateExpertStatus(row.userId, { expertStatus: nextStatus });
   row.expertStatus = nextStatus;
 };
@@ -1078,3 +1078,5 @@ onMounted(() => {
   color: var(--app-text-muted);
 }
 </style>
+
+

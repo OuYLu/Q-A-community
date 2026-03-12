@@ -18,6 +18,7 @@ import com.community.mapper.QaAnswerMapper;
 import com.community.mapper.QaCommentMapper;
 import com.community.mapper.QaQuestionMapper;
 import com.community.service.CmsAuditAdminService;
+import com.community.service.EsSearchService;
 import com.community.vo.CmsAuditAuthorVO;
 import com.community.vo.CmsAuditContentVO;
 import com.community.vo.CmsAuditDetailRowVO;
@@ -44,6 +45,7 @@ public class CmsAuditAdminServiceImpl implements CmsAuditAdminService {
     private final QaAnswerMapper qaAnswerMapper;
     private final QaCommentMapper qaCommentMapper;
     private final KbEntryMapper kbEntryMapper;
+    private final EsSearchService esSearchService;
 
     @Override
     public PageInfo<CmsAuditPageItemVO> page(CmsAuditPageQueryDTO query) {
@@ -198,6 +200,7 @@ public class CmsAuditAdminServiceImpl implements CmsAuditAdminService {
                 q.setStatus(status);
                 q.setRejectReason(rejectReason);
                 qaQuestionMapper.updateById(q);
+                esSearchService.syncQuestionById(bizId);
             }
             case 2 -> {
                 QaAnswer a = qaAnswerMapper.selectById(bizId);
@@ -224,6 +227,7 @@ public class CmsAuditAdminServiceImpl implements CmsAuditAdminService {
                 }
                 e.setStatus(status);
                 kbEntryMapper.updateById(e);
+                esSearchService.syncKbById(bizId);
             }
             default -> throw new BizException(ResultCode.BAD_REQUEST, "不支持的业务类型: " + bizType);
         }

@@ -108,6 +108,10 @@
       e.summary,
       e.content,
       e.source,
+      e.view_count AS viewCount,
+      e.like_count AS likeCount,
+      e.favorite_count AS favoriteCount,
+      e.status,
       e.created_at AS createdAt
     FROM kb_entry e
     WHERE e.status = 1

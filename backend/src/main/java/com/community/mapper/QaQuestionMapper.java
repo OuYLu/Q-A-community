@@ -37,6 +37,8 @@ public interface QaQuestionMapper extends BaseMapper<QaQuestion> {
 
     List<SearchQuestionDoc> selectSearchQuestionDocs();
 
+    SearchQuestionDoc selectSearchQuestionDocById(@Param("id") Long id);
+
     List<AppMyQuestionItemVO> selectMyQuestions(@Param("userId") Long userId);
 
     List<AppQuestionListItemVO> selectAppQuestionPage(@Param("keyword") String keyword,

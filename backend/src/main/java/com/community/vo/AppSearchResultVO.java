@@ -10,6 +10,7 @@ import java.util.List;
 public class AppSearchResultVO {
     private String query;
     private List<AppSearchQuestionVO> questions;
+    private List<AppSearchAnswerVO> answers;
     private List<AppSearchTopicVO> topics;
     private List<AppSearchTagVO> tags;
     private List<AppSearchKbVO> kbEntries;

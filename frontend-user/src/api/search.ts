@@ -19,8 +19,8 @@ export interface AppSearchTopicVO {
 
 export interface AppSearchTagVO {
   id: number;
-  tagName: string;
-  questionCount: number;
+  name: string;
+  useCount: number;
 }
 
 export interface AppSearchKbVO {
@@ -33,9 +33,19 @@ export interface AppSearchKbVO {
   createdAt?: string;
 }
 
+export interface AppSearchAnswerVO {
+  answerId: number;
+  questionId: number;
+  questionTitle: string;
+  contentPreview?: string;
+  likeCount?: number;
+  createdAt?: string;
+}
+
 export interface AppSearchResultVO {
   query: string;
   questions: AppSearchQuestionVO[];
+  answers: AppSearchAnswerVO[];
   topics: AppSearchTopicVO[];
   tags: AppSearchTagVO[];
   kbEntries: AppSearchKbVO[];
@@ -54,7 +64,7 @@ export interface AppSearchHistoryVO {
 export const searchApi = {
   search(params: {
     query: string;
-    type?: "all" | "question" | "topic" | "tag" | "kb";
+    type?: "all" | "question" | "answer" | "topic" | "tag" | "kb";
     sortBy?: "comprehensive" | "latest" | "hot";
     categoryId?: number;
     topicId?: number;

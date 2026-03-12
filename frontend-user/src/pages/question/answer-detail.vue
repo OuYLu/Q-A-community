@@ -2,7 +2,7 @@
 import { computed, ref } from "vue";
 import { onLoad, onShow } from "@dcloudio/uni-app";
 import { ensurePageAuth } from "@/utils/auth-guard";
-import { openUserHomePage } from "@/utils/nav";
+import { openQuestionDetail, openUserHomePage } from "@/utils/nav";
 import { questionApi, type AppAnswerCommentVO, type AppAnswerDetailVO } from "@/api/question";
 
 const answerId = ref(0);
@@ -133,6 +133,12 @@ function openCommentAuthor(comment: AppAnswerCommentVO) {
   openUserHomePage(Number(comment.authorId));
 }
 
+function openQuestionFromAnswer() {
+  const qid = detail.value?.questionId;
+  if (!qid) return;
+  openQuestionDetail(Number(qid));
+}
+
 onLoad((options) => {
   answerId.value = Number(options?.id || options?.answerId || 0);
   if (!answerId.value) {
@@ -158,7 +164,7 @@ onShow(() => {
       {{ loadFailed ? (loadErrorText || "回答不存在或已删除") : "未找到回答" }}
     </view>
     <view v-else>
-      <view class="question-title">问题：{{ detail.questionTitle }}</view>
+      <view class="question-title" @click="openQuestionFromAnswer">问题：{{ detail.questionTitle }}</view>
 
       <view class="answer-card">
         <view class="more-btn" @click.stop="showMoreMenu">...</view>

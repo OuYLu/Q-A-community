@@ -17,6 +17,7 @@ import com.community.mapper.KbCategoryMapper;
 import com.community.mapper.KbEntryMapper;
 import com.community.mapper.KbEntryTagMapper;
 import com.community.mapper.QaTagMapper;
+import com.community.service.EsSearchService;
 import com.community.service.KbAdminService;
 import com.community.vo.KbCategoryTreeVO;
 import com.community.vo.KbEntryDetailVO;
@@ -44,6 +45,7 @@ public class KbAdminServiceImpl implements KbAdminService {
     private final KbEntryMapper kbEntryMapper;
     private final KbEntryTagMapper kbEntryTagMapper;
     private final QaTagMapper qaTagMapper;
+    private final EsSearchService esSearchService;
 
     @Override
     public List<KbCategoryTreeVO> categoryTree() {
@@ -171,6 +173,7 @@ public class KbAdminServiceImpl implements KbAdminService {
         row.setFavoriteCount(0);
         kbEntryMapper.insert(row);
         replaceEntryTags(row.getId(), dto.getTagIds());
+        esSearchService.syncKbById(row.getId());
         return row.getId();
     }
 
@@ -188,6 +191,7 @@ public class KbAdminServiceImpl implements KbAdminService {
         row.setSource(dto.getSource());
         kbEntryMapper.updateById(row);
         replaceEntryTags(id, dto.getTagIds());
+        esSearchService.syncKbById(id);
     }
 
     @Override
@@ -199,6 +203,7 @@ public class KbAdminServiceImpl implements KbAdminService {
         KbEntry row = getEntryOrThrow(id);
         row.setStatus(dto.getStatus());
         kbEntryMapper.updateById(row);
+        esSearchService.syncKbById(id);
     }
 
     private KbCategoryTreeVO toTreeNode(KbCategory c) {

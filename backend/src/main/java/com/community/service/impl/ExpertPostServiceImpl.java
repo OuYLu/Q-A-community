@@ -168,6 +168,7 @@ public class ExpertPostServiceImpl implements ExpertPostService {
         }
         kbEntryTagMapper.delete(new LambdaQueryWrapper<KbEntryTag>().eq(KbEntryTag::getEntryId, id));
         expertPostMapper.deleteById(id);
+        esSearchService.syncKbById(id);
     }
 
     @Override
@@ -524,19 +525,9 @@ public class ExpertPostServiceImpl implements ExpertPostService {
     }
 
     private void indexKbForEs(KbEntry entry) {
-        if (esSearchService == null || !esSearchService.isEnabled() || entry == null) {
+        if (esSearchService == null || !esSearchService.isEnabled() || entry == null || entry.getId() == null) {
             return;
         }
-        if (entry.getStatus() == null || entry.getStatus() != 1) {
-            return;
-        }
-        SearchKbDoc doc = new SearchKbDoc();
-        doc.setId(entry.getId());
-        doc.setTitle(entry.getTitle());
-        doc.setSummary(entry.getSummary());
-        doc.setContent(entry.getContent());
-        doc.setSource(entry.getSource());
-        doc.setCreatedAt(entry.getCreatedAt());
-        esSearchService.indexKb(doc);
+        esSearchService.syncKbById(entry.getId());
     }
 }

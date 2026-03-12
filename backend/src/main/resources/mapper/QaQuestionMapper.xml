@@ -130,14 +130,55 @@
       q.id,
       q.title,
       q.content,
+      COALESCE(ans.answerContent, '') AS answerContent,
       q.category_id AS categoryId,
       q.topic_id AS topicId,
       q.answer_count AS answerCount,
+      q.view_count AS viewCount,
+      q.like_count AS likeCount,
+      q.favorite_count AS favoriteCount,
       q.status,
       q.created_at AS createdAt
     FROM qa_question q
+    LEFT JOIN (
+      SELECT
+        a.question_id AS questionId,
+        GROUP_CONCAT(a.content SEPARATOR ' ') AS answerContent
+      FROM qa_answer a
+      WHERE a.delete_flag = 0
+        AND a.status = 1
+      GROUP BY a.question_id
+    ) ans ON ans.questionId = q.id
     WHERE q.delete_flag = 0
       AND q.status = 1
+  </select>
+
+  <select id="selectSearchQuestionDocById" resultType="com.community.vo.SearchQuestionDoc">
+    SELECT
+      q.id,
+      q.title,
+      q.content,
+      COALESCE(ans.answerContent, '') AS answerContent,
+      q.category_id AS categoryId,
+      q.topic_id AS topicId,
+      q.answer_count AS answerCount,
+      q.view_count AS viewCount,
+      q.like_count AS likeCount,
+      q.favorite_count AS favoriteCount,
+      q.status,
+      q.created_at AS createdAt
+    FROM qa_question q
+    LEFT JOIN (
+      SELECT
+        a.question_id AS questionId,
+        GROUP_CONCAT(a.content SEPARATOR ' ') AS answerContent
+      FROM qa_answer a
+      WHERE a.delete_flag = 0
+        AND a.status = 1
+      GROUP BY a.question_id
+    ) ans ON ans.questionId = q.id
+    WHERE q.id = #{id}
+    LIMIT 1
   </select>
 
   <select id="selectMyQuestions" resultType="com.community.vo.AppMyQuestionItemVO">
