@@ -98,7 +98,14 @@
       AND q.delete_flag = 0
       AND q.status = 1
       AND (a.content LIKE CONCAT('%', #{query}, '%')
-        OR q.title LIKE CONCAT('%', #{query}, '%'))
+        OR q.title LIKE CONCAT('%', #{query}, '%')
+      <if test="semanticTerms != null and semanticTerms.size() > 0">
+        <foreach collection="semanticTerms" item="term">
+        OR a.content LIKE CONCAT('%', #{term}, '%')
+        OR q.title LIKE CONCAT('%', #{term}, '%')
+        </foreach>
+      </if>
+      )
     ORDER BY
       <choose>
         <when test="sortBy == 'latest'">a.created_at DESC, a.id DESC</when>
@@ -106,6 +113,12 @@
         <otherwise>
           (CASE WHEN a.content LIKE CONCAT('%', #{query}, '%') THEN 8 ELSE 0 END
           + CASE WHEN q.title LIKE CONCAT('%', #{query}, '%') THEN 2 ELSE 0 END
+          <if test="semanticTerms != null and semanticTerms.size() > 0">
+            <foreach collection="semanticTerms" item="term">
+          + CASE WHEN a.content LIKE CONCAT('%', #{term}, '%') THEN 3 ELSE 0 END
+          + CASE WHEN q.title LIKE CONCAT('%', #{term}, '%') THEN 2 ELSE 0 END
+            </foreach>
+          </if>
           + a.like_count * 2 + q.view_count * 0.2) DESC,
           a.created_at DESC,
           a.id DESC

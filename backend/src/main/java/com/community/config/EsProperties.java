@@ -38,4 +38,20 @@ public class EsProperties {
      * 搜索策略: mysql/es_lexical/es_hybrid
      */
     private String searchStrategy = "es_lexical";
+
+    /**
+     * Optional runtime synonym groups for semantic search.
+     * Format: term1,term2,term3;foo,bar
+     */
+    private String semanticSynonyms;
+
+    /**
+     * Max extracted semantic terms for one query.
+     */
+    private Integer semanticTermLimit = 12;
+
+    /**
+     * Max generated semantic variants for one query.
+     */
+    private Integer semanticVariantLimit = 8;
 }

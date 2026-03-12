@@ -1,15 +1,13 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { onReachBottom, onShow } from "@dcloudio/uni-app";
+import { onShow } from "@dcloudio/uni-app";
 import {
   searchApi,
   type AppSearchHistoryVO,
   type AppSearchHotVO,
   type AppSearchAnswerVO,
   type AppSearchKbVO,
-  type AppSearchQuestionVO,
-  type AppSearchTopicVO,
-  type AppSearchTagVO
+  type AppSearchQuestionVO
 } from "@/api/search";
 import { useAuthStore } from "@/stores/auth";
 import { openAnswerDetailPage, openExpertPostDetailPage, openQuestionDetail } from "@/utils/nav";
@@ -27,11 +25,19 @@ const historyList = ref<AppSearchHistoryVO[]>([]);
 const questionList = ref<AppSearchQuestionVO[]>([]);
 const answerList = ref<AppSearchAnswerVO[]>([]);
 const kbList = ref<AppSearchKbVO[]>([]);
-const topicList = ref<AppSearchTopicVO[]>([]);
-const tagList = ref<AppSearchTagVO[]>([]);
-const page = ref(1);
-const pageSize = 10;
-const hasMore = ref(false);
+const KB_INIT_LIMIT = 5;
+const QUESTION_INIT_LIMIT = 5;
+const ANSWER_INIT_LIMIT = 5;
+const LOAD_MORE_STEP = 10;
+const kbLimit = ref(KB_INIT_LIMIT);
+const questionLimit = ref(QUESTION_INIT_LIMIT);
+const answerLimit = ref(ANSWER_INIT_LIMIT);
+const kbHasMore = ref(false);
+const questionHasMore = ref(false);
+const answerHasMore = ref(false);
+const kbLoading = ref(false);
+const questionLoading = ref(false);
+const answerLoading = ref(false);
 const inResult = ref(false);
 const sortBy = ref<SortKey>("comprehensive");
 const officialAvatar = `${BASE_URL}/api/common/avatar/staff.png`;
@@ -45,12 +51,7 @@ const sortTabs: Array<{ key: SortKey; label: string }> = [
 ];
 
 const hasResult = computed(
-  () =>
-    kbList.value.length > 0 ||
-    questionList.value.length > 0 ||
-    answerList.value.length > 0 ||
-    topicList.value.length > 0 ||
-    tagList.value.length > 0
+  () => kbList.value.length > 0 || questionList.value.length > 0 || answerList.value.length > 0
 );
 
 function localHistoryKey() {
@@ -124,45 +125,106 @@ async function loadPanels() {
   }
 }
 
+async function fetchKbRows() {
+  const text = query.value.trim();
+  if (!text) {
+    kbList.value = [];
+    kbHasMore.value = false;
+    return 0;
+  }
+  kbLoading.value = true;
+  try {
+    const data = await searchApi.search({
+      query: text,
+      type: "kb",
+      sortBy: sortBy.value,
+      page: 1,
+      pageSize: kbLimit.value + 1
+    });
+    const rows = data.kbEntries || [];
+    kbList.value = rows.slice(0, kbLimit.value);
+    kbHasMore.value = rows.length > kbLimit.value;
+    return kbList.value.length;
+  } finally {
+    kbLoading.value = false;
+  }
+}
+
+async function fetchQuestionRows() {
+  const text = query.value.trim();
+  if (!text) {
+    questionList.value = [];
+    questionHasMore.value = false;
+    return 0;
+  }
+  questionLoading.value = true;
+  try {
+    const data = await searchApi.search({
+      query: text,
+      type: "question",
+      sortBy: sortBy.value,
+      page: 1,
+      pageSize: questionLimit.value + 1
+    });
+    const rows = data.questions || [];
+    questionList.value = rows.slice(0, questionLimit.value);
+    questionHasMore.value = rows.length > questionLimit.value;
+    return questionList.value.length;
+  } finally {
+    questionLoading.value = false;
+  }
+}
+
+async function fetchAnswerRows() {
+  const text = query.value.trim();
+  if (!text) {
+    answerList.value = [];
+    answerHasMore.value = false;
+    return 0;
+  }
+  answerLoading.value = true;
+  try {
+    const data = await searchApi.search({
+      query: text,
+      type: "answer",
+      sortBy: sortBy.value,
+      page: 1,
+      pageSize: answerLimit.value + 1
+    });
+    const rows = data.answers || [];
+    answerList.value = rows.slice(0, answerLimit.value);
+    answerHasMore.value = rows.length > answerLimit.value;
+    return answerList.value.length;
+  } finally {
+    answerLoading.value = false;
+  }
+}
+
 async function search(reset = true) {
   const text = query.value.trim();
   query.value = text;
   if (!text || searching.value) return;
 
   if (reset) {
-    page.value = 1;
+    kbLimit.value = KB_INIT_LIMIT;
+    questionLimit.value = QUESTION_INIT_LIMIT;
+    answerLimit.value = ANSWER_INIT_LIMIT;
     questionList.value = [];
     answerList.value = [];
     kbList.value = [];
-    topicList.value = [];
-    tagList.value = [];
-    hasMore.value = false;
+    kbHasMore.value = false;
+    questionHasMore.value = false;
+    answerHasMore.value = false;
     inResult.value = true;
   }
 
   searching.value = true;
   try {
-    const data = await searchApi.search({
-      query: text,
-      type: "all",
-      sortBy: sortBy.value,
-      page: page.value,
-      pageSize
-    });
-    const questionRows = data.questions || [];
-    const answerRows = data.answers || [];
-    const kbRows = data.kbEntries || [];
-    const topicRows = data.topics || [];
-    const tagRows = data.tags || [];
-    questionList.value = reset ? questionRows : [...questionList.value, ...questionRows];
-    answerList.value = reset ? answerRows : [...answerList.value, ...answerRows];
-    kbList.value = reset ? kbRows : [...kbList.value, ...kbRows];
-    topicList.value = reset ? topicRows : topicList.value;
-    tagList.value = reset ? tagRows : tagList.value;
-    hasMore.value = questionRows.length >= pageSize || kbRows.length >= pageSize || answerRows.length >= pageSize;
-    if (questionRows.length > 0 || kbRows.length > 0 || answerRows.length > 0) {
-      page.value += 1;
-    }
+    const [questionHit, answerHit, kbHit] = await Promise.all([
+      fetchQuestionRows(),
+      fetchAnswerRows(),
+      fetchKbRows()
+    ]);
 
     if (reset) {
       appendLocalHistory(text);
@@ -171,7 +233,7 @@ async function search(reset = true) {
         await searchApi.logSearch({
           queryText: text,
           searchType: 1,
-          hitCount: questionRows.length + kbRows.length + answerRows.length + topicRows.length + tagRows.length
+          hitCount: questionHit + answerHit + kbHit
         });
         await loadPanels();
       } catch {
@@ -213,10 +275,12 @@ function resetPanel() {
   questionList.value = [];
   answerList.value = [];
   kbList.value = [];
-  topicList.value = [];
-  tagList.value = [];
-  page.value = 1;
-  hasMore.value = false;
+  kbLimit.value = KB_INIT_LIMIT;
+  questionLimit.value = QUESTION_INIT_LIMIT;
+  answerLimit.value = ANSWER_INIT_LIMIT;
+  kbHasMore.value = false;
+  questionHasMore.value = false;
+  answerHasMore.value = false;
 }
 
 function isOfficialKb(item: AppSearchKbVO) {
@@ -228,22 +292,39 @@ function openKb(item: AppSearchKbVO) {
   openExpertPostDetailPage(item.id);
 }
 
-function openTopic(topicId?: number) {
-  if (!topicId) return;
-  uni.navigateTo({
-    url: `/pages/discover/topic-detail?topicId=${topicId}`
-  });
-}
-
-function chooseTag(tagName?: string) {
-  if (!tagName) return;
-  query.value = tagName;
-  search(true);
-}
-
 function openAnswerQuestion(questionId?: number) {
   if (!questionId) return;
   openQuestionDetail(questionId);
+}
+
+async function loadMoreKb() {
+  if (!kbHasMore.value || kbLoading.value) return;
+  kbLimit.value += LOAD_MORE_STEP;
+  try {
+    await fetchKbRows();
+  } catch {
+    uni.showToast({ title: "加载更多失败", icon: "none" });
+  }
+}
+
+async function loadMoreQuestions() {
+  if (!questionHasMore.value || questionLoading.value) return;
+  questionLimit.value += LOAD_MORE_STEP;
+  try {
+    await fetchQuestionRows();
+  } catch {
+    uni.showToast({ title: "加载更多失败", icon: "none" });
+  }
+}
+
+async function loadMoreAnswers() {
+  if (!answerHasMore.value || answerLoading.value) return;
+  answerLimit.value += LOAD_MORE_STEP;
+  try {
+    await fetchAnswerRows();
+  } catch {
+    uni.showToast({ title: "加载更多失败", icon: "none" });
+  }
 }
 
 function goLogin() {
@@ -258,12 +339,6 @@ onShow(async () => {
     await search(true);
   } else {
     await loadPanels();
-  }
-});
-
-onReachBottom(() => {
-  if (!needLogin.value && inResult.value && hasMore.value) {
-    search(false);
   }
 });
 </script>
@@ -306,97 +381,70 @@ onReachBottom(() => {
         <view v-if="searching && !hasResult" class="state">搜索中...</view>
         <view v-else-if="!hasResult" class="state">没有匹配内容</view>
         <view v-else class="result-body">
-          <view class="result-section section-kb">
+          <view v-if="kbList.length" class="result-section section-kb">
             <view class="section-title">科普文章</view>
-            <view v-if="!kbList.length" class="state inline">暂无相关科普文章</view>
-            <view v-else>
-              <view
-                v-for="item in kbList"
-                :key="item.id"
-                class="app-card result-item"
-                @click="openKb(item)"
-              >
-                <view v-if="isOfficialKb(item)" class="kb-author-row">
-                  <image class="kb-author-avatar" :src="officialAvatar" mode="aspectFill" />
-                  <view class="kb-author-name">问问官方</view>
-                  <view class="kb-official">官方</view>
-                </view>
-                <view class="result-title">{{ item.title }}</view>
-                <view class="result-desc">{{ item.summary || "暂无摘要" }}</view>
-                <view class="meta">
-                  <text>{{ item.viewCount || 0 }}浏览</text>
-                  <text>{{ item.likeCount || 0 }}点赞</text>
-                </view>
+            <view
+              v-for="item in kbList"
+              :key="item.id"
+              class="app-card result-item"
+              @click="openKb(item)"
+            >
+              <view v-if="isOfficialKb(item)" class="kb-author-row">
+                <image class="kb-author-avatar" :src="officialAvatar" mode="aspectFill" />
+                <view class="kb-author-name">问问官方</view>
+                <view class="kb-official">官方</view>
               </view>
+              <view class="result-title">{{ item.title }}</view>
+              <view class="result-desc">{{ item.summary || "暂无摘要" }}</view>
+              <view class="meta">
+                <text>{{ item.viewCount || 0 }}浏览</text>
+                <text>{{ item.likeCount || 0 }}点赞</text>
+              </view>
+            </view>
+            <view v-if="kbHasMore" class="module-more" @click="loadMoreKb">
+              {{ kbLoading ? "加载中..." : "展示更多" }}
             </view>
           </view>
 
-          <view class="result-section section-question">
+          <view v-if="questionList.length" class="result-section section-question">
             <view class="section-title">问题结果</view>
-            <view v-if="!questionList.length" class="state inline">暂无相关问题</view>
-            <view v-else>
-              <view
-                v-for="item in questionList"
-                :key="item.id"
-                class="app-card result-item"
-                @click="openQuestionDetail(item.id)"
-              >
-                <view class="result-title">{{ item.title }}</view>
-                <view class="result-desc">{{ item.summary || "暂无摘要" }}</view>
-                <view class="meta">
-                  <text>{{ item.answerCount || 0 }}回答</text>
-                  <text>{{ item.viewCount || 0 }}浏览</text>
-                  <text>{{ item.likeCount || 0 }}点赞</text>
-                </view>
+            <view
+              v-for="item in questionList"
+              :key="item.id"
+              class="app-card result-item"
+              @click="openQuestionDetail(item.id)"
+            >
+              <view class="result-title">{{ item.title }}</view>
+              <view class="result-desc">{{ item.summary || "暂无摘要" }}</view>
+              <view class="meta">
+                <text>{{ item.answerCount || 0 }}回答</text>
+                <text>{{ item.viewCount || 0 }}浏览</text>
+                <text>{{ item.likeCount || 0 }}点赞</text>
               </view>
+            </view>
+            <view v-if="questionHasMore" class="module-more" @click="loadMoreQuestions">
+              {{ questionLoading ? "加载中..." : "展示更多" }}
             </view>
           </view>
 
-          <view class="result-section section-answer">
+          <view v-if="answerList.length" class="result-section section-answer">
             <view class="section-title">回答结果</view>
-            <view v-if="!answerList.length" class="state inline">暂无相关回答</view>
-            <view v-else>
-              <view
-                v-for="item in answerList"
-                :key="item.answerId"
-                class="app-card result-item"
-                @click="openAnswerDetailPage(item.answerId)"
-              >
-                <view class="result-title" @click.stop="openAnswerQuestion(item.questionId)">{{ item.questionTitle }}</view>
-                <view class="result-desc">{{ item.contentPreview || "暂无回答内容" }}</view>
-                <view class="meta">
-                  <text>{{ item.likeCount || 0 }}点赞</text>
-                </view>
+            <view
+              v-for="item in answerList"
+              :key="item.answerId"
+              class="app-card result-item"
+              @click="openAnswerDetailPage(item.answerId)"
+            >
+              <view class="result-title" @click.stop="openAnswerQuestion(item.questionId)">{{ item.questionTitle }}</view>
+              <view class="result-desc">{{ item.contentPreview || "暂无回答内容" }}</view>
+              <view class="meta">
+                <text>{{ item.likeCount || 0 }}点赞</text>
               </view>
             </view>
-          </view>
-
-          <view class="result-section section-topic">
-            <view class="section-title">话题结果</view>
-            <view v-if="!topicList.length" class="state inline">暂无相关话题</view>
-            <view v-else>
-              <view v-for="item in topicList" :key="item.id" class="app-card result-item" @click="openTopic(item.id)">
-                <view class="result-title">#{{ item.title }}</view>
-                <view class="result-desc">{{ item.subtitle || "暂无简介" }}</view>
-                <view class="meta">
-                  <text>{{ item.followCount || 0 }}关注</text>
-                  <text>{{ item.questionCount || 0 }}问题</text>
-                </view>
-              </view>
+            <view v-if="answerHasMore" class="module-more" @click="loadMoreAnswers">
+              {{ answerLoading ? "加载中..." : "展示更多" }}
             </view>
           </view>
-
-          <view class="result-section section-tag">
-            <view class="section-title">标签结果</view>
-            <view v-if="!tagList.length" class="state inline">暂无相关标签</view>
-            <view v-else class="chips">
-              <text v-for="item in tagList" :key="item.id" class="app-chip" @click="chooseTag(item.name)">
-                #{{ item.name }} · {{ item.useCount || 0 }}
-              </text>
-            </view>
-          </view>
-
-          <view class="state load-more">{{ hasMore ? "上拉加载更多" : "没有更多了" }}</view>
         </view>
       </view>
 
@@ -626,6 +674,13 @@ onReachBottom(() => {
   display: flex;
   gap: 18rpx;
   color: #8ba0b3;
+}
+
+.module-more {
+  margin-top: 10rpx;
+  color: #4ba7d9;
+  text-align: center;
+  padding: 8rpx 0;
 }
 
 .state {

@@ -165,6 +165,12 @@
   gap: 18rpx;
   color: #8ba0b3;
 }
+.module-more.data-v-308a4d57 {
+  margin-top: 10rpx;
+  color: #4ba7d9;
+  text-align: center;
+  padding: 8rpx 0;
+}
 .state.data-v-308a4d57 {
   color: #8ba0b3;
   text-align: center;

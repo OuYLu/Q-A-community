@@ -4,6 +4,8 @@ export interface AppSearchQuestionVO {
   id: number;
   title: string;
   summary?: string;
+  titleHighlight?: string;
+  summaryHighlight?: string;
   answerCount?: number;
   viewCount?: number;
   likeCount?: number;
@@ -27,6 +29,8 @@ export interface AppSearchKbVO {
   id: number;
   title: string;
   summary?: string;
+  titleHighlight?: string;
+  summaryHighlight?: string;
   viewCount?: number;
   likeCount?: number;
   source?: string | null;
@@ -38,8 +42,16 @@ export interface AppSearchAnswerVO {
   questionId: number;
   questionTitle: string;
   contentPreview?: string;
+  questionTitleHighlight?: string;
+  contentPreviewHighlight?: string;
   likeCount?: number;
   createdAt?: string;
+}
+
+export interface AppSearchSimilarQuestionVO {
+  id: number;
+  title: string;
+  titleHighlight?: string;
 }
 
 export interface AppSearchResultVO {
@@ -49,6 +61,7 @@ export interface AppSearchResultVO {
   topics: AppSearchTopicVO[];
   tags: AppSearchTagVO[];
   kbEntries: AppSearchKbVO[];
+  similarQuestions?: AppSearchSimilarQuestionVO[];
 }
 
 export interface AppSearchHotVO {

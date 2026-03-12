@@ -13,6 +13,8 @@ public class AppSearchAnswerVO {
     private Long questionId;
     private String questionTitle;
     private String contentPreview;
+    private String questionTitleHighlight;
+    private String contentPreviewHighlight;
     private Integer likeCount;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;

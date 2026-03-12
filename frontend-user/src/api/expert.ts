@@ -1,4 +1,5 @@
 import { request } from "@/api/http";
+import { BASE_URL } from "@/utils/constants";
 
 export interface ExpertProofFileDTO {
   url: string;
@@ -88,6 +89,33 @@ export interface AppExpertPostDetailVO {
   updatedAt?: string;
 }
 
+export interface AppKbInteractVO {
+  kbEntryId: number;
+  likeCount?: number;
+  favoriteCount?: number;
+  commentCount?: number;
+  liked?: boolean;
+  favorited?: boolean;
+}
+
+export interface AppKbCommentVO {
+  id: number;
+  kbEntryId: number;
+  parentId?: number;
+  authorId: number;
+  authorName?: string;
+  authorAvatar?: string;
+  content: string;
+  createdAt?: string;
+}
+
+function toAbsoluteUrl(url?: string) {
+  if (!url) return "";
+  if (url.startsWith("http://") || url.startsWith("https://")) return url;
+  if (url.startsWith("/")) return `${BASE_URL}${url}`;
+  return `${BASE_URL}/${url}`;
+}
+
 export const expertApi = {
   apply(data: ExpertApplyDTO) {
     return request<void>({
@@ -123,6 +151,40 @@ export const expertApi = {
   detail(id: number) {
     return request<AppExpertPostDetailVO>({
       url: `/api/expert/posts/${id}`
+    });
+  },
+  kbInteraction(id: number) {
+    return request<AppKbInteractVO>({
+      url: `/api/customer/kb/${id}/interaction`
+    });
+  },
+  toggleKbLike(id: number) {
+    return request<AppKbInteractVO>({
+      url: `/api/customer/kb/${id}/like`,
+      method: "POST"
+    });
+  },
+  toggleKbFavorite(id: number) {
+    return request<AppKbInteractVO>({
+      url: `/api/customer/kb/${id}/favorite`,
+      method: "POST"
+    });
+  },
+  kbComments(id: number) {
+    return request<AppKbCommentVO[]>({
+      url: `/api/customer/kb/${id}/comments`
+    }).then((list) =>
+      (list || []).map((item) => ({
+        ...item,
+        authorAvatar: toAbsoluteUrl(item?.authorAvatar)
+      }))
+    );
+  },
+  createKbComment(id: number, content: string, parentId?: number) {
+    return request<number>({
+      url: `/api/customer/kb/${id}/comments`,
+      method: "POST",
+      data: { content, parentId }
     });
   }
 };

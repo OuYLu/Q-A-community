@@ -21,4 +21,23 @@
       AND c.delete_flag = 0
     ORDER BY c.created_at ASC, c.id ASC
   </select>
+
+  <select id="selectKbComments" resultType="com.community.vo.AppKbCommentVO">
+    SELECT
+      c.id,
+      c.biz_id AS kbEntryId,
+      c.parent_id AS parentId,
+      c.user_id AS authorId,
+      u.nickname AS authorName,
+      u.avatar AS authorAvatar,
+      c.content,
+      c.created_at AS createdAt
+    FROM qa_comment c
+    LEFT JOIN user u ON u.id = c.user_id
+    WHERE c.biz_type = 4
+      AND c.biz_id = #{kbEntryId}
+      AND c.status = 1
+      AND c.delete_flag = 0
+    ORDER BY c.created_at ASC, c.id ASC
+  </select>
 </mapper>

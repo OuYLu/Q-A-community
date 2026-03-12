@@ -21,6 +21,7 @@ public interface QaAnswerMapper extends BaseMapper<QaAnswer> {
     AppQuestionAnswerVO selectAppAnswerById(@Param("answerId") Long answerId);
 
     List<AppSearchAnswerVO> selectAppSearchAnswers(@Param("query") String query,
+                                                   @Param("semanticTerms") List<String> semanticTerms,
                                                    @Param("sortBy") String sortBy,
                                                    @Param("limit") Integer limit,
                                                    @Param("offset") Integer offset);

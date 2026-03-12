@@ -27,11 +27,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -43,17 +46,22 @@ public class EsSearchServiceImpl implements EsSearchService {
     private static final int SEMANTIC_VARIANT_LIMIT = 8;
     private static final int SEMANTIC_TERM_LIMIT = 12;
     private static final Map<String, List<String>> MEDICAL_SYNONYMS = Map.ofEntries(
-        Map.entry("高血压", List.of("血压高", "hypertension")),
-        Map.entry("糖尿病", List.of("血糖高", "diabetes")),
-        Map.entry("脑梗", List.of("脑梗塞", "脑梗死")),
-        Map.entry("中风", List.of("卒中")),
-        Map.entry("发烧", List.of("发热")),
-        Map.entry("感冒", List.of("上呼吸道感染")),
-        Map.entry("头晕", List.of("眩晕")),
-        Map.entry("胃疼", List.of("胃痛")),
-        Map.entry("失眠", List.of("睡不着", "睡眠障碍")),
-        Map.entry("便秘", List.of("排便困难"))
+        Map.entry("\u9ad8\u8840\u538b", List.of("\u8840\u538b\u9ad8", "hypertension")),
+        Map.entry("\u7cd6\u5c3f\u75c5", List.of("\u8840\u7cd6\u9ad8", "diabetes")),
+        Map.entry("\u8111\u68d7", List.of("\u8111\u68d7\u585e", "\u8111\u68d7\u6b7b")),
+        Map.entry("\u4e2d\u98ce", List.of("\u5352\u4e2d")),
+        Map.entry("\u53d1\u70e7", List.of("\u53d1\u70ed")),
+        Map.entry("\u611f\u5192", List.of("\u4e0a\u547c\u5438\u9053\u611f\u67d3")),
+        Map.entry("\u5934\u6655", List.of("\u7729\u6655")),
+        Map.entry("\u80c3\u75bc", List.of("\u80c3\u75db")),
+        Map.entry("\u5931\u7720", List.of("\u7761\u4e0d\u7740", "\u7761\u7720\u969c\u788d")),
+        Map.entry("\u4fbf\u79d8", List.of("\u6392\u4fbf\u56f0\u96be"))
     );
+
+    private static final int MIN_SEMANTIC_LIMIT = 1;
+    private static final int MAX_SEMANTIC_TERM_LIMIT = 24;
+    private static final int MAX_SEMANTIC_VARIANT_LIMIT = 20;
+    private static final Pattern ASCII_ALNUM = Pattern.compile("^[a-zA-Z0-9_-]+$");
 
     private final EsProperties properties;
     private final RestTemplateBuilder restTemplateBuilder;
@@ -155,6 +163,37 @@ public class EsSearchServiceImpl implements EsSearchService {
         }
         Map<String, Object> body = buildKbSearchBody(query, from, size);
         return executeSearch(route.readAlias(), body);
+    }
+
+    @Override
+    public List<String> buildSemanticTerms(String query, int limit) {
+        if (!StringUtils.hasText(query)) {
+            return List.of();
+        }
+        int resolvedLimit = Math.max(MIN_SEMANTIC_LIMIT, limit);
+        List<String> terms = extractSemanticTerms(query);
+        LinkedHashSet<String> expanded = new LinkedHashSet<>(terms);
+        for (String variant : expandSemanticVariants(query, terms)) {
+            if (!StringUtils.hasText(variant)) {
+                continue;
+            }
+            String[] parts = variant.split("\\s+");
+            for (String part : parts) {
+                if (StringUtils.hasText(part)) {
+                    expanded.add(part);
+                }
+                if (expanded.size() >= resolvedLimit) {
+                    break;
+                }
+            }
+            if (expanded.size() >= resolvedLimit) {
+                break;
+            }
+        }
+        String normalized = normalizeQuery(query);
+        expanded.remove(normalized);
+        List<String> result = new ArrayList<>(expanded);
+        return result.subList(0, Math.min(resolvedLimit, result.size()));
     }
 
     @Override
@@ -286,7 +325,7 @@ public class EsSearchServiceImpl implements EsSearchService {
         List<Object> must = new ArrayList<>();
         must.add(semanticMode ? questionSemanticClause(query) : Map.of("multi_match", Map.of(
             "query", query,
-            "fields", List.of("title^4", "content")
+            "fields", List.of("title^4", "content", "answerContent^1.2")
         )));
 
         List<Object> filters = new ArrayList<>();
@@ -318,87 +357,89 @@ public class EsSearchServiceImpl implements EsSearchService {
     }
 
     private Map<String, Object> questionSemanticClause(String query) {
+        String normalizedQuery = normalizeQuery(query);
+        if (!StringUtils.hasText(normalizedQuery)) {
+            normalizedQuery = query.trim();
+        }
+        List<Object> must = new ArrayList<>();
+        must.add(coreQueryClause(
+            normalizedQuery,
+            List.of("title^6", "content^3", "answerContent^2")
+        ));
         List<Object> should = new ArrayList<>();
-        should.add(Map.of("multi_match", Map.of(
-            "query", query,
-            "fields", List.of("title^5", "content^2"),
-            "type", "best_fields"
-        )));
-        should.add(Map.of("match_phrase", Map.of(
-            "title", Map.of("query", query, "slop", 2, "boost", 4)
-        )));
-        should.add(Map.of("match_bool_prefix", Map.of(
-            "title", Map.of("query", query, "boost", 2)
-        )));
+        should.add(multiMatchClause(normalizedQuery, List.of("title^5", "content^2.2", "answerContent^1.8"), 5.0));
+        should.add(crossFieldClause(normalizedQuery, List.of("title^4", "content^1.8", "answerContent^1.5"), 3.5));
+        should.add(phraseClause("title", normalizedQuery, 1, 4.5));
+        should.add(phraseClause("content", normalizedQuery, 2, 2.2));
+        should.add(prefixClause("title", normalizedQuery, 2.0));
+        should.add(prefixClause("content", normalizedQuery, 1.2));
 
-        List<String> terms = extractSemanticTerms(query);
-        for (String variant : expandSemanticVariants(query, terms)) {
-            if (query.equals(variant)) {
+        List<String> terms = extractSemanticTerms(normalizedQuery);
+        for (String term : terms) {
+            should.add(matchClause("title", term, 1.8));
+            should.add(matchClause("content", term, 1.3));
+            should.add(matchClause("answerContent", term, 1.2));
+            if (isAsciiTerm(term) && term.length() >= 4) {
+                should.add(fuzzyClause("title", term, 1.15));
+                should.add(fuzzyClause("content", term, 1.05));
+            }
+        }
+
+        for (String variant : expandSemanticVariants(normalizedQuery, terms)) {
+            if (!StringUtils.hasText(variant) || normalizedQuery.equals(variant)) {
                 continue;
             }
-            should.add(Map.of("multi_match", Map.of(
-                "query", variant,
-                "fields", List.of("title^4", "content^2"),
-                "type", "best_fields",
-                "boost", 1.8
-            )));
-        }
-        for (String term : terms) {
-            should.add(Map.of("match", Map.of(
-                "title", Map.of("query", term, "boost", 1.5)
-            )));
-            should.add(Map.of("match", Map.of(
-                "content", Map.of("query", term, "boost", 1.1)
-            )));
+            should.add(multiMatchClause(variant, List.of("title^4.5", "content^2", "answerContent^1.7"), 2.0));
+            should.add(phraseClause("title", variant, 2, 1.4));
         }
 
         Map<String, Object> bool = new HashMap<>();
+        bool.put("must", must);
         bool.put("should", should);
-        bool.put("minimum_should_match", 1);
+        bool.put("minimum_should_match", 0);
         return Map.of("bool", bool);
     }
 
     private Map<String, Object> kbSemanticClause(String query) {
+        String normalizedQuery = normalizeQuery(query);
+        if (!StringUtils.hasText(normalizedQuery)) {
+            normalizedQuery = query.trim();
+        }
+        List<Object> must = new ArrayList<>();
+        must.add(coreQueryClause(
+            normalizedQuery,
+            List.of("title^5.5", "summary^3.5", "content^2.2")
+        ));
         List<Object> should = new ArrayList<>();
-        should.add(Map.of("multi_match", Map.of(
-            "query", query,
-            "fields", List.of("title^4", "summary^3", "content^2"),
-            "type", "best_fields"
-        )));
-        should.add(Map.of("match_phrase", Map.of(
-            "title", Map.of("query", query, "slop", 2, "boost", 3.5)
-        )));
-        should.add(Map.of("match_bool_prefix", Map.of(
-            "title", Map.of("query", query, "boost", 2)
-        )));
+        should.add(multiMatchClause(normalizedQuery, List.of("title^4.5", "summary^3.2", "content^2.1"), 4.2));
+        should.add(crossFieldClause(normalizedQuery, List.of("title^4", "summary^2.8", "content^1.8"), 2.6));
+        should.add(phraseClause("title", normalizedQuery, 1, 3.8));
+        should.add(phraseClause("summary", normalizedQuery, 2, 2.4));
+        should.add(prefixClause("title", normalizedQuery, 1.9));
 
-        List<String> terms = extractSemanticTerms(query);
-        for (String variant : expandSemanticVariants(query, terms)) {
-            if (query.equals(variant)) {
+        List<String> terms = extractSemanticTerms(normalizedQuery);
+        for (String term : terms) {
+            should.add(matchClause("title", term, 1.7));
+            should.add(matchClause("summary", term, 1.5));
+            should.add(matchClause("content", term, 1.2));
+            if (isAsciiTerm(term) && term.length() >= 4) {
+                should.add(fuzzyClause("title", term, 1.12));
+                should.add(fuzzyClause("summary", term, 1.05));
+            }
+        }
+
+        for (String variant : expandSemanticVariants(normalizedQuery, terms)) {
+            if (!StringUtils.hasText(variant) || normalizedQuery.equals(variant)) {
                 continue;
             }
-            should.add(Map.of("multi_match", Map.of(
-                "query", variant,
-                "fields", List.of("title^4", "summary^3", "content^2"),
-                "type", "best_fields",
-                "boost", 1.7
-            )));
-        }
-        for (String term : terms) {
-            should.add(Map.of("match", Map.of(
-                "title", Map.of("query", term, "boost", 1.5)
-            )));
-            should.add(Map.of("match", Map.of(
-                "summary", Map.of("query", term, "boost", 1.3)
-            )));
-            should.add(Map.of("match", Map.of(
-                "content", Map.of("query", term, "boost", 1.1)
-            )));
+            should.add(multiMatchClause(variant, List.of("title^4.2", "summary^3", "content^2"), 1.8));
+            should.add(phraseClause("title", variant, 2, 1.3));
         }
 
         Map<String, Object> bool = new HashMap<>();
+        bool.put("must", must);
         bool.put("should", should);
-        bool.put("minimum_should_match", 1);
+        bool.put("minimum_should_match", 0);
         return Map.of("bool", bool);
     }
 
@@ -416,6 +457,14 @@ public class EsSearchServiceImpl implements EsSearchService {
             "factor", 0.1,
             "missing", 0
         )));
+        functions.add(Map.of("gauss", Map.of(
+            "createdAt", Map.of(
+                "origin", "now",
+                "scale", "90d",
+                "offset", "7d",
+                "decay", 0.6
+            )
+        )));
         return Map.of("function_score", Map.of(
             "query", baseQuery,
             "functions", functions,
@@ -425,14 +474,24 @@ public class EsSearchServiceImpl implements EsSearchService {
     }
 
     private Map<String, Object> kbHybridQuery(Map<String, Object> baseQuery) {
+        List<Map<String, Object>> functions = new ArrayList<>();
+        functions.add(Map.of("field_value_factor", Map.of(
+            "field", "hotScore",
+            "modifier", "log1p",
+            "factor", 0.35,
+            "missing", 0
+        )));
+        functions.add(Map.of("gauss", Map.of(
+            "createdAt", Map.of(
+                "origin", "now",
+                "scale", "120d",
+                "offset", "14d",
+                "decay", 0.65
+            )
+        )));
         return Map.of("function_score", Map.of(
             "query", baseQuery,
-            "functions", List.of(Map.of("field_value_factor", Map.of(
-                "field", "hotScore",
-                "modifier", "log1p",
-                "factor", 0.35,
-                "missing", 0
-            ))),
+            "functions", functions,
             "score_mode", "sum",
             "boost_mode", "sum"
         ));
@@ -465,6 +524,149 @@ public class EsSearchServiceImpl implements EsSearchService {
         return strategy.trim().toLowerCase();
     }
 
+    private Map<String, Object> multiMatchClause(String query, List<String> fields, double boost) {
+        Map<String, Object> mm = new HashMap<>();
+        mm.put("query", query);
+        mm.put("fields", fields);
+        mm.put("type", "best_fields");
+        mm.put("minimum_should_match", minimumShouldMatch(query));
+        mm.put("boost", boost);
+        return Map.of("multi_match", mm);
+    }
+
+    private Map<String, Object> coreQueryClause(String query, List<String> fields) {
+        Map<String, Object> mm = new HashMap<>();
+        mm.put("query", query);
+        mm.put("fields", fields);
+        mm.put("type", "best_fields");
+        mm.put("minimum_should_match", coreMinimumShouldMatch(query));
+        return Map.of("multi_match", mm);
+    }
+
+    private Map<String, Object> crossFieldClause(String query, List<String> fields, double boost) {
+        Map<String, Object> mm = new HashMap<>();
+        mm.put("query", query);
+        mm.put("fields", fields);
+        mm.put("type", "cross_fields");
+        mm.put("operator", "and");
+        mm.put("boost", boost);
+        return Map.of("multi_match", mm);
+    }
+
+    private Map<String, Object> phraseClause(String field, String query, int slop, double boost) {
+        return Map.of("match_phrase", Map.of(
+            field, Map.of(
+                "query", query,
+                "slop", slop,
+                "boost", boost
+            )
+        ));
+    }
+
+    private Map<String, Object> prefixClause(String field, String query, double boost) {
+        return Map.of("match_bool_prefix", Map.of(
+            field, Map.of(
+                "query", query,
+                "boost", boost
+            )
+        ));
+    }
+
+    private Map<String, Object> matchClause(String field, String query, double boost) {
+        return Map.of("match", Map.of(
+            field, Map.of(
+                "query", query,
+                "boost", boost
+            )
+        ));
+    }
+
+    private Map<String, Object> fuzzyClause(String field, String query, double boost) {
+        return Map.of("match", Map.of(
+            field, Map.of(
+                "query", query,
+                "fuzziness", "AUTO",
+                "prefix_length", 1,
+                "boost", boost
+            )
+        ));
+    }
+
+    private String minimumShouldMatch(String query) {
+        int tokens = semanticTokenCount(query);
+        if (tokens <= 2) {
+            return "75%";
+        }
+        if (tokens <= 4) {
+            return "70%";
+        }
+        return "70%";
+    }
+
+    private String coreMinimumShouldMatch(String query) {
+        int tokens = semanticTokenCount(query);
+        if (tokens <= 2) {
+            return "100%";
+        }
+        if (tokens <= 4) {
+            return "75%";
+        }
+        if (tokens <= 8) {
+            return "65%";
+        }
+        return "55%";
+    }
+
+    private int semanticTokenCount(String query) {
+        if (!StringUtils.hasText(query)) {
+            return 1;
+        }
+        String normalized = normalizeQuery(query);
+        if (!StringUtils.hasText(normalized)) {
+            return 1;
+        }
+        String[] parts = normalized.split("\\s+");
+        int wsCount = 0;
+        for (String part : parts) {
+            if (StringUtils.hasText(part)) {
+                wsCount++;
+            }
+        }
+        if (wsCount > 1) {
+            return wsCount;
+        }
+        int chineseCount = 0;
+        for (int i = 0; i < normalized.length(); i++) {
+            char c = normalized.charAt(i);
+            if (c >= 0x4E00 && c <= 0x9FFF) {
+                chineseCount++;
+            }
+        }
+        if (chineseCount > 0) {
+            return chineseCount;
+        }
+        return 1;
+    }
+
+    private boolean isAsciiTerm(String term) {
+        if (!StringUtils.hasText(term)) {
+            return false;
+        }
+        return ASCII_ALNUM.matcher(term).matches();
+    }
+
+    private int resolveSemanticTermLimit() {
+        int configured = properties.getSemanticTermLimit() == null ? SEMANTIC_TERM_LIMIT : properties.getSemanticTermLimit();
+        configured = Math.max(configured, MIN_SEMANTIC_LIMIT);
+        return Math.min(configured, MAX_SEMANTIC_TERM_LIMIT);
+    }
+
+    private int resolveSemanticVariantLimit() {
+        int configured = properties.getSemanticVariantLimit() == null ? SEMANTIC_VARIANT_LIMIT : properties.getSemanticVariantLimit();
+        configured = Math.max(configured, MIN_SEMANTIC_LIMIT);
+        return Math.min(configured, MAX_SEMANTIC_VARIANT_LIMIT);
+    }
+
     private List<String> extractSemanticTerms(String rawQuery) {
         if (!StringUtils.hasText(rawQuery)) {
             return List.of();
@@ -473,6 +675,7 @@ public class EsSearchServiceImpl implements EsSearchService {
         if (!StringUtils.hasText(normalized)) {
             return List.of();
         }
+        int termLimit = resolveSemanticTermLimit();
         LinkedHashSet<String> terms = new LinkedHashSet<>();
         String[] parts = normalized.split("\\s+");
         for (String part : parts) {
@@ -486,51 +689,132 @@ public class EsSearchServiceImpl implements EsSearchService {
                     if (StringUtils.hasText(bg)) {
                         terms.add(bg);
                     }
-                    if (terms.size() >= SEMANTIC_TERM_LIMIT) {
+                    if (terms.size() >= termLimit) {
                         break;
                     }
                 }
             }
-            if (terms.size() >= SEMANTIC_TERM_LIMIT) {
+            if (terms.size() >= termLimit) {
                 break;
             }
         }
-        return new ArrayList<>(terms).subList(0, Math.min(SEMANTIC_TERM_LIMIT, terms.size()));
+        List<String> result = new ArrayList<>(terms);
+        return result.subList(0, Math.min(termLimit, result.size()));
     }
 
     private List<String> expandSemanticVariants(String query, List<String> terms) {
+        int variantLimit = resolveSemanticVariantLimit();
         LinkedHashSet<String> variants = new LinkedHashSet<>();
-        variants.add(normalizeQuery(query));
-        for (Map.Entry<String, List<String>> entry : MEDICAL_SYNONYMS.entrySet()) {
+        String normalizedQuery = normalizeQuery(query);
+        variants.add(normalizedQuery);
+        List<String> termList = terms == null ? List.of() : terms;
+        Set<String> lookupTerms = new LinkedHashSet<>();
+        for (String term : termList) {
+            if (StringUtils.hasText(term)) {
+                lookupTerms.add(term.toLowerCase(Locale.ROOT));
+            }
+        }
+        String lowerQuery = normalizedQuery.toLowerCase(Locale.ROOT);
+
+        for (Map.Entry<String, List<String>> entry : semanticSynonyms().entrySet()) {
             String key = entry.getKey();
-            List<String> syns = entry.getValue();
-            if (!StringUtils.hasText(key) || syns == null || syns.isEmpty()) {
+            if (!StringUtils.hasText(key)) {
                 continue;
             }
-            String lowerQuery = query.toLowerCase(Locale.ROOT);
-            boolean hit = lowerQuery.contains(key.toLowerCase(Locale.ROOT));
-            if (!hit && terms != null) {
-                for (String t : terms) {
-                    if (key.equalsIgnoreCase(t)) {
-                        hit = true;
-                        break;
-                    }
-                }
+            boolean hit = lowerQuery.contains(key.toLowerCase(Locale.ROOT)) || lookupTerms.contains(key.toLowerCase(Locale.ROOT));
+            if (!hit) {
+                continue;
             }
-            if (hit) {
-                for (String syn : syns) {
-                    if (!StringUtils.hasText(syn)) {
-                        continue;
-                    }
-                    variants.add(normalizeQuery(query.replace(key, syn)));
-                    variants.add(normalizeQuery(query + " " + syn));
-                    if (variants.size() >= SEMANTIC_VARIANT_LIMIT) {
-                        return new ArrayList<>(variants);
-                    }
+            for (String syn : entry.getValue()) {
+                if (!StringUtils.hasText(syn)) {
+                    continue;
+                }
+                variants.add(normalizeQuery(replaceIgnoreCase(normalizedQuery, key, syn)));
+                variants.add(normalizeQuery(normalizedQuery + " " + syn));
+                if (variants.size() >= variantLimit) {
+                    return new ArrayList<>(variants);
                 }
             }
         }
         return new ArrayList<>(variants);
+    }
+
+    private Map<String, List<String>> semanticSynonyms() {
+        Map<String, LinkedHashSet<String>> merged = new LinkedHashMap<>();
+        for (Map.Entry<String, List<String>> entry : MEDICAL_SYNONYMS.entrySet()) {
+            List<String> group = new ArrayList<>();
+            group.add(entry.getKey());
+            if (entry.getValue() != null) {
+                group.addAll(entry.getValue());
+            }
+            mergeSynonymGroup(merged, group);
+        }
+        mergeCustomSynonyms(merged, properties.getSemanticSynonyms());
+
+        Map<String, List<String>> result = new LinkedHashMap<>();
+        for (Map.Entry<String, LinkedHashSet<String>> entry : merged.entrySet()) {
+            result.put(entry.getKey(), new ArrayList<>(entry.getValue()));
+        }
+        return result;
+    }
+
+    private void mergeCustomSynonyms(Map<String, LinkedHashSet<String>> merged, String configured) {
+        if (!StringUtils.hasText(configured)) {
+            return;
+        }
+        String normalizedConfigured = configured
+            .replace('；', ';')
+            .replace('，', ',')
+            .replace('、', ',')
+            .replace('\t', ' ');
+        String[] groups = normalizedConfigured.split("(?:;|\\r\\n|\\n|\\r|\\s{2,})+");
+        for (String group : groups) {
+            if (!StringUtils.hasText(group)) {
+                continue;
+            }
+            String[] parts = group.split("[,|]+");
+            List<String> terms = new ArrayList<>();
+            for (String part : parts) {
+                String term = normalizeQuery(part);
+                if (StringUtils.hasText(term)) {
+                    terms.add(term);
+                }
+            }
+            mergeSynonymGroup(merged, terms);
+        }
+    }
+
+    private void mergeSynonymGroup(Map<String, LinkedHashSet<String>> merged, List<String> group) {
+        if (group == null || group.size() < 2) {
+            return;
+        }
+        LinkedHashSet<String> normalized = new LinkedHashSet<>();
+        for (String term : group) {
+            String normalizedTerm = normalizeQuery(term);
+            if (StringUtils.hasText(normalizedTerm)) {
+                normalized.add(normalizedTerm);
+            }
+        }
+        if (normalized.size() < 2) {
+            return;
+        }
+        for (String term : normalized) {
+            LinkedHashSet<String> alternatives = merged.computeIfAbsent(term, ignored -> new LinkedHashSet<>());
+            for (String candidate : normalized) {
+                if (!term.equalsIgnoreCase(candidate)) {
+                    alternatives.add(candidate);
+                }
+            }
+        }
+    }
+
+    private String replaceIgnoreCase(String source, String target, String replacement) {
+        if (!StringUtils.hasText(source) || !StringUtils.hasText(target) || replacement == null) {
+            return source;
+        }
+        Pattern pattern = Pattern.compile(Pattern.quote(target), Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
+        Matcher matcher = pattern.matcher(source);
+        return matcher.replaceAll(Matcher.quoteReplacement(replacement));
     }
 
     private String normalizeQuery(String query) {
@@ -538,7 +822,7 @@ public class EsSearchServiceImpl implements EsSearchService {
             return "";
         }
         return query.trim()
-            .replaceAll("[\\p{Punct}，。！？；：“”‘’（）【】《》、]+", " ")
+            .replaceAll("[\\p{Punct}\\p{IsPunctuation}]+", " ")
             .replaceAll("\\s+", " ");
     }
 

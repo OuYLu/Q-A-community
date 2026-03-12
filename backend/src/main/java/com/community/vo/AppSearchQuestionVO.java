@@ -12,6 +12,8 @@ public class AppSearchQuestionVO {
     private Long id;
     private String title;
     private String summary;
+    private String titleHighlight;
+    private String summaryHighlight;
     private Integer answerCount;
     private Integer viewCount;
     private Integer likeCount;

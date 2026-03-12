@@ -15,12 +15,13 @@ import com.community.mapper.QaTopicMapper;
 import com.community.mapper.SearchQueryLogMapper;
 import com.community.service.CustomerSearchService;
 import com.community.service.EsSearchService;
-import com.community.vo.AppSearchHistoryVO;
 import com.community.vo.AppSearchAnswerVO;
+import com.community.vo.AppSearchHistoryVO;
 import com.community.vo.AppSearchHotVO;
 import com.community.vo.AppSearchKbVO;
 import com.community.vo.AppSearchQuestionVO;
 import com.community.vo.AppSearchResultVO;
+import com.community.vo.AppSearchSimilarQuestionVO;
 import com.community.vo.AppSearchTagVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -29,12 +30,25 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
 public class CustomerSearchServiceImpl implements CustomerSearchService {
+    private static final int SIMILAR_QUESTION_LIMIT = 5;
+    private static final int HIGHLIGHT_TERM_LIMIT = 10;
+    private static final Pattern ASCII_ALNUM = Pattern.compile("^[a-zA-Z0-9_-]+$");
+    private static final String HIT_START = "<em class=\"search-hit\">";
+    private static final String HIT_END = "</em>";
+
     private final QaQuestionMapper qaQuestionMapper;
     private final QaAnswerMapper qaAnswerMapper;
     private final QaTopicMapper qaTopicMapper;
@@ -52,25 +66,28 @@ public class CustomerSearchServiceImpl implements CustomerSearchService {
         int page = query.getPage() == null || query.getPage() <= 0 ? 1 : query.getPage();
         int pageSize = query.getPageSize() == null || query.getPageSize() <= 0 ? 10 : query.getPageSize();
         int offset = (page - 1) * pageSize;
-        String type = query.getType() == null ? "all" : query.getType().toLowerCase();
+        String type = query.getType() == null ? "all" : query.getType().toLowerCase(Locale.ROOT);
+        List<String> highlightKeywords = buildHighlightKeywords(query.getQuery());
 
         AppSearchResultVO vo = new AppSearchResultVO();
         vo.setQuery(query.getQuery());
 
         if ("question".equals(type) || "all".equals(type)) {
-            vo.setQuestions(searchQuestions(query, pageSize, offset));
+            vo.setQuestions(searchQuestions(query, pageSize, offset, highlightKeywords));
+            vo.setSimilarQuestions(searchSimilarQuestions(query, highlightKeywords));
         } else {
             vo.setQuestions(Collections.emptyList());
+            vo.setSimilarQuestions(Collections.emptyList());
         }
 
         if ("answer".equals(type) || "all".equals(type)) {
-            vo.setAnswers(searchAnswers(query, pageSize, offset));
+            vo.setAnswers(searchAnswers(query, pageSize, offset, highlightKeywords));
         } else {
             vo.setAnswers(Collections.emptyList());
         }
 
         if ("kb".equals(type) || "all".equals(type)) {
-            vo.setKbEntries(searchKb(query, pageSize, offset));
+            vo.setKbEntries(searchKb(query, pageSize, offset, highlightKeywords));
         } else {
             vo.setKbEntries(Collections.emptyList());
         }
@@ -90,7 +107,8 @@ public class CustomerSearchServiceImpl implements CustomerSearchService {
         return vo;
     }
 
-    private List<AppSearchQuestionVO> searchQuestions(AppSearchQueryDTO query, int pageSize, int offset) {
+    private List<AppSearchQuestionVO> searchQuestions(AppSearchQueryDTO query, int pageSize, int offset,
+                                                      List<String> highlightKeywords) {
         if (useEsSearch()) {
             try {
                 List<Long> ids = esSearchService.searchQuestionIds(
@@ -103,15 +121,16 @@ public class CustomerSearchServiceImpl implements CustomerSearchService {
                     query.getSortBy()
                 );
                 if (ids != null && !ids.isEmpty()) {
-                    return qaQuestionMapper.selectAppSearchQuestionsByIds(
+                    List<AppSearchQuestionVO> rows = qaQuestionMapper.selectAppSearchQuestionsByIds(
                         ids,
                         query.getCategoryId(),
                         query.getTopicId(),
                         query.getOnlyUnsolved()
                     );
+                    applyQuestionHighlights(rows, highlightKeywords);
+                    return rows;
                 }
-                // ES 未命中时回退 MySQL，避免索引延迟导致结果为空
-                return qaQuestionMapper.selectAppSearchQuestions(
+                List<AppSearchQuestionVO> rows = qaQuestionMapper.selectAppSearchQuestions(
                     query.getQuery(),
                     query.getSortBy(),
                     query.getCategoryId(),
@@ -120,11 +139,13 @@ public class CustomerSearchServiceImpl implements CustomerSearchService {
                     pageSize,
                     offset
                 );
+                applyQuestionHighlights(rows, highlightKeywords);
+                return rows;
             } catch (Exception ignored) {
                 // fall back to mysql
             }
         }
-        return qaQuestionMapper.selectAppSearchQuestions(
+        List<AppSearchQuestionVO> rows = qaQuestionMapper.selectAppSearchQuestions(
             query.getQuery(),
             query.getSortBy(),
             query.getCategoryId(),
@@ -133,31 +154,250 @@ public class CustomerSearchServiceImpl implements CustomerSearchService {
             pageSize,
             offset
         );
+        applyQuestionHighlights(rows, highlightKeywords);
+        return rows;
     }
 
-    private List<AppSearchKbVO> searchKb(AppSearchQueryDTO query, int pageSize, int offset) {
+    private List<AppSearchKbVO> searchKb(AppSearchQueryDTO query, int pageSize, int offset,
+                                         List<String> highlightKeywords) {
         if (useEsSearch()) {
             try {
                 List<Long> ids = esSearchService.searchKbIds(query.getQuery(), offset, pageSize);
                 if (ids != null && !ids.isEmpty()) {
-                    return kbEntryMapper.selectAppSearchKbByIds(ids);
+                    List<AppSearchKbVO> rows = kbEntryMapper.selectAppSearchKbByIds(ids);
+                    applyKbHighlights(rows, highlightKeywords);
+                    return rows;
                 }
-                // ES 未命中时回退 MySQL，避免索引延迟导致结果为空
-                return kbEntryMapper.selectAppSearchKb(query.getQuery(), pageSize, offset);
+                List<AppSearchKbVO> rows = kbEntryMapper.selectAppSearchKb(query.getQuery(), pageSize, offset);
+                applyKbHighlights(rows, highlightKeywords);
+                return rows;
             } catch (Exception ignored) {
                 // fall back to mysql
             }
         }
-        return kbEntryMapper.selectAppSearchKb(query.getQuery(), pageSize, offset);
+        List<AppSearchKbVO> rows = kbEntryMapper.selectAppSearchKb(query.getQuery(), pageSize, offset);
+        applyKbHighlights(rows, highlightKeywords);
+        return rows;
     }
 
-    private List<AppSearchAnswerVO> searchAnswers(AppSearchQueryDTO query, int pageSize, int offset) {
-        return qaAnswerMapper.selectAppSearchAnswers(
+    private List<AppSearchAnswerVO> searchAnswers(AppSearchQueryDTO query, int pageSize, int offset,
+                                                  List<String> highlightKeywords) {
+        List<String> semanticTerms = Collections.emptyList();
+        try {
+            semanticTerms = esSearchService.buildSemanticTerms(query.getQuery(), 8);
+        } catch (Exception ignored) {
+            // keep lexical fallback for answers
+        }
+        List<AppSearchAnswerVO> rows = qaAnswerMapper.selectAppSearchAnswers(
             query.getQuery(),
+            semanticTerms,
             query.getSortBy(),
             pageSize,
             offset
         );
+        applyAnswerHighlights(rows, highlightKeywords);
+        return rows;
+    }
+
+    private List<AppSearchSimilarQuestionVO> searchSimilarQuestions(AppSearchQueryDTO query, List<String> highlightKeywords) {
+        List<AppSearchQuestionVO> candidates = Collections.emptyList();
+        if (useEsSearch()) {
+            try {
+                List<Long> ids = esSearchService.searchQuestionIds(
+                    query.getQuery(),
+                    0,
+                    SIMILAR_QUESTION_LIMIT * 2,
+                    query.getCategoryId(),
+                    query.getTopicId(),
+                    query.getOnlyUnsolved(),
+                    "comprehensive"
+                );
+                if (ids != null && !ids.isEmpty()) {
+                    candidates = qaQuestionMapper.selectAppSearchQuestionsByIds(
+                        ids,
+                        query.getCategoryId(),
+                        query.getTopicId(),
+                        query.getOnlyUnsolved()
+                    );
+                }
+            } catch (Exception ignored) {
+                // fallback to mysql below
+            }
+        }
+
+        if (candidates == null || candidates.isEmpty()) {
+            candidates = qaQuestionMapper.selectAppSearchQuestions(
+                query.getQuery(),
+                "comprehensive",
+                query.getCategoryId(),
+                query.getTopicId(),
+                query.getOnlyUnsolved(),
+                SIMILAR_QUESTION_LIMIT * 2,
+                0
+            );
+        }
+        if (candidates == null || candidates.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        String queryNorm = normalizeText(query.getQuery());
+        Set<String> dedup = new LinkedHashSet<>();
+        List<AppSearchSimilarQuestionVO> result = new ArrayList<>();
+        for (AppSearchQuestionVO candidate : candidates) {
+            if (candidate == null || !StringUtils.hasText(candidate.getTitle()) || candidate.getId() == null) {
+                continue;
+            }
+            String title = candidate.getTitle().trim();
+            String norm = normalizeText(title);
+            if (!StringUtils.hasText(norm) || norm.equals(queryNorm) || !dedup.add(norm)) {
+                continue;
+            }
+            AppSearchSimilarQuestionVO suggestion = new AppSearchSimilarQuestionVO();
+            suggestion.setId(candidate.getId());
+            suggestion.setTitle(title);
+            suggestion.setTitleHighlight(highlightText(title, highlightKeywords));
+            result.add(suggestion);
+            if (result.size() >= SIMILAR_QUESTION_LIMIT) {
+                break;
+            }
+        }
+        return result;
+    }
+
+    private List<String> buildHighlightKeywords(String query) {
+        if (!StringUtils.hasText(query)) {
+            return Collections.emptyList();
+        }
+        LinkedHashSet<String> keywords = new LinkedHashSet<>();
+        String normalizedQuery = normalizeText(query);
+        if (StringUtils.hasText(normalizedQuery)) {
+            keywords.add(normalizedQuery);
+            for (String token : normalizedQuery.split("\\s+")) {
+                if (StringUtils.hasText(token)) {
+                    keywords.add(token);
+                }
+            }
+        }
+        try {
+            List<String> semanticTerms = esSearchService.buildSemanticTerms(query, HIGHLIGHT_TERM_LIMIT);
+            if (semanticTerms != null) {
+                for (String term : semanticTerms) {
+                    String normalized = normalizeText(term);
+                    if (StringUtils.hasText(normalized)) {
+                        keywords.add(normalized);
+                    }
+                }
+            }
+        } catch (Exception ignored) {
+            // keep lexical highlight only
+        }
+        List<String> result = new ArrayList<>(keywords);
+        result.sort(Comparator.comparingInt(String::length).reversed());
+        if (result.size() > HIGHLIGHT_TERM_LIMIT) {
+            return result.subList(0, HIGHLIGHT_TERM_LIMIT);
+        }
+        return result;
+    }
+
+    private void applyQuestionHighlights(List<AppSearchQuestionVO> rows, List<String> keywords) {
+        if (rows == null || rows.isEmpty()) {
+            return;
+        }
+        for (AppSearchQuestionVO row : rows) {
+            if (row == null) {
+                continue;
+            }
+            row.setTitleHighlight(highlightText(row.getTitle(), keywords));
+            row.setSummaryHighlight(highlightText(row.getSummary(), keywords));
+        }
+    }
+
+    private void applyKbHighlights(List<AppSearchKbVO> rows, List<String> keywords) {
+        if (rows == null || rows.isEmpty()) {
+            return;
+        }
+        for (AppSearchKbVO row : rows) {
+            if (row == null) {
+                continue;
+            }
+            row.setTitleHighlight(highlightText(row.getTitle(), keywords));
+            row.setSummaryHighlight(highlightText(row.getSummary(), keywords));
+        }
+    }
+
+    private void applyAnswerHighlights(List<AppSearchAnswerVO> rows, List<String> keywords) {
+        if (rows == null || rows.isEmpty()) {
+            return;
+        }
+        for (AppSearchAnswerVO row : rows) {
+            if (row == null) {
+                continue;
+            }
+            row.setQuestionTitleHighlight(highlightText(row.getQuestionTitle(), keywords));
+            row.setContentPreviewHighlight(highlightText(row.getContentPreview(), keywords));
+        }
+    }
+
+    private String highlightText(String raw, List<String> keywords) {
+        if (raw == null) {
+            return "";
+        }
+        String escaped = escapeHtml(raw);
+        if (keywords == null || keywords.isEmpty()) {
+            return escaped;
+        }
+        String highlighted = escaped;
+        for (String keyword : keywords) {
+            if (!StringUtils.hasText(keyword)) {
+                continue;
+            }
+            highlighted = highlightKeyword(highlighted, keyword.trim());
+        }
+        return highlighted;
+    }
+
+    private String highlightKeyword(String input, String keyword) {
+        if (!StringUtils.hasText(input) || !StringUtils.hasText(keyword)) {
+            return input;
+        }
+        String escapedKeyword = escapeHtml(keyword);
+        if (!StringUtils.hasText(escapedKeyword)) {
+            return input;
+        }
+        Pattern pattern = isAscii(escapedKeyword)
+            ? Pattern.compile(Pattern.quote(escapedKeyword), Pattern.CASE_INSENSITIVE)
+            : Pattern.compile(Pattern.quote(escapedKeyword));
+        Matcher matcher = pattern.matcher(input);
+        StringBuffer sb = new StringBuffer();
+        while (matcher.find()) {
+            String matched = matcher.group();
+            matcher.appendReplacement(sb, Matcher.quoteReplacement(HIT_START + matched + HIT_END));
+        }
+        matcher.appendTail(sb);
+        return sb.toString();
+    }
+
+    private boolean isAscii(String text) {
+        return StringUtils.hasText(text) && ASCII_ALNUM.matcher(text).matches();
+    }
+
+    private String normalizeText(String text) {
+        if (!StringUtils.hasText(text)) {
+            return "";
+        }
+        return text.trim().toLowerCase(Locale.ROOT).replaceAll("\\s+", " ");
+    }
+
+    private String escapeHtml(String raw) {
+        if (raw == null) {
+            return "";
+        }
+        return raw
+            .replace("&", "&amp;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;")
+            .replace("\"", "&quot;")
+            .replace("'", "&#39;");
     }
 
     private boolean useEsSearch() {

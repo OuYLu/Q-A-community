@@ -14,4 +14,5 @@ public class AppSearchResultVO {
     private List<AppSearchTopicVO> topics;
     private List<AppSearchTagVO> tags;
     private List<AppSearchKbVO> kbEntries;
+    private List<AppSearchSimilarQuestionVO> similarQuestions;
 }

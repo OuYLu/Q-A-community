@@ -18,6 +18,8 @@ public interface EsSearchService {
 
     List<Long> searchKbIds(String query, int from, int size);
 
+    List<String> buildSemanticTerms(String query, int limit);
+
     void reindexAll();
 
     void indexQuestion(SearchQuestionDoc doc);
