@@ -1,15 +1,20 @@
 package com.community.controller.customer;
 
 import com.community.common.Result;
+import com.community.dto.AppMeCancelRequestDTO;
 import com.community.dto.AppMePasswordChangeDTO;
 import com.community.dto.AppMePasswordSetFirstDTO;
+import com.community.dto.AppMePrivacyUpdateDTO;
 import com.community.dto.AppMeProfileUpdateDTO;
 import com.community.dto.AppPageQueryDTO;
 import com.community.service.CustomerMeService;
 import com.community.vo.AppDocVO;
 import com.community.vo.AppFollowTopicItemVO;
 import com.community.vo.AppFollowUserItemVO;
+import com.community.vo.AppMeCancelRequestVO;
+import com.community.vo.AppMeDataExportVO;
 import com.community.vo.AppMeOverviewVO;
+import com.community.vo.AppMePrivacyVO;
 import com.community.vo.AppMyAnswerItemVO;
 import com.community.vo.AppMyFavoriteItemVO;
 import com.community.vo.AppMyHistoryItemVO;
@@ -87,7 +92,7 @@ public class CustomerMeController {
     }
 
     @GetMapping("/following")
-    @Operation(summary = "我的关注用户")
+    @Operation(summary = "我关注的用户")
     public Result<PageInfo<AppFollowUserItemVO>> following(@ModelAttribute AppPageQueryDTO query) {
         return Result.success(customerMeService.following(query));
     }
@@ -104,10 +109,41 @@ public class CustomerMeController {
         return Result.success(customerMeService.followedTopics(query));
     }
 
+    @GetMapping("/privacy")
+    @Operation(summary = "获取隐私设置")
+    public Result<AppMePrivacyVO> privacy() {
+        return Result.success(customerMeService.privacy());
+    }
+
+    @PutMapping("/privacy")
+    @Operation(summary = "更新隐私设置")
+    public Result<Void> updatePrivacy(@Valid @RequestBody AppMePrivacyUpdateDTO dto) {
+        customerMeService.updatePrivacy(dto);
+        return Result.success(null);
+    }
+
+    @GetMapping("/export")
+    @Operation(summary = "导出我的数据")
+    public Result<AppMeDataExportVO> exportData() {
+        return Result.success(customerMeService.exportData());
+    }
+
+    @PostMapping("/cancel-request")
+    @Operation(summary = "提交账号注销申请")
+    public Result<Void> submitCancelRequest(@Valid @RequestBody AppMeCancelRequestDTO dto) {
+        customerMeService.submitCancelRequest(dto);
+        return Result.success(null);
+    }
+
+    @GetMapping("/cancel-request/latest")
+    @Operation(summary = "获取最近一次账号注销申请")
+    public Result<AppMeCancelRequestVO> latestCancelRequest() {
+        return Result.success(customerMeService.latestCancelRequest());
+    }
+
     @GetMapping("/docs/{type}")
     @Operation(summary = "静态文档：设置/帮助/用户协议/隐私政策")
     public Result<AppDocVO> doc(@PathVariable String type) {
         return Result.success(customerMeService.doc(type));
     }
 }
-

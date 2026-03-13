@@ -343,7 +343,7 @@
     LEFT JOIN qa_topic t ON t.id = q.topic_id
     LEFT JOIN user u ON u.id = q.user_id
     WHERE 1 = 1
-      AND q.status <> 5
+      AND q.status != 5
     <if test="keyword != null and keyword != ''">
       AND (
         q.title LIKE CONCAT('%', #{keyword}, '%')
@@ -387,3 +387,4 @@
       q.id DESC
   </select>
 </mapper>
+

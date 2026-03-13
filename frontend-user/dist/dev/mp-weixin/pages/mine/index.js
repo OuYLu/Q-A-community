@@ -156,10 +156,18 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     function openDoc(type) {
       common_vendor.index.navigateTo({ url: `/pages/mine/doc?type=${type}` });
     }
+    function openOther(type) {
+      if (type === "settings") {
+        common_vendor.index.navigateTo({ url: "/pages/mine/settings" });
+        return;
+      }
+      openDoc(type);
+    }
     function formatJoinedAt(value) {
       if (!value)
         return "--";
-      const date = new Date(value);
+      const normalized = value.replace("T", " ").replace(/-/g, "/");
+      const date = new Date(normalized);
       if (Number.isNaN(date.getTime()))
         return value;
       const y = date.getFullYear();
@@ -255,7 +263,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             a: common_vendor.t(item.icon),
             b: common_vendor.t(item.title),
             c: item.title,
-            d: common_vendor.o(($event) => openDoc(item.type), item.title)
+            d: common_vendor.o(($event) => openOther(item.type), item.title)
           };
         }),
         p: common_vendor.t(formatJoinedAt((_a = overview.value) == null ? void 0 : _a.joinedAt)),

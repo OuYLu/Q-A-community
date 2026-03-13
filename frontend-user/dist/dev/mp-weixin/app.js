@@ -22,6 +22,7 @@ if (!Math) {
   "./pages/auth/wechat-bind-phone.js";
   "./pages/mine/list.js";
   "./pages/mine/doc.js";
+  "./pages/mine/settings.js";
   "./pages/mine/edit-profile.js";
   "./pages/mine/password.js";
   "./pages/user/home.js";

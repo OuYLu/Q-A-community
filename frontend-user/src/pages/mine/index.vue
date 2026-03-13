@@ -156,9 +156,18 @@ function openDoc(type: string) {
   uni.navigateTo({ url: `/pages/mine/doc?type=${type}` });
 }
 
+function openOther(type: string) {
+  if (type === "settings") {
+    uni.navigateTo({ url: "/pages/mine/settings" });
+    return;
+  }
+  openDoc(type);
+}
+
 function formatJoinedAt(value?: string) {
   if (!value) return "--";
-  const date = new Date(value);
+  const normalized = value.replace("T", " ").replace(/-/g, "/");
+  const date = new Date(normalized);
   if (Number.isNaN(date.getTime())) return value;
   const y = date.getFullYear();
   const m = `${date.getMonth() + 1}`.padStart(2, "0");
@@ -260,7 +269,7 @@ onShow(() => {
 
     <view class="section-title">其他</view>
     <view class="list-card">
-      <view v-for="item in others" :key="item.title" class="list-row" @click="openDoc(item.type)">
+      <view v-for="item in others" :key="item.title" class="list-row" @click="openOther(item.type)">
         <view class="row-left">
           <view class="icon">{{ item.icon }}</view>
           <text class="row-title">{{ item.title }}</text>

@@ -4,11 +4,14 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.community.common.BizException;
 import com.community.common.ResultCode;
 import com.community.common.SecurityUser;
+import com.community.dto.AppMeCancelRequestDTO;
 import com.community.dto.AppMePasswordChangeDTO;
 import com.community.dto.AppMePasswordSetFirstDTO;
+import com.community.dto.AppMePrivacyUpdateDTO;
 import com.community.dto.AppMeProfileUpdateDTO;
 import com.community.dto.AppPageQueryDTO;
 import com.community.entity.ExpertProfile;
+import com.community.entity.UserPrivacySetting;
 import com.community.entity.User;
 import com.community.entity.UserStat;
 import com.community.mapper.ExpertPostMapper;
@@ -20,12 +23,16 @@ import com.community.mapper.QaTopicFollowMapper;
 import com.community.mapper.UserBrowseHistoryMapper;
 import com.community.mapper.UserFollowMapper;
 import com.community.mapper.UserMapper;
+import com.community.mapper.UserPrivacySettingMapper;
 import com.community.mapper.UserStatMapper;
 import com.community.service.CustomerMeService;
 import com.community.vo.AppDocVO;
 import com.community.vo.AppFollowTopicItemVO;
 import com.community.vo.AppFollowUserItemVO;
+import com.community.vo.AppMeCancelRequestVO;
+import com.community.vo.AppMeDataExportVO;
 import com.community.vo.AppMeOverviewVO;
+import com.community.vo.AppMePrivacyVO;
 import com.community.vo.AppMyAnswerItemVO;
 import com.community.vo.AppMyFavoriteItemVO;
 import com.community.vo.AppMyHistoryItemVO;
@@ -42,6 +49,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -56,6 +65,7 @@ public class CustomerMeServiceImpl implements CustomerMeService {
     private final QaTopicFollowMapper qaTopicFollowMapper;
     private final ExpertProfileMapper expertProfileMapper;
     private final ExpertPostMapper expertPostMapper;
+    private final UserPrivacySettingMapper userPrivacySettingMapper;
     private final PasswordEncoder passwordEncoder;
 
     @Value("${qa.history-retention-days:30}")
@@ -66,7 +76,7 @@ public class CustomerMeServiceImpl implements CustomerMeService {
         Long userId = requireUserId();
         User user = userMapper.selectById(userId);
         if (user == null) {
-            throw new BizException(ResultCode.BAD_REQUEST, "用户不存在");
+            throw new BizException(ResultCode.BAD_REQUEST, "user not found");
         }
 
         UserStat stat = userStatMapper.selectById(userId);
@@ -138,7 +148,7 @@ public class CustomerMeServiceImpl implements CustomerMeService {
         Long userId = requireUserId();
         User user = userMapper.selectById(userId);
         if (user == null) {
-            throw new BizException(ResultCode.BAD_REQUEST, "用户不存在");
+            throw new BizException(ResultCode.BAD_REQUEST, "user not found");
         }
 
         if (StringUtils.hasText(dto.getNickname())) {
@@ -162,13 +172,13 @@ public class CustomerMeServiceImpl implements CustomerMeService {
         Long userId = requireUserId();
         User user = userMapper.selectById(userId);
         if (user == null) {
-            throw new BizException(ResultCode.BAD_REQUEST, "用户不存在");
+            throw new BizException(ResultCode.BAD_REQUEST, "user not found");
         }
         if (!dto.getNewPassword().equals(dto.getConfirmPassword())) {
-            throw new BizException(ResultCode.BAD_REQUEST, "两次密码输入不一致");
+            throw new BizException(ResultCode.BAD_REQUEST, "password confirm mismatch");
         }
         if (user.getPasswordSet() == null || user.getPasswordSet() != 0) {
-            throw new BizException(ResultCode.BAD_REQUEST, "首次密码已设置");
+            throw new BizException(ResultCode.BAD_REQUEST, "password already set");
         }
 
         user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
@@ -182,13 +192,13 @@ public class CustomerMeServiceImpl implements CustomerMeService {
         Long userId = requireUserId();
         User user = userMapper.selectById(userId);
         if (user == null) {
-            throw new BizException(ResultCode.BAD_REQUEST, "用户不存在");
+            throw new BizException(ResultCode.BAD_REQUEST, "user not found");
         }
         if (!dto.getNewPassword().equals(dto.getConfirmPassword())) {
-            throw new BizException(ResultCode.BAD_REQUEST, "两次密码输入不一致");
+            throw new BizException(ResultCode.BAD_REQUEST, "password confirm mismatch");
         }
         if (!passwordEncoder.matches(dto.getOldPassword(), user.getPassword())) {
-            throw new BizException(ResultCode.BAD_REQUEST, "旧密码不正确");
+            throw new BizException(ResultCode.BAD_REQUEST, "old password incorrect");
         }
 
         user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
@@ -247,30 +257,155 @@ public class CustomerMeServiceImpl implements CustomerMeService {
     }
 
     @Override
+    @Transactional
+    public AppMePrivacyVO privacy() {
+        Long userId = requireUserId();
+        UserPrivacySetting setting = findOrCreatePrivacySetting(userId);
+        return toPrivacyVO(setting);
+    }
+
+    @Override
+    @Transactional
+    public void updatePrivacy(AppMePrivacyUpdateDTO dto) {
+        Long userId = requireUserId();
+        validateBoolFlag(dto.getProfileVisible(), "profileVisible");
+        validateBoolFlag(dto.getStatsVisible(), "statsVisible");
+        validateBoolFlag(dto.getPersonalizedRecommend(), "personalizedRecommend");
+
+        UserPrivacySetting setting = findOrCreatePrivacySetting(userId);
+        setting.setProfileVisible(dto.getProfileVisible());
+        setting.setStatsVisible(dto.getStatsVisible());
+        setting.setPersonalizedRecommend(dto.getPersonalizedRecommend());
+        userPrivacySettingMapper.updateById(setting);
+    }
+
+    @Override
+    public AppMeDataExportVO exportData() {
+        Long userId = requireUserId();
+        LocalDateTime retainedFrom = LocalDateTime.now().minusDays(Math.max(1, historyRetentionDays));
+
+        AppMeDataExportVO vo = new AppMeDataExportVO();
+        vo.setExportedAt(LocalDateTime.now());
+        vo.setOverview(overview());
+        vo.setPrivacy(toPrivacyVO(findOrCreatePrivacySetting(userId)));
+        vo.setRecentQuestions(limitList(qaQuestionMapper.selectMyQuestions(userId), 200));
+        vo.setRecentAnswers(limitList(qaAnswerMapper.selectMyAnswers(userId), 200));
+        vo.setRecentFavorites(limitList(qaFavoriteMapper.selectMyFavorites(userId), 200));
+        vo.setRecentHistory(limitList(userBrowseHistoryMapper.selectMyHistory(userId, retainedFrom), 200));
+        vo.setFollowing(limitList(userFollowMapper.selectMyFollowing(userId), 200));
+        vo.setFollowers(limitList(userFollowMapper.selectMyFollowers(userId), 200));
+        vo.setFollowedTopics(limitList(qaTopicFollowMapper.selectMyFollowedTopics(userId), 200));
+        return vo;
+    }
+
+    @Override
+    @Transactional
+    public void submitCancelRequest(AppMeCancelRequestDTO dto) {
+        Long userId = requireUserId();
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new BizException(ResultCode.BAD_REQUEST, "user not found");
+        }
+        if (user.getStatus() != null && user.getStatus() == User.STATUS_DISABLED) {
+            return;
+        }
+
+        user.setStatus(User.STATUS_DISABLED);
+        user.setPhone(null);
+        user.setEmail(null);
+        user.setAvatar(null);
+        user.setSlogan(null);
+        user.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
+        user.setPasswordSet(1);
+        userMapper.updateById(user);
+
+        UserPrivacySetting setting = findOrCreatePrivacySetting(userId);
+        setting.setProfileVisible(0);
+        setting.setStatsVisible(0);
+        setting.setPersonalizedRecommend(0);
+        userPrivacySettingMapper.updateById(setting);
+    }
+
+    @Override
+    public AppMeCancelRequestVO latestCancelRequest() {
+        requireUserId();
+        return null;
+    }
+
+    @Override
     public AppDocVO doc(String type) {
         String normalized = type == null ? "" : type.trim().toLowerCase();
         AppDocVO vo = new AppDocVO();
         vo.setType(normalized);
         switch (normalized) {
             case "settings" -> {
-                vo.setTitle("设置");
-                vo.setContent("设置页占位内容：用于配置账号安全、通知和隐私偏好。");
+                vo.setTitle("settings");
+                vo.setContent("settings placeholder");
             }
             case "help" -> {
-                vo.setTitle("帮助与反馈");
-                vo.setContent("帮助页占位内容：请通过应用内反馈入口提交问题。");
+                vo.setTitle("help");
+                vo.setContent("help placeholder");
             }
             case "user-agreement" -> {
-                vo.setTitle("用户协议");
-                vo.setContent("用户协议占位内容：请替换为正式法律文本。");
+                vo.setTitle("user agreement");
+                vo.setContent("user agreement placeholder");
             }
             case "privacy-policy" -> {
-                vo.setTitle("隐私政策");
-                vo.setContent("隐私政策占位内容：请替换为正式法律文本。");
+                vo.setTitle("privacy policy");
+                vo.setContent("privacy policy placeholder");
             }
-            default -> throw new BizException(ResultCode.BAD_REQUEST, "不支持的文档类型");
+            default -> throw new BizException(ResultCode.BAD_REQUEST, "unsupported doc type");
         }
         return vo;
+    }
+    private UserPrivacySetting findOrCreatePrivacySetting(Long userId) {
+        UserPrivacySetting setting = userPrivacySettingMapper.selectOne(new LambdaQueryWrapper<UserPrivacySetting>()
+            .eq(UserPrivacySetting::getUserId, userId)
+            .last("LIMIT 1"));
+        if (setting != null) {
+            return setting;
+        }
+        UserPrivacySetting created = new UserPrivacySetting();
+        created.setUserId(userId);
+        created.setProfileVisible(1);
+        created.setStatsVisible(1);
+        created.setPersonalizedRecommend(1);
+        userPrivacySettingMapper.insert(created);
+        return userPrivacySettingMapper.selectOne(new LambdaQueryWrapper<UserPrivacySetting>()
+            .eq(UserPrivacySetting::getUserId, userId)
+            .last("LIMIT 1"));
+    }
+
+    private AppMePrivacyVO toPrivacyVO(UserPrivacySetting setting) {
+        AppMePrivacyVO vo = new AppMePrivacyVO();
+        if (setting == null) {
+            vo.setProfileVisible(1);
+            vo.setStatsVisible(1);
+            vo.setPersonalizedRecommend(1);
+            vo.setUpdatedAt(null);
+            return vo;
+        }
+        vo.setProfileVisible(setting.getProfileVisible());
+        vo.setStatsVisible(setting.getStatsVisible());
+        vo.setPersonalizedRecommend(setting.getPersonalizedRecommend());
+        vo.setUpdatedAt(setting.getUpdatedAt());
+        return vo;
+    }
+
+    private void validateBoolFlag(Integer value, String field) {
+        if (value == null || (value != 0 && value != 1)) {
+            throw new BizException(ResultCode.BAD_REQUEST, field + " only supports 0 or 1");
+        }
+    }
+
+    private <T> List<T> limitList(List<T> source, int maxSize) {
+        if (source == null || source.isEmpty()) {
+            return List.of();
+        }
+        if (source.size() <= maxSize) {
+            return source;
+        }
+        return source.subList(0, maxSize);
     }
 
     private int resolvePage(AppPageQueryDTO query) {
@@ -290,8 +425,10 @@ public class CustomerMeServiceImpl implements CustomerMeService {
     private Long requireUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !(authentication.getPrincipal() instanceof SecurityUser securityUser)) {
-            throw new BizException(ResultCode.UNAUTHORIZED, "未授权");
+            throw new BizException(ResultCode.UNAUTHORIZED, "unauthorized");
         }
         return securityUser.getId();
     }
 }
+
+

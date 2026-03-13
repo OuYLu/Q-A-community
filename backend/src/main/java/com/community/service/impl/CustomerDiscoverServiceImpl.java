@@ -1,11 +1,14 @@
 package com.community.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.community.common.SecurityUser;
 import com.community.dto.AppQuestionPageQueryDTO;
+import com.community.entity.UserPrivacySetting;
 import com.community.mapper.ExpertProfileMapper;
 import com.community.mapper.QaCategoryMapper;
 import com.community.mapper.QaQuestionMapper;
 import com.community.mapper.QaTopicMapper;
+import com.community.mapper.UserPrivacySettingMapper;
 import com.community.service.CustomerDiscoverService;
 import com.community.vo.AppCategoryVO;
 import com.community.vo.AppExpertCardVO;
@@ -30,6 +33,7 @@ public class CustomerDiscoverServiceImpl implements CustomerDiscoverService {
     private final QaTopicMapper qaTopicMapper;
     private final QaQuestionMapper qaQuestionMapper;
     private final ExpertProfileMapper expertProfileMapper;
+    private final UserPrivacySettingMapper userPrivacySettingMapper;
 
     @Override
     public AppGuestHomeVO guestHome(Integer topicLimit, Integer questionLimit, Integer expertLimit) {
@@ -102,11 +106,24 @@ public class CustomerDiscoverServiceImpl implements CustomerDiscoverService {
         if (userId == null || query == null) {
             return false;
         }
+        if (!isPersonalizedRecommendEnabled(userId)) {
+            return false;
+        }
         if (StringUtils.hasText(query.getKeyword())) {
             return false;
         }
         String sortBy = StringUtils.hasText(query.getSortBy()) ? query.getSortBy().trim().toLowerCase() : "hot";
         return !"latest".equals(sortBy);
+    }
+
+    private boolean isPersonalizedRecommendEnabled(Long userId) {
+        UserPrivacySetting setting = userPrivacySettingMapper.selectOne(new LambdaQueryWrapper<UserPrivacySetting>()
+            .eq(UserPrivacySetting::getUserId, userId)
+            .last("LIMIT 1"));
+        if (setting == null || setting.getPersonalizedRecommend() == null) {
+            return true;
+        }
+        return setting.getPersonalizedRecommend() == 1;
     }
 
     private Long currentUserId() {

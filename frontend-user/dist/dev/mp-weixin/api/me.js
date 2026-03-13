@@ -69,6 +69,35 @@ const meApi = {
       params
     });
   },
+  privacy() {
+    return api_http.request({
+      url: "/api/customer/me/privacy"
+    });
+  },
+  updatePrivacy(data) {
+    return api_http.request({
+      url: "/api/customer/me/privacy",
+      method: "PUT",
+      data
+    });
+  },
+  exportData() {
+    return api_http.request({
+      url: "/api/customer/me/export"
+    });
+  },
+  submitCancelRequest(data) {
+    return api_http.request({
+      url: "/api/customer/me/cancel-request",
+      method: "POST",
+      data
+    });
+  },
+  latestCancelRequest() {
+    return api_http.request({
+      url: "/api/customer/me/cancel-request/latest"
+    });
+  },
   doc(type) {
     return api_http.request({
       url: `/api/customer/me/docs/${type}`

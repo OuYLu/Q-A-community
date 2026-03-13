@@ -13,12 +13,14 @@ import com.community.entity.KbEntry;
 import com.community.entity.KbEntryTag;
 import com.community.entity.QaTag;
 import com.community.entity.User;
+import com.community.entity.UserPrivacySetting;
 import com.community.mapper.CmsSensitiveWordMapper;
 import com.community.mapper.ExpertPostMapper;
 import com.community.mapper.KbCategoryMapper;
 import com.community.mapper.KbEntryTagMapper;
 import com.community.mapper.QaTagMapper;
 import com.community.mapper.UserMapper;
+import com.community.mapper.UserPrivacySettingMapper;
 import com.community.service.EsSearchService;
 import com.community.service.ExpertPostService;
 import com.community.service.RecommendationBehaviorService;
@@ -62,6 +64,7 @@ public class ExpertPostServiceImpl implements ExpertPostService {
     private final ObjectMapper objectMapper;
     private final EsSearchService esSearchService;
     private final RecommendationBehaviorService recommendationBehaviorService;
+    private final UserPrivacySettingMapper userPrivacySettingMapper;
 
     @Override
     public List<AppKbCategoryVO> categories() {
@@ -480,11 +483,24 @@ public class ExpertPostServiceImpl implements ExpertPostService {
         if (userId == null || query == null) {
             return false;
         }
+        if (!isPersonalizedRecommendEnabled(userId)) {
+            return false;
+        }
         if (StringUtils.hasText(query.getKeyword())) {
             return false;
         }
         String sortBy = StringUtils.hasText(query.getSortBy()) ? query.getSortBy().trim().toLowerCase() : "hot";
         return !"latest".equals(sortBy);
+    }
+
+    private boolean isPersonalizedRecommendEnabled(Long userId) {
+        UserPrivacySetting setting = userPrivacySettingMapper.selectOne(new LambdaQueryWrapper<UserPrivacySetting>()
+            .eq(UserPrivacySetting::getUserId, userId)
+            .last("LIMIT 1"));
+        if (setting == null || setting.getPersonalizedRecommend() == null) {
+            return true;
+        }
+        return setting.getPersonalizedRecommend() == 1;
     }
 
     private Long currentUserIdOrNull() {

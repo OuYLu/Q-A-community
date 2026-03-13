@@ -5,11 +5,12 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.community.common.BizException;
 import com.community.common.ResultCode;
 import com.community.common.SecurityUser;
+import com.community.dto.AppPageQueryDTO;
 import com.community.entity.NotifyMessage;
-import com.community.entity.QaAnswer;
 import com.community.entity.QaQuestion;
 import com.community.entity.User;
 import com.community.entity.UserFollow;
+import com.community.entity.UserPrivacySetting;
 import com.community.entity.UserStat;
 import com.community.mapper.ExpertPostMapper;
 import com.community.mapper.NotifyMessageMapper;
@@ -17,9 +18,9 @@ import com.community.mapper.QaAnswerMapper;
 import com.community.mapper.QaQuestionMapper;
 import com.community.mapper.UserFollowMapper;
 import com.community.mapper.UserMapper;
+import com.community.mapper.UserPrivacySettingMapper;
 import com.community.mapper.UserStatMapper;
 import com.community.service.CustomerUserService;
-import com.community.dto.AppPageQueryDTO;
 import com.community.vo.AppExpertPostItemVO;
 import com.community.vo.AppMyAnswerItemVO;
 import com.community.vo.AppUserHomeVO;
@@ -45,6 +46,7 @@ public class CustomerUserServiceImpl implements CustomerUserService {
     private final QaAnswerMapper qaAnswerMapper;
     private final NotifyMessageMapper notifyMessageMapper;
     private final ExpertPostMapper expertPostMapper;
+    private final UserPrivacySettingMapper userPrivacySettingMapper;
 
     @Override
     public AppUserHomeVO home(Long userId) {
@@ -54,20 +56,28 @@ public class CustomerUserServiceImpl implements CustomerUserService {
             throw new BizException(ResultCode.BAD_REQUEST, "用户不存在");
         }
         boolean self = currentUserId.equals(userId);
+        boolean profileVisible = self || isProfileVisible(userId);
+        boolean statsVisible = self || (profileVisible && isStatsVisible(userId));
 
         UserStat stat = userStatMapper.selectById(userId);
-        int questionCount = Math.toIntExact(qaQuestionMapper.selectCount(new LambdaQueryWrapper<QaQuestion>()
-            .eq(QaQuestion::getUserId, userId)
-            .eq(QaQuestion::getDeleteFlag, 0)
-            .eq(QaQuestion::getStatus, 1)));
-        Long effectiveAnswerCount = qaAnswerMapper.countUserEffectiveAnswers(userId);
-        int answerCount = effectiveAnswerCount == null ? 0 : Math.toIntExact(effectiveAnswerCount);
-        int followerCount = stat != null && stat.getFollowerCount() != null
-            ? stat.getFollowerCount()
-            : (user.getFollowerCount() == null ? 0 : user.getFollowerCount());
-        int followingCount = stat != null && stat.getFollowingCount() != null
-            ? stat.getFollowingCount()
-            : (user.getFollowingCount() == null ? 0 : user.getFollowingCount());
+        int questionCount = 0;
+        int answerCount = 0;
+        int followerCount = 0;
+        int followingCount = 0;
+        if (statsVisible) {
+            questionCount = Math.toIntExact(qaQuestionMapper.selectCount(new LambdaQueryWrapper<QaQuestion>()
+                .eq(QaQuestion::getUserId, userId)
+                .eq(QaQuestion::getDeleteFlag, 0)
+                .eq(QaQuestion::getStatus, 1)));
+            Long effectiveAnswerCount = qaAnswerMapper.countUserEffectiveAnswers(userId);
+            answerCount = effectiveAnswerCount == null ? 0 : Math.toIntExact(effectiveAnswerCount);
+            followerCount = stat != null && stat.getFollowerCount() != null
+                ? stat.getFollowerCount()
+                : (user.getFollowerCount() == null ? 0 : user.getFollowerCount());
+            followingCount = stat != null && stat.getFollowingCount() != null
+                ? stat.getFollowingCount()
+                : (user.getFollowingCount() == null ? 0 : user.getFollowingCount());
+        }
 
         boolean followed = !self && userFollowMapper.selectCount(new LambdaQueryWrapper<UserFollow>()
             .eq(UserFollow::getFollowerId, currentUserId)
@@ -79,7 +89,7 @@ public class CustomerUserServiceImpl implements CustomerUserService {
         vo.setAvatar(user.getAvatar());
         vo.setSlogan(user.getSlogan());
         vo.setExpertStatus(user.getExpertStatus());
-        if (user.getExpertStatus() != null && user.getExpertStatus() == 3) {
+        if (statsVisible && user.getExpertStatus() != null && user.getExpertStatus() == 3) {
             Long postCountValue = expertPostMapper.countPublishedByAuthor(userId);
             int postCount = postCountValue == null ? 0 : Math.toIntExact(postCountValue);
             vo.setExpertPostCount(postCount);
@@ -132,7 +142,7 @@ public class CustomerUserServiceImpl implements CustomerUserService {
     public void unfollow(Long userId) {
         Long currentUserId = requireUserId();
         if (currentUserId.equals(userId)) {
-            throw new BizException(ResultCode.BAD_REQUEST, "不能取关自己");
+            throw new BizException(ResultCode.BAD_REQUEST, "不能取消关注自己");
         }
 
         int deleted = userFollowMapper.delete(new LambdaQueryWrapper<UserFollow>()
@@ -150,10 +160,13 @@ public class CustomerUserServiceImpl implements CustomerUserService {
 
     @Override
     public PageInfo<AppMyAnswerItemVO> answers(Long userId, AppPageQueryDTO query) {
-        requireUserId();
+        Long currentUserId = requireUserId();
         User target = userMapper.selectById(userId);
         if (target == null) {
             throw new BizException(ResultCode.BAD_REQUEST, "用户不存在");
+        }
+        if (!currentUserId.equals(userId) && !isProfileVisible(userId)) {
+            return new PageInfo<>(List.of());
         }
         int page = query == null || query.getPage() == null || query.getPage() <= 0 ? 1 : query.getPage();
         int pageSize = query == null || query.getPageSize() == null || query.getPageSize() <= 0 ? 10 : query.getPageSize();
@@ -163,10 +176,13 @@ public class CustomerUserServiceImpl implements CustomerUserService {
 
     @Override
     public PageInfo<AppExpertPostItemVO> expertPosts(Long userId, AppPageQueryDTO query) {
-        requireUserId();
+        Long currentUserId = requireUserId();
         User target = userMapper.selectById(userId);
         if (target == null) {
             throw new BizException(ResultCode.BAD_REQUEST, "用户不存在");
+        }
+        if (!currentUserId.equals(userId) && !isProfileVisible(userId)) {
+            return new PageInfo<>(List.of());
         }
         if (target.getExpertStatus() == null || target.getExpertStatus() != 3) {
             return new PageInfo<>(List.of());
@@ -251,6 +267,26 @@ public class CustomerUserServiceImpl implements CustomerUserService {
             return user.getUsername().trim();
         }
         return "用户";
+    }
+
+    private boolean isProfileVisible(Long userId) {
+        UserPrivacySetting setting = userPrivacySettingMapper.selectOne(new LambdaQueryWrapper<UserPrivacySetting>()
+            .eq(UserPrivacySetting::getUserId, userId)
+            .last("LIMIT 1"));
+        if (setting == null || setting.getProfileVisible() == null) {
+            return true;
+        }
+        return setting.getProfileVisible() == 1;
+    }
+
+    private boolean isStatsVisible(Long userId) {
+        UserPrivacySetting setting = userPrivacySettingMapper.selectOne(new LambdaQueryWrapper<UserPrivacySetting>()
+            .eq(UserPrivacySetting::getUserId, userId)
+            .last("LIMIT 1"));
+        if (setting == null || setting.getStatsVisible() == null) {
+            return true;
+        }
+        return setting.getStatsVisible() == 1;
     }
 
     private Long requireUserId() {

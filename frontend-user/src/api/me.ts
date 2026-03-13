@@ -92,6 +92,45 @@ export interface AppDocVO {
   content: string;
 }
 
+export interface AppMePrivacyVO {
+  profileVisible: number;
+  statsVisible: number;
+  personalizedRecommend: number;
+  updatedAt?: string | null;
+}
+
+export interface AppMePrivacyUpdateDTO {
+  profileVisible: number;
+  statsVisible: number;
+  personalizedRecommend: number;
+}
+
+export interface AppMeCancelRequestDTO {
+  reason?: string;
+}
+
+export interface AppMeCancelRequestVO {
+  id: number;
+  status: number;
+  reason?: string | null;
+  reviewNote?: string | null;
+  reviewedAt?: string | null;
+  createdAt: string;
+}
+
+export interface AppMeDataExportVO {
+  exportedAt: string;
+  overview: AppMeOverviewVO;
+  privacy: AppMePrivacyVO;
+  recentQuestions: AppMyQuestionItemVO[];
+  recentAnswers: AppMyAnswerItemVO[];
+  recentFavorites: AppMyFavoriteItemVO[];
+  recentHistory: AppMyHistoryItemVO[];
+  following: AppFollowUserItemVO[];
+  followers: AppFollowUserItemVO[];
+  followedTopics: AppFollowTopicItemVO[];
+}
+
 export type AppDocType = "settings" | "help" | "user-agreement" | "privacy-policy";
 
 export interface AppProfileUpdateDTO {
@@ -185,6 +224,35 @@ export const meApi = {
     return request<PageInfo<AppFollowTopicItemVO>>({
       url: "/api/customer/me/topics/following",
       params
+    });
+  },
+  privacy() {
+    return request<AppMePrivacyVO>({
+      url: "/api/customer/me/privacy"
+    });
+  },
+  updatePrivacy(data: AppMePrivacyUpdateDTO) {
+    return request<void>({
+      url: "/api/customer/me/privacy",
+      method: "PUT",
+      data
+    });
+  },
+  exportData() {
+    return request<AppMeDataExportVO>({
+      url: "/api/customer/me/export"
+    });
+  },
+  submitCancelRequest(data: AppMeCancelRequestDTO) {
+    return request<void>({
+      url: "/api/customer/me/cancel-request",
+      method: "POST",
+      data
+    });
+  },
+  latestCancelRequest() {
+    return request<AppMeCancelRequestVO | null>({
+      url: "/api/customer/me/cancel-request/latest"
     });
   },
   doc(type: AppDocType) {

@@ -19,6 +19,7 @@
     "pages/auth/wechat-bind-phone",
     "pages/mine/list",
     "pages/mine/doc",
+    "pages/mine/settings",
     "pages/mine/edit-profile",
     "pages/mine/password",
     "pages/user/home",
