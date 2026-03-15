@@ -1,10 +1,10 @@
 <template>
   <el-card>
     <h2>用户管理</h2>
-    <p>后台人员可以管理 staff / customer / expert 用户。</p>
+    <p>后台人员可以管理后台用户、普通用户、专家用户。</p>
 
     <el-tabs v-model="activeTab" class="user-tabs">
-      <el-tab-pane label="Staff 管理" name="staff">
+      <el-tab-pane label="后台用户管理" name="staff">
         <div class="toolbar">
           <el-form :inline="true" :model="staffQuery" class="toolbar-form">
             <el-form-item label="用户名">
@@ -23,7 +23,7 @@
               <el-button @click="resetStaff">重置</el-button>
             </el-form-item>
           </el-form>
-          <el-button type="primary" @click="openCreateStaff">新增 Staff</el-button>
+          <el-button type="primary" @click="openCreateStaff">新增后台用户</el-button>
         </div>
 
         <el-table :data="staffList" v-loading="staffLoading" style="width: 100%">
@@ -68,7 +68,7 @@
         </div>
       </el-tab-pane>
 
-      <el-tab-pane label="Customer 管理" name="customer">
+      <el-tab-pane label="普通用户管理" name="customer">
         <div class="toolbar">
           <el-form :inline="true" :model="customerQuery" class="toolbar-form">
             <el-form-item label="用户名">
@@ -132,7 +132,7 @@
         </div>
       </el-tab-pane>
 
-      <el-tab-pane label="Expert 管理" name="expert">
+      <el-tab-pane label="专家用户管理" name="expert">
         <el-card class="sub-card">
           <div class="toolbar">
             <el-form :inline="true" :model="expertQuery" class="toolbar-form">
@@ -284,7 +284,7 @@
     </template>
   </el-dialog>
 
-  <el-dialog v-model="createVisible" title="新增 Staff" width="460px">
+  <el-dialog v-model="createVisible" title="新增后台用户" width="460px">
     <div class="create-avatar-section">
       <el-upload class="avatar-uploader" :show-file-list="false" :before-upload="handleCreateAvatarUpload">
         <el-avatar :size="76" :src="createAvatarSrc" class="clickable-avatar">

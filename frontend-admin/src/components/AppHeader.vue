@@ -34,7 +34,20 @@ const theme = ref<"light" | "dark" | "highlight">(
   (localStorage.getItem("admin_theme") as "light" | "dark" | "highlight") || "light"
 );
 
-const userLabel = computed(() => authStore.user?.nickname || authStore.user?.username || "-");
+const toChineseUserLabel = (raw?: string) => {
+  if (!raw) return "-";
+  const key = raw.trim().toLowerCase();
+  if (key === "administrator" || key === "admin") return "管理员";
+  if (key === "staff") return "后台用户";
+  if (key === "customer") return "普通用户";
+  if (key === "expert") return "专家用户";
+  return raw;
+};
+
+const userLabel = computed(() => {
+  const raw = authStore.user?.nickname || authStore.user?.username || "";
+  return toChineseUserLabel(raw);
+});
 const themeLabel = computed(() => {
   if (theme.value === "dark") return "深色";
   if (theme.value === "highlight") return "高亮";

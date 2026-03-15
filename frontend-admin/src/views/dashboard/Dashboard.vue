@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <el-card class="dashboard-card">
     <div class="head-row">
       <div>
@@ -17,7 +17,7 @@
 
     <section class="section overview-section">
       <div class="section-head">
-        <h3 class="section-title">概览 Overview</h3>
+        <h3 class="section-title">概览</h3>
         <p class="section-sub">核心KPI与关键趋势</p>
       </div>
 
@@ -144,7 +144,7 @@
 
     <section class="section insights-section">
       <div class="section-head">
-        <h3 class="section-title">热点 Insights</h3>
+        <h3 class="section-title">热点</h3>
         <p class="section-sub">热门标签、热门专题与新增标签趋势</p>
       </div>
 
@@ -246,7 +246,7 @@
 
     <section class="section actions-section">
       <div class="section-head">
-        <h3 class="section-title action-title">待办 Actions</h3>
+        <h3 class="section-title action-title">待办</h3>
         <p class="section-sub">优先处理审核与举报任务</p>
       </div>
 
