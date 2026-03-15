@@ -1,11 +1,12 @@
-﻿<template>
+<template>
   <div class="header-container">
-    <div class="title">智慧医养健康问答社区 · 管理端</div>
+    <div class="title-block">
+      <div class="title">智慧医养健康问答社区</div>
+      <div class="subtitle">后台运营管理台</div>
+    </div>
     <div class="actions">
       <el-dropdown @command="setTheme">
-        <el-button size="small">
-          主题：{{ themeLabel }}
-        </el-button>
+        <el-button size="small" class="theme-btn">主题：{{ themeLabel }}</el-button>
         <template #dropdown>
           <el-dropdown-menu>
             <el-dropdown-item command="light">浅色</el-dropdown-item>
@@ -57,26 +58,60 @@ const handleLogout = () => {
 
 <style scoped>
 .header-container {
-  height: 100%;
-  padding: 0 28px;
+  min-height: 60px;
+  padding: 0 6px 0 10px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 10px;
+}
+
+.title-block {
+  min-width: 0;
 }
 
 .title {
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 16px;
   color: var(--app-text);
   letter-spacing: 0.2px;
+}
+
+.subtitle {
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--app-text-muted);
 }
 
 .actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+}
+
+.theme-btn {
+  min-width: 88px;
 }
 
 .user {
-  color: var(--app-text-muted);
+  display: inline-flex;
+  align-items: center;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: var(--app-primary-soft);
+  color: var(--app-text);
+  font-size: 13px;
+}
+
+@media (max-width: 760px) {
+  .title {
+    font-size: 14px;
+  }
+
+  .subtitle,
+  .user {
+    display: none;
+  }
 }
 </style>

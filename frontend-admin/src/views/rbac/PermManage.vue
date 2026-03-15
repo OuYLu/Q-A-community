@@ -1,7 +1,7 @@
-﻿<template>
+<template>
   <el-card>
     <h2>权限点管理</h2>
-    <p>管理员可以管理权限点（增删查改）。</p>
+    <p>后台人员可以管理权限点（增删查改）。</p>
 
     <div class="toolbar">
       <el-form :inline="true" :model="query" class="toolbar-form">

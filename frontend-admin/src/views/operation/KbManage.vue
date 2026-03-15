@@ -1,7 +1,7 @@
-﻿<template>
+<template>
   <el-card>
     <h2>知识库管理</h2>
-    <p>管理员可以管理知识库分类与条目。</p>
+    <p>后台人员可以管理知识库分类与条目。</p>
 
     <el-tabs v-model="activeTab" class="kb-tabs">
       <el-tab-pane label="分类管理" name="category">

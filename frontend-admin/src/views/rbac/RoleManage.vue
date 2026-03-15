@@ -1,7 +1,7 @@
-﻿<template>
+<template>
   <el-card>
     <h2>角色管理</h2>
-    <p>管理员可以管理角色，并配置角色权限。</p>
+    <p>后台人员可以管理角色，并配置角色权限。</p>
 
     <div class="toolbar">
       <el-form :inline="true" :model="query" class="toolbar-form">

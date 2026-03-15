@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="crumb-wrap">
     <el-breadcrumb separator="/">
       <el-breadcrumb-item v-for="item in breadcrumbs" :key="item.title">
@@ -16,9 +16,17 @@ const { breadcrumbs } = useBreadcrumbs();
 
 <style scoped>
 .crumb-wrap {
-  background: var(--app-surface);
-  border-radius: var(--app-radius);
-  padding: 12px 16px;
-  box-shadow: var(--app-shadow);
+  padding: 0 0 2px;
+}
+
+.crumb-wrap :deep(.el-breadcrumb__inner) {
+  color: var(--app-text-muted);
+  font-weight: 500;
+  font-size: 13px;
+}
+
+.crumb-wrap :deep(.el-breadcrumb__item:last-child .el-breadcrumb__inner) {
+  color: var(--app-text);
+  font-weight: 600;
 }
 </style>

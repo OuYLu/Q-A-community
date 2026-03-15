@@ -1,7 +1,7 @@
-﻿<template>
+<template>
   <el-card>
     <h2>用户管理</h2>
-    <p>管理员可以管理 staff / customer / expert 用户。</p>
+    <p>后台人员可以管理 staff / customer / expert 用户。</p>
 
     <el-tabs v-model="activeTab" class="user-tabs">
       <el-tab-pane label="Staff 管理" name="staff">

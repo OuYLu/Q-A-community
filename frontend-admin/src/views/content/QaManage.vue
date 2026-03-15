@@ -1,7 +1,7 @@
 <template>
   <el-card>
     <h2>问答管理</h2>
-    <p>管理员可对全量问题与回答进行检索、上下架和删除操作。</p>
+    <p>后台人员可对全量问题与回答进行检索、上下架和删除操作。</p>
 
     <el-tabs v-model="activeTab" class="qa-tabs">
       <el-tab-pane label="问题管理" name="question">

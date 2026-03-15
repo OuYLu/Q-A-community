@@ -1,7 +1,7 @@
-﻿<template>
+<template>
   <el-card>
     <h2>专题管理</h2>
-    <p>管理员可以管理专题（增删查改、状态维护、详情查看）。</p>
+    <p>后台人员可以管理专题（增删查改、状态维护、详情查看）。</p>
 
     <div class="toolbar">
       <el-form :inline="true" :model="query" class="toolbar-form">
