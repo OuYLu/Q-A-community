@@ -84,19 +84,23 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return item.title || "";
     }
     function rowSubText(item) {
-      if (type.value === "favorites")
-        return `${item.answerCount} 回答 ${item.likeCount} 点赞`;
+      if (type.value === "favorites") {
+        if (Number((item == null ? void 0 : item.bizType) || 1) === 2) {
+          return `${item.likeCount || 0} 点赞 ${item.favoriteCount || 0} 收藏`;
+        }
+        return `${item.answerCount || 0} 回答 ${item.likeCount || 0} 点赞`;
+      }
       if (type.value === "history")
         return item.subTitle || "";
       if (type.value === "questions")
-        return `状态：${item.status}，${item.answerCount} 回答`;
+        return `状态：${item.status}，${item.answerCount || 0} 回答`;
       if (type.value === "answers")
         return isInvalidAnswerRow(item) ? "该回答因违规已删除" : item.contentPreview || "";
       if (type.value === "topic-following")
         return item.subtitle || "点击查看专题详情";
       if (type.value === "expert-posts")
         return `${item.likeCount || 0} 点赞 ${item.viewCount || 0} 浏览`;
-      return `专家状态：${item.expertStatus ?? "普通"}`;
+      return `专家状态：${item.expertStatus ?? "普通用户"}`;
     }
     function rowTimeText(item) {
       if (type.value === "favorites")
@@ -220,9 +224,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         utils_nav.openQuestionDetail(Number(item.id));
         return;
       }
-      if (type.value === "favorites" && (item == null ? void 0 : item.questionId)) {
-        utils_nav.openQuestionDetail(Number(item.questionId));
-        return;
+      if (type.value === "favorites") {
+        if (Number((item == null ? void 0 : item.bizType) || 1) === 2 && (item == null ? void 0 : item.bizId)) {
+          utils_nav.openExpertPostDetailPage(Number(item.bizId));
+          return;
+        }
+        if (item == null ? void 0 : item.questionId) {
+          utils_nav.openQuestionDetail(Number(item.questionId));
+          return;
+        }
       }
       if (type.value === "answers" && (item == null ? void 0 : item.questionId)) {
         if (isInvalidAnswerRow(item)) {
@@ -234,6 +244,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
       if (type.value === "history" && (item == null ? void 0 : item.bizType) === 1 && (item == null ? void 0 : item.bizId)) {
         utils_nav.openQuestionDetail(Number(item.bizId));
+        return;
+      }
+      if (type.value === "history" && (item == null ? void 0 : item.bizType) === 2 && (item == null ? void 0 : item.bizId)) {
+        utils_nav.openExpertPostDetailPage(Number(item.bizId));
         return;
       }
       if (type.value === "expert-posts" && (item == null ? void 0 : item.id)) {
@@ -323,7 +337,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }, resolveAvatar(item.avatar) ? {
             b: resolveAvatar(item.avatar)
           } : {
-            c: common_vendor.t((item.nickname || "用").slice(0, 1))
+            c: common_vendor.t((item.nickname || "用户").slice(0, 1))
           }, {
             d: common_vendor.t(item.nickname || `用户 ${item.userId}`),
             e: common_vendor.t(formatDate(item.followedAt) || "-"),

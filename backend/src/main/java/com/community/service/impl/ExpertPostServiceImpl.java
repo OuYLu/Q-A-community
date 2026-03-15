@@ -13,12 +13,14 @@ import com.community.entity.KbEntry;
 import com.community.entity.KbEntryTag;
 import com.community.entity.QaTag;
 import com.community.entity.User;
+import com.community.entity.UserBrowseHistory;
 import com.community.entity.UserPrivacySetting;
 import com.community.mapper.CmsSensitiveWordMapper;
 import com.community.mapper.ExpertPostMapper;
 import com.community.mapper.KbCategoryMapper;
 import com.community.mapper.KbEntryTagMapper;
 import com.community.mapper.QaTagMapper;
+import com.community.mapper.UserBrowseHistoryMapper;
 import com.community.mapper.UserMapper;
 import com.community.mapper.UserPrivacySettingMapper;
 import com.community.service.EsSearchService;
@@ -35,6 +37,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -54,6 +57,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class ExpertPostServiceImpl implements ExpertPostService {
     private static final String SOURCE_EXPERT_POST = "expert_post";
+    private static final int KB_BROWSE_BIZ_TYPE = 2;
 
     private final ExpertPostMapper expertPostMapper;
     private final UserMapper userMapper;
@@ -65,6 +69,10 @@ public class ExpertPostServiceImpl implements ExpertPostService {
     private final EsSearchService esSearchService;
     private final RecommendationBehaviorService recommendationBehaviorService;
     private final UserPrivacySettingMapper userPrivacySettingMapper;
+    private final UserBrowseHistoryMapper userBrowseHistoryMapper;
+
+    @Value("${qa.view-dedup-minutes:5}")
+    private long viewDedupMinutes;
 
     @Override
     public List<AppKbCategoryVO> categories() {
@@ -221,6 +229,7 @@ public class ExpertPostServiceImpl implements ExpertPostService {
             expertPostMapper.increaseViewCount(id);
             vo.setViewCount((vo.getViewCount() == null ? 0 : vo.getViewCount()) + 1);
             if (currentUserId != null) {
+                recordKbBrowse(currentUserId, id);
                 recommendationBehaviorService.recordKbView(currentUserId, id, vo.getCategoryId());
             }
         }
@@ -501,6 +510,36 @@ public class ExpertPostServiceImpl implements ExpertPostService {
             return true;
         }
         return setting.getPersonalizedRecommend() == 1;
+    }
+
+    private void recordKbBrowse(Long userId, Long kbEntryId) {
+        if (userId == null || kbEntryId == null) {
+            return;
+        }
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime cutoff = now.minusMinutes(Math.max(1L, viewDedupMinutes));
+
+        UserBrowseHistory latest = userBrowseHistoryMapper.selectOne(new LambdaQueryWrapper<UserBrowseHistory>()
+            .eq(UserBrowseHistory::getUserId, userId)
+            .eq(UserBrowseHistory::getBizType, KB_BROWSE_BIZ_TYPE)
+            .eq(UserBrowseHistory::getBizId, kbEntryId)
+            .orderByDesc(UserBrowseHistory::getCreatedAt)
+            .last("LIMIT 1"));
+
+        if (latest != null) {
+            if (latest.getCreatedAt() == null || latest.getCreatedAt().isBefore(cutoff)) {
+                latest.setCreatedAt(now);
+                userBrowseHistoryMapper.updateById(latest);
+            }
+            return;
+        }
+
+        UserBrowseHistory browse = new UserBrowseHistory();
+        browse.setUserId(userId);
+        browse.setBizType(KB_BROWSE_BIZ_TYPE);
+        browse.setBizId(kbEntryId);
+        browse.setCreatedAt(now);
+        userBrowseHistoryMapper.insert(browse);
     }
 
     private Long currentUserIdOrNull() {

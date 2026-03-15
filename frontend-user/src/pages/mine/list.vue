@@ -106,13 +106,18 @@ function rowMainText(item: any) {
 }
 
 function rowSubText(item: any) {
-  if (type.value === "favorites") return `${item.answerCount} 回答 ${item.likeCount} 点赞`;
+  if (type.value === "favorites") {
+    if (Number(item?.bizType || 1) === 2) {
+      return `${item.likeCount || 0} 点赞 ${item.favoriteCount || 0} 收藏`;
+    }
+    return `${item.answerCount || 0} 回答 ${item.likeCount || 0} 点赞`;
+  }
   if (type.value === "history") return item.subTitle || "";
-  if (type.value === "questions") return `状态：${item.status}，${item.answerCount} 回答`;
+  if (type.value === "questions") return `状态：${item.status}，${item.answerCount || 0} 回答`;
   if (type.value === "answers") return isInvalidAnswerRow(item) ? "该回答因违规已删除" : item.contentPreview || "";
   if (type.value === "topic-following") return item.subtitle || "点击查看专题详情";
   if (type.value === "expert-posts") return `${item.likeCount || 0} 点赞 ${item.viewCount || 0} 浏览`;
-  return `专家状态：${item.expertStatus ?? "普通"}`;
+  return `专家状态：${item.expertStatus ?? "普通用户"}`;
 }
 
 function rowTimeText(item: any) {
@@ -231,9 +236,15 @@ function openRow(item: any) {
     openQuestionDetail(Number(item.id));
     return;
   }
-  if (type.value === "favorites" && item?.questionId) {
-    openQuestionDetail(Number(item.questionId));
-    return;
+  if (type.value === "favorites") {
+    if (Number(item?.bizType || 1) === 2 && item?.bizId) {
+      openExpertPostDetailPage(Number(item.bizId));
+      return;
+    }
+    if (item?.questionId) {
+      openQuestionDetail(Number(item.questionId));
+      return;
+    }
   }
   if (type.value === "answers" && item?.questionId) {
     if (isInvalidAnswerRow(item)) {
@@ -245,6 +256,10 @@ function openRow(item: any) {
   }
   if (type.value === "history" && item?.bizType === 1 && item?.bizId) {
     openQuestionDetail(Number(item.bizId));
+    return;
+  }
+  if (type.value === "history" && item?.bizType === 2 && item?.bizId) {
+    openExpertPostDetailPage(Number(item.bizId));
     return;
   }
   if (type.value === "expert-posts" && item?.id) {
@@ -339,7 +354,7 @@ onReachBottom(() => {
         @tap="openRow(item)"
       >
         <image v-if="resolveAvatar(item.avatar)" class="follow-avatar" :src="resolveAvatar(item.avatar)" mode="aspectFill" />
-        <view v-else class="follow-avatar follow-avatar--fallback">{{ (item.nickname || "用").slice(0, 1) }}</view>
+        <view v-else class="follow-avatar follow-avatar--fallback">{{ (item.nickname || "用户").slice(0, 1) }}</view>
         <view class="follow-info">
           <view class="follow-name">{{ item.nickname || `用户 ${item.userId}` }}</view>
           <view class="follow-time">关注日期：{{ formatDate(item.followedAt) || "-" }}</view>
@@ -593,3 +608,4 @@ onReachBottom(() => {
   padding: 24rpx 0;
 }
 </style>
+

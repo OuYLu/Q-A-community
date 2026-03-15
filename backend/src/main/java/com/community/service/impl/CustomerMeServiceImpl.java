@@ -20,6 +20,7 @@ import com.community.mapper.QaAnswerMapper;
 import com.community.mapper.QaFavoriteMapper;
 import com.community.mapper.QaQuestionMapper;
 import com.community.mapper.QaTopicFollowMapper;
+import com.community.mapper.QaVoteMapper;
 import com.community.mapper.UserBrowseHistoryMapper;
 import com.community.mapper.UserFollowMapper;
 import com.community.mapper.UserMapper;
@@ -58,6 +59,7 @@ public class CustomerMeServiceImpl implements CustomerMeService {
     private final UserMapper userMapper;
     private final UserStatMapper userStatMapper;
     private final QaFavoriteMapper qaFavoriteMapper;
+    private final QaVoteMapper qaVoteMapper;
     private final UserBrowseHistoryMapper userBrowseHistoryMapper;
     private final QaQuestionMapper qaQuestionMapper;
     private final QaAnswerMapper qaAnswerMapper;
@@ -98,8 +100,13 @@ public class CustomerMeServiceImpl implements CustomerMeService {
                 .eq(com.community.entity.QaTopicFollow::getUserId, userId)
         ));
 
-        int favoriteCount = Math.toIntExact(qaFavoriteMapper.selectCount(new LambdaQueryWrapper<com.community.entity.QaFavorite>()
+        int questionFavoriteCount = Math.toIntExact(qaFavoriteMapper.selectCount(new LambdaQueryWrapper<com.community.entity.QaFavorite>()
             .eq(com.community.entity.QaFavorite::getUserId, userId)));
+        int kbFavoriteCount = Math.toIntExact(qaVoteMapper.selectCount(new LambdaQueryWrapper<com.community.entity.QaVote>()
+            .eq(com.community.entity.QaVote::getUserId, userId)
+            .eq(com.community.entity.QaVote::getBizType, 6)
+            .eq(com.community.entity.QaVote::getVoteType, 1)));
+        int favoriteCount = questionFavoriteCount + kbFavoriteCount;
         LocalDateTime retainedFrom = LocalDateTime.now().minusDays(Math.max(1, historyRetentionDays));
         Long historyCountValue = userBrowseHistoryMapper.countMyHistory(userId, retainedFrom);
         int historyCount = historyCountValue == null ? 0 : Math.toIntExact(historyCountValue);

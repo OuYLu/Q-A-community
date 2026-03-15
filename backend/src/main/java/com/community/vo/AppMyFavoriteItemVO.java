@@ -7,6 +7,11 @@ import java.time.LocalDateTime;
 
 @Data
 public class AppMyFavoriteItemVO {
+    /**
+     * 1-question, 2-kb entry
+     */
+    private Integer bizType;
+    private Long bizId;
     private Long questionId;
     private String title;
     private Integer answerCount;

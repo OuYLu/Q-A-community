@@ -5,16 +5,48 @@
 <mapper namespace="com.community.mapper.QaFavoriteMapper">
   <select id="selectMyFavorites" resultType="com.community.vo.AppMyFavoriteItemVO">
     SELECT
-      f.question_id AS questionId,
-      q.title AS title,
-      q.answer_count AS answerCount,
-      q.like_count AS likeCount,
-      q.favorite_count AS favoriteCount,
-      f.created_at AS favoriteAt
-    FROM qa_favorite f
-    JOIN qa_question q ON q.id = f.question_id
-    WHERE f.user_id = #{userId}
-      AND q.delete_flag = 0
-    ORDER BY f.created_at DESC, f.id DESC
+      merged.bizType,
+      merged.bizId,
+      merged.questionId,
+      merged.title,
+      merged.answerCount,
+      merged.likeCount,
+      merged.favoriteCount,
+      merged.favoriteAt
+    FROM (
+      SELECT
+        1 AS bizType,
+        f.question_id AS bizId,
+        f.question_id AS questionId,
+        q.title AS title,
+        q.answer_count AS answerCount,
+        q.like_count AS likeCount,
+        q.favorite_count AS favoriteCount,
+        f.created_at AS favoriteAt
+      FROM qa_favorite f
+      JOIN qa_question q ON q.id = f.question_id
+      WHERE f.user_id = #{userId}
+        AND q.delete_flag = 0
+        AND q.status IN (1, 5)
+
+      UNION ALL
+
+      SELECT
+        2 AS bizType,
+        v.biz_id AS bizId,
+        NULL AS questionId,
+        kb.title AS title,
+        0 AS answerCount,
+        kb.like_count AS likeCount,
+        kb.favorite_count AS favoriteCount,
+        v.created_at AS favoriteAt
+      FROM qa_vote v
+      JOIN kb_entry kb ON kb.id = v.biz_id
+      WHERE v.user_id = #{userId}
+        AND v.biz_type = 6
+        AND v.vote_type = 1
+        AND kb.status = 1
+    ) merged
+    ORDER BY merged.favoriteAt DESC, merged.bizId DESC
   </select>
 </mapper>
