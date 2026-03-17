@@ -82,71 +82,149 @@
       COALESCE(qc.cnt, 0) AS questionCount
     FROM qa_category c
     LEFT JOIN (
-      SELECT category_id, COUNT(1) AS cnt
-      FROM qa_question
-      WHERE delete_flag = 0
-      GROUP BY category_id
-    ) qc ON qc.category_id = c.id
+      SELECT
+        COALESCE(cat.parent_id, cat.id) AS rootId,
+        COUNT(1) AS cnt
+      FROM qa_question q
+      JOIN qa_category cat ON cat.id = q.category_id
+      WHERE q.delete_flag = 0
+        AND q.status = 1
+        AND cat.delete_flag = 0
+        AND cat.status = 1
+      GROUP BY COALESCE(cat.parent_id, cat.id)
+    ) qc ON qc.rootId = c.id
     WHERE c.delete_flag = 0
       AND c.status = 1
       AND c.parent_id IS NULL
     ORDER BY c.sort ASC, c.created_at DESC
+    <if test="limit != null and limit > 0">
+      LIMIT #{limit}
+    </if>
   </select>
 
   <select id="selectAppPreferredCategoriesByInterest" resultType="com.community.vo.AppCategoryVO">
     SELECT
-      c.id,
-      c.name,
-      c.icon,
+      root.id,
+      root.name,
+      root.icon,
       COALESCE(qc.cnt, 0) AS questionCount
-    FROM rec_user_interest ri
-    JOIN qa_category c ON c.id = ri.category_id
+    FROM (
+      SELECT
+        COALESCE(leaf.parent_id, leaf.id) AS rootId,
+        SUM(ri.score) AS score,
+        MAX(ri.updated_at) AS lastTime
+      FROM rec_user_interest ri
+      JOIN qa_category leaf ON leaf.id = ri.category_id
+      WHERE ri.user_id = #{userId}
+        AND ri.score > 0
+        AND leaf.delete_flag = 0
+        AND leaf.status = 1
+      GROUP BY COALESCE(leaf.parent_id, leaf.id)
+    ) pref
+    JOIN qa_category root ON root.id = pref.rootId
     LEFT JOIN (
-      SELECT category_id, COUNT(1) AS cnt
-      FROM qa_question
-      WHERE delete_flag = 0
-      GROUP BY category_id
-    ) qc ON qc.category_id = c.id
-    WHERE ri.user_id = #{userId}
-      AND ri.score > 0
-      AND c.delete_flag = 0
-      AND c.status = 1
-      AND c.parent_id IS NULL
-    ORDER BY ri.score DESC, ri.updated_at DESC, c.sort ASC
-    LIMIT #{limit}
+      SELECT
+        COALESCE(cat.parent_id, cat.id) AS rootId,
+        COUNT(1) AS cnt
+      FROM qa_question q
+      JOIN qa_category cat ON cat.id = q.category_id
+      WHERE q.delete_flag = 0
+        AND q.status = 1
+        AND cat.delete_flag = 0
+        AND cat.status = 1
+      GROUP BY COALESCE(cat.parent_id, cat.id)
+    ) qc ON qc.rootId = root.id
+    WHERE root.delete_flag = 0
+      AND root.status = 1
+      AND root.parent_id IS NULL
+    ORDER BY pref.score DESC, pref.lastTime DESC, root.sort ASC
+    <if test="limit != null and limit > 0">
+      LIMIT #{limit}
+    </if>
   </select>
 
   <select id="selectAppPreferredCategories" resultType="com.community.vo.AppCategoryVO">
     SELECT
-      c.id,
-      c.name,
-      c.icon,
+      root.id,
+      root.name,
+      root.icon,
       COALESCE(qc.cnt, 0) AS questionCount
-    FROM qa_category c
+    FROM qa_category root
     JOIN (
       SELECT
-        q.category_id AS category_id,
-        COUNT(1) AS browse_cnt,
-        MAX(h.created_at) AS last_browse_at
-      FROM user_browse_history h
-      JOIN qa_question q ON q.id = h.biz_id
-      WHERE h.user_id = #{userId}
-        AND h.biz_type = 1
-        AND q.delete_flag = 0
-        AND q.status = 1
-        AND q.category_id IS NOT NULL
-      GROUP BY q.category_id
-    ) pref ON pref.category_id = c.id
+        pref.rootId,
+        SUM(pref.score) AS score,
+        MAX(pref.lastTime) AS lastTime
+      FROM (
+        SELECT
+          COALESCE(cat.parent_id, cat.id) AS rootId,
+          COUNT(1) * 1.0 AS score,
+          MAX(h.created_at) AS lastTime
+        FROM user_browse_history h
+        JOIN qa_question q ON q.id = h.biz_id
+        JOIN qa_category cat ON cat.id = q.category_id
+        WHERE h.user_id = #{userId}
+          AND h.biz_type = 1
+          AND q.delete_flag = 0
+          AND q.status = 1
+          AND cat.delete_flag = 0
+          AND cat.status = 1
+        GROUP BY COALESCE(cat.parent_id, cat.id)
+
+        UNION ALL
+
+        SELECT
+          COALESCE(cat.parent_id, cat.id) AS rootId,
+          COUNT(1) * 3.0 AS score,
+          MAX(v.created_at) AS lastTime
+        FROM qa_vote v
+        JOIN qa_question q ON q.id = v.biz_id
+        JOIN qa_category cat ON cat.id = q.category_id
+        WHERE v.user_id = #{userId}
+          AND v.biz_type = 1
+          AND v.vote_type = 1
+          AND q.delete_flag = 0
+          AND q.status = 1
+          AND cat.delete_flag = 0
+          AND cat.status = 1
+        GROUP BY COALESCE(cat.parent_id, cat.id)
+
+        UNION ALL
+
+        SELECT
+          COALESCE(cat.parent_id, cat.id) AS rootId,
+          COUNT(1) * 4.0 AS score,
+          MAX(f.created_at) AS lastTime
+        FROM qa_favorite f
+        JOIN qa_question q ON q.id = f.question_id
+        JOIN qa_category cat ON cat.id = q.category_id
+        WHERE f.user_id = #{userId}
+          AND q.delete_flag = 0
+          AND q.status = 1
+          AND cat.delete_flag = 0
+          AND cat.status = 1
+        GROUP BY COALESCE(cat.parent_id, cat.id)
+      ) pref
+      GROUP BY pref.rootId
+    ) pref ON pref.rootId = root.id
     LEFT JOIN (
-      SELECT category_id, COUNT(1) AS cnt
-      FROM qa_question
-      WHERE delete_flag = 0
-      GROUP BY category_id
-    ) qc ON qc.category_id = c.id
-    WHERE c.delete_flag = 0
-      AND c.status = 1
-      AND c.parent_id IS NULL
-    ORDER BY pref.browse_cnt DESC, pref.last_browse_at DESC, c.sort ASC
-    LIMIT #{limit}
+      SELECT
+        COALESCE(cat.parent_id, cat.id) AS rootId,
+        COUNT(1) AS cnt
+      FROM qa_question q
+      JOIN qa_category cat ON cat.id = q.category_id
+      WHERE q.delete_flag = 0
+        AND q.status = 1
+        AND cat.delete_flag = 0
+        AND cat.status = 1
+      GROUP BY COALESCE(cat.parent_id, cat.id)
+    ) qc ON qc.rootId = root.id
+    WHERE root.delete_flag = 0
+      AND root.status = 1
+      AND root.parent_id IS NULL
+    ORDER BY pref.score DESC, pref.lastTime DESC, root.sort ASC
+    <if test="limit != null and limit > 0">
+      LIMIT #{limit}
+    </if>
   </select>
 </mapper>

@@ -42,7 +42,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       loading.value = true;
       errorText.value = "";
       try {
-        const [kbCategories, home] = await Promise.all([api_expert.expertApi.categories(), api_discover.discoverApi.getHome()]);
+        const [kbCategories, home] = await Promise.all([api_discover.discoverApi.getKbCategories(4), api_discover.discoverApi.getHome()]);
         scienceCategories.value = kbCategories || [];
         qaCategories.value = home.categories || [];
       } catch {

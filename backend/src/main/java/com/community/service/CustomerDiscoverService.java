@@ -3,6 +3,7 @@ package com.community.service;
 import com.community.vo.AppCategoryVO;
 import com.community.vo.AppExpertCardVO;
 import com.community.vo.AppGuestHomeVO;
+import com.community.vo.AppKbCategoryVO;
 import com.community.vo.AppQuestionListItemVO;
 import com.community.vo.AppQuestionHotItemVO;
 import com.community.vo.AppTopicListItemVO;
@@ -14,7 +15,9 @@ import java.util.List;
 public interface CustomerDiscoverService {
     AppGuestHomeVO guestHome(Integer topicLimit, Integer questionLimit, Integer expertLimit);
     PageInfo<AppQuestionListItemVO> questionPage(AppQuestionPageQueryDTO query);
-    List<AppCategoryVO> listCategories();
+    List<AppCategoryVO> listCategories(Integer limit);
+    List<AppCategoryVO> listAllCategories();
+    List<AppKbCategoryVO> listKbCategories(Integer limit);
     List<AppTopicListItemVO> hotTopics(Integer limit);
     List<AppQuestionHotItemVO> hotQuestions(Integer limit);
     List<AppExpertCardVO> expertCards(Integer limit);

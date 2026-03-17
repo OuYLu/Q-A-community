@@ -15,6 +15,7 @@ import com.community.dto.AppQuestionReportCreateDTO;
 import com.community.dto.AppQuestionUpdateDTO;
 import com.community.entity.CmsReport;
 import com.community.entity.CmsSensitiveWord;
+import com.community.entity.CmsAudit;
 import com.community.entity.NotifyMessage;
 import com.community.entity.QaAnswer;
 import com.community.entity.QaCategory;
@@ -32,6 +33,7 @@ import com.community.mapper.NotifyMessageMapper;
 import com.community.mapper.QaAnswerMapper;
 import com.community.mapper.QaCategoryMapper;
 import com.community.mapper.CmsSensitiveWordMapper;
+import com.community.mapper.CmsAuditMapper;
 import com.community.mapper.CmsReportMapper;
 import com.community.mapper.QaCommentMapper;
 import com.community.mapper.QaFavoriteMapper;
@@ -54,6 +56,7 @@ import com.community.vo.AppQuestionDetailVO;
 import com.community.vo.AppQuestionListItemVO;
 import com.community.vo.SearchQuestionDoc;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -88,6 +91,7 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
     private final QaFavoriteMapper qaFavoriteMapper;
     private final NotifyMessageMapper notifyMessageMapper;
     private final CmsSensitiveWordMapper sensitiveWordMapper;
+    private final CmsAuditMapper cmsAuditMapper;
     private final CmsReportMapper cmsReportMapper;
     private final UserMapper userMapper;
     private final UserBrowseHistoryMapper userBrowseHistoryMapper;
@@ -97,6 +101,9 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
     private final RecommendationBehaviorService recommendationBehaviorService;
 
     private static final int QUESTION_BROWSE_BIZ_TYPE = 1;
+    private static final int SENSITIVE_LEVEL_REVIEW = 1;
+    private static final int AUDIT_TRIGGER_RULE = 1;
+    private static final int AUDIT_TYPE_RULE = 1;
 
     @Value("${qa.view-dedup-minutes:5}")
     private long viewDedupMinutes;
@@ -195,7 +202,8 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
         Long userId = requireUserId();
         assertUserCanPublish(userId);
         validateQuestionRef(dto.getCategoryId(), dto.getTopicId());
-        validateNoSensitiveWords("Question", dto.getTitle(), dto.getContent());
+        SensitiveScanResult sensitive = scanSensitiveWords(dto.getTitle(), dto.getContent());
+        throwIfBlocked("Question", sensitive);
 
         QaQuestion question = new QaQuestion();
         question.setUserId(userId);
@@ -214,6 +222,7 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
         question.setLastActiveAt(LocalDateTime.now());
         qaQuestionMapper.insert(question);
         indexQuestionForEs(question);
+        createOrRefreshRuleAudit(1, question.getId(), userId, sensitive.reviewHits());
 
         replaceQuestionTags(question.getId(), resolveQuestionTagIds(dto.getTagIds(), dto.getTagNames()));
         increaseTopicQuestionCount(dto.getTopicId(), 1);
@@ -233,7 +242,8 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
             throw new BizException(ResultCode.FORBIDDEN, "no permission to update this question");
         }
         validateQuestionRef(dto.getCategoryId(), dto.getTopicId());
-        validateNoSensitiveWords("Question", dto.getTitle(), dto.getContent());
+        SensitiveScanResult sensitive = scanSensitiveWords(dto.getTitle(), dto.getContent());
+        throwIfBlocked("Question", sensitive);
 
         Long oldTopicId = question.getTopicId();
         question.setTitle(dto.getTitle().trim());
@@ -244,6 +254,7 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
         question.setLastActiveAt(LocalDateTime.now());
         qaQuestionMapper.updateById(question);
         indexQuestionForEs(question);
+        createOrRefreshRuleAudit(1, question.getId(), userId, sensitive.reviewHits());
 
         replaceQuestionTags(id, dto.getTagIds());
         if (oldTopicId == null ? dto.getTopicId() != null : !oldTopicId.equals(dto.getTopicId())) {
@@ -410,7 +421,8 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
         if (question.getStatus() == null || question.getStatus() != 1) {
             throw new BizException(ResultCode.BAD_REQUEST, "question cannot be answered");
         }
-        validateNoSensitiveWords("Answer", dto.getContent());
+        SensitiveScanResult sensitive = scanSensitiveWords(dto.getContent());
+        throwIfBlocked("Answer", sensitive);
 
         QaAnswer answer = new QaAnswer();
         answer.setQuestionId(questionId);
@@ -422,6 +434,7 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
         answer.setLikeCount(0);
         answer.setIsAnonymous(dto.getIsAnonymous() != null && dto.getIsAnonymous() == 1 ? 1 : 0);
         qaAnswerMapper.insert(answer);
+        createOrRefreshRuleAudit(2, answer.getId(), userId, sensitive.reviewHits());
 
         qaQuestionMapper.updateAnswerCount(questionId, 1);
         qaQuestionMapper.update(null, new LambdaUpdateWrapper<QaQuestion>()
@@ -455,10 +468,12 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
         if (!userId.equals(answer.getUserId())) {
             throw new BizException(ResultCode.FORBIDDEN, "no permission to update this answer");
         }
-        validateNoSensitiveWords("Answer", dto.getContent());
+        SensitiveScanResult sensitive = scanSensitiveWords(dto.getContent());
+        throwIfBlocked("Answer", sensitive);
         answer.setContent(dto.getContent().trim());
         answer.setImageUrls(serializeImageUrls(dto.getImageUrls()));
         qaAnswerMapper.updateById(answer);
+        createOrRefreshRuleAudit(2, answer.getId(), userId, sensitive.reviewHits());
 
         qaQuestionMapper.update(null, new LambdaUpdateWrapper<QaQuestion>()
             .eq(QaQuestion::getId, answer.getQuestionId())
@@ -798,7 +813,8 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
         Long userId = requireUserId();
         assertUserCanPublish(userId);
         QaAnswer answer = requirePublishedAnswer(answerId);
-        validateNoSensitiveWords("Comment", dto.getContent());
+        SensitiveScanResult sensitive = scanSensitiveWords(dto.getContent());
+        throwIfBlocked("Comment", sensitive);
 
         QaComment comment = new QaComment();
         comment.setBizType(2);
@@ -822,6 +838,7 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
         comment.setRejectReason(null);
         comment.setDeleteFlag(0);
         qaCommentMapper.insert(comment);
+        createOrRefreshRuleAudit(3, comment.getId(), userId, sensitive.reviewHits());
         if (parentComment == null) {
             // first-level comment: notify answer author
             createNotifyIfNeeded(
@@ -1130,6 +1147,121 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
             return;
         }
         esSearchService.syncQuestionById(question.getId());
+    }
+
+    private SensitiveScanResult scanSensitiveWords(String... texts) {
+        List<String> candidates = new ArrayList<>();
+        if (texts != null) {
+            for (String text : texts) {
+                if (StringUtils.hasText(text)) {
+                    candidates.add(text);
+                }
+            }
+        }
+        if (candidates.isEmpty()) {
+            return new SensitiveScanResult(List.of(), List.of());
+        }
+
+        List<CmsSensitiveWord> words = sensitiveWordMapper.selectList(new LambdaQueryWrapper<CmsSensitiveWord>()
+            .eq(CmsSensitiveWord::getEnabled, 1));
+        if (words == null || words.isEmpty()) {
+            return new SensitiveScanResult(List.of(), List.of());
+        }
+
+        List<SensitiveHit> blockedHits = new ArrayList<>();
+        List<SensitiveHit> reviewHits = new ArrayList<>();
+        Set<String> dedup = new LinkedHashSet<>();
+        for (String rawText : candidates) {
+            String text = rawText.trim();
+            if (!StringUtils.hasText(text)) {
+                continue;
+            }
+            String lowerText = text.toLowerCase(Locale.ROOT);
+            for (CmsSensitiveWord item : words) {
+                if (item == null || !StringUtils.hasText(item.getWord())) {
+                    continue;
+                }
+                String hitWord = item.getWord().trim();
+                if (hitWord.isEmpty()) {
+                    continue;
+                }
+                if (text.contains(hitWord) || lowerText.contains(hitWord.toLowerCase(Locale.ROOT))) {
+                    Integer level = item.getLevel() == null ? 2 : item.getLevel();
+                    String key = hitWord.toLowerCase(Locale.ROOT) + "#" + level;
+                    if (!dedup.add(key)) {
+                        continue;
+                    }
+                    SensitiveHit hit = new SensitiveHit(
+                        hitWord,
+                        level,
+                        item.getCategory(),
+                        item.getHitActionDesc(),
+                        item.getReasonTemplate()
+                    );
+                    if (level == SENSITIVE_LEVEL_REVIEW) {
+                        reviewHits.add(hit);
+                    } else {
+                        blockedHits.add(hit);
+                    }
+                }
+            }
+        }
+        return new SensitiveScanResult(blockedHits, reviewHits);
+    }
+
+    private void throwIfBlocked(String bizName, SensitiveScanResult result) {
+        if (result == null || result.blockedHits().isEmpty()) {
+            return;
+        }
+        SensitiveHit first = result.blockedHits().get(0);
+        if (StringUtils.hasText(first.reasonTemplate())) {
+            throw new BizException(ResultCode.BAD_REQUEST, first.reasonTemplate());
+        }
+        throw new BizException(ResultCode.BAD_REQUEST, bizName + " contains sensitive word: " + first.word());
+    }
+
+    private void createOrRefreshRuleAudit(Integer bizType,
+                                          Long bizId,
+                                          Long submitUserId,
+                                          List<SensitiveHit> reviewHits) {
+        if (bizType == null || bizId == null || reviewHits == null || reviewHits.isEmpty()) {
+            return;
+        }
+        JsonNode hitDetail = objectMapper.valueToTree(reviewHits);
+        CmsAudit exists = cmsAuditMapper.selectOne(new LambdaQueryWrapper<CmsAudit>()
+            .eq(CmsAudit::getBizType, bizType)
+            .eq(CmsAudit::getBizId, bizId)
+            .eq(CmsAudit::getTriggerSource, AUDIT_TRIGGER_RULE)
+            .eq(CmsAudit::getAuditStatus, 1)
+            .last("LIMIT 1"));
+        if (exists != null) {
+            exists.setAuditType(AUDIT_TYPE_RULE);
+            exists.setModelLabel("sensitive_rule");
+            exists.setModelScore(null);
+            exists.setHitDetail(hitDetail);
+            exists.setSubmitUserId(submitUserId);
+            cmsAuditMapper.updateById(exists);
+            return;
+        }
+        CmsAudit audit = new CmsAudit();
+        audit.setBizType(bizType);
+        audit.setBizId(bizId);
+        audit.setTriggerSource(AUDIT_TRIGGER_RULE);
+        audit.setAuditType(AUDIT_TYPE_RULE);
+        audit.setAuditStatus(1);
+        audit.setAction(null);
+        audit.setModelLabel("sensitive_rule");
+        audit.setModelScore(null);
+        audit.setHitDetail(hitDetail);
+        audit.setRejectReason(null);
+        audit.setSubmitUserId(submitUserId);
+        cmsAuditMapper.insert(audit);
+    }
+
+    private record SensitiveScanResult(List<SensitiveHit> blockedHits, List<SensitiveHit> reviewHits) {
+    }
+
+    private record SensitiveHit(String word, Integer level, String category, String hitActionDesc, String reasonTemplate) {
     }
 
     private void fillImageUrls(AppQuestionDetailVO vo) {

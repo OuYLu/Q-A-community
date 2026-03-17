@@ -49,7 +49,7 @@ async function loadData() {
   loading.value = true;
   try {
     const [categoryData, kbCategoryData, topicData, rankData, expertData] = await Promise.all([
-      discoverApi.getCategories(),
+      discoverApi.getAllCategories(),
       expertApi.categories(),
       discoverApi.getHotTopics(12),
       discoverApi.getHotQuestions(20),

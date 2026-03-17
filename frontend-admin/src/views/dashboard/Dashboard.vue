@@ -443,9 +443,9 @@ const reasonTagType = (value?: number) => {
 };
 
 const triggerSourceText = (value?: number) => {
-  if (value === 1) return "用户提交";
+  if (value === 1) return "规则触发（敏感词）";
   if (value === 2) return "举报触发";
-  if (value === 3) return "人工转审";
+  if (value === 3) return "人工复审";
   return value == null ? "-" : String(value);
 };
 

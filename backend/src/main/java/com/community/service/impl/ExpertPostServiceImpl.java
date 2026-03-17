@@ -7,6 +7,7 @@ import com.community.common.SecurityUser;
 import com.community.dto.AppExpertContentBlockDTO;
 import com.community.dto.AppExpertPostCreateDTO;
 import com.community.dto.AppExpertPostPageQueryDTO;
+import com.community.entity.CmsAudit;
 import com.community.entity.CmsSensitiveWord;
 import com.community.entity.KbCategory;
 import com.community.entity.KbEntry;
@@ -16,6 +17,7 @@ import com.community.entity.User;
 import com.community.entity.UserBrowseHistory;
 import com.community.entity.UserPrivacySetting;
 import com.community.mapper.CmsSensitiveWordMapper;
+import com.community.mapper.CmsAuditMapper;
 import com.community.mapper.ExpertPostMapper;
 import com.community.mapper.KbCategoryMapper;
 import com.community.mapper.KbEntryTagMapper;
@@ -33,6 +35,7 @@ import com.community.vo.AppKbCategoryVO;
 import com.community.vo.KbTagSimpleVO;
 import com.community.vo.SearchKbDoc;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -58,8 +61,12 @@ import java.util.Set;
 public class ExpertPostServiceImpl implements ExpertPostService {
     private static final String SOURCE_EXPERT_POST = "expert_post";
     private static final int KB_BROWSE_BIZ_TYPE = 2;
+    private static final int SENSITIVE_LEVEL_REVIEW = 1;
+    private static final int AUDIT_TRIGGER_RULE = 1;
+    private static final int AUDIT_TYPE_RULE = 1;
 
     private final ExpertPostMapper expertPostMapper;
+    private final CmsAuditMapper cmsAuditMapper;
     private final UserMapper userMapper;
     private final CmsSensitiveWordMapper sensitiveWordMapper;
     private final KbEntryTagMapper kbEntryTagMapper;
@@ -100,7 +107,8 @@ public class ExpertPostServiceImpl implements ExpertPostService {
 
         List<AppExpertContentBlockVO> blocks = normalizeContentBlocks(dto.getContentBlocks(), dto.getContent(), dto.getImageUrls());
         String mergedText = mergeTextBlocks(blocks);
-        validateNoSensitiveWords("科普文章", dto.getTitle(), dto.getSummary(), mergedText);
+        SensitiveScanResult sensitive = scanSensitiveWords(dto.getTitle(), dto.getSummary(), mergedText);
+        throwIfBlocked("科普文章", sensitive);
 
         List<String> tagNames = normalizeTagNames(dto.getTagNames());
         validateNoSensitiveWords("标签", tagNames.toArray(String[]::new));
@@ -121,6 +129,7 @@ public class ExpertPostServiceImpl implements ExpertPostService {
         entry.setCreatedAt(now);
         entry.setUpdatedAt(now);
         expertPostMapper.insert(entry);
+        createOrRefreshRuleAudit(4, entry.getId(), userId, sensitive.reviewHits());
 
         bindTags(entry.getId(), List.of(), tagNames, now);
         indexKbForEs(entry);
@@ -142,7 +151,8 @@ public class ExpertPostServiceImpl implements ExpertPostService {
         validateCategoryRequired(dto.getCategoryId());
         List<AppExpertContentBlockVO> blocks = normalizeContentBlocks(dto.getContentBlocks(), dto.getContent(), dto.getImageUrls());
         String mergedText = mergeTextBlocks(blocks);
-        validateNoSensitiveWords("科普文章", dto.getTitle(), dto.getSummary(), mergedText);
+        SensitiveScanResult sensitive = scanSensitiveWords(dto.getTitle(), dto.getSummary(), mergedText);
+        throwIfBlocked("科普文章", sensitive);
 
         List<String> tagNames = normalizeTagNames(dto.getTagNames());
         validateNoSensitiveWords("标签", tagNames.toArray(String[]::new));
@@ -154,6 +164,7 @@ public class ExpertPostServiceImpl implements ExpertPostService {
         exists.setContentRef(buildContentRef(dto.getCoverImage(), blocks));
         exists.setUpdatedAt(LocalDateTime.now());
         expertPostMapper.updateById(exists);
+        createOrRefreshRuleAudit(4, exists.getId(), userId, sensitive.reviewHits());
 
         List<KbTagSimpleVO> oldTags = kbEntryTagMapper.selectTagsByEntryId(id);
         List<Long> oldTagIds = oldTags == null ? List.of() : oldTags.stream().map(KbTagSimpleVO::getId).toList();
@@ -597,6 +608,114 @@ public class ExpertPostServiceImpl implements ExpertPostService {
                 throw new BizException(ResultCode.BAD_REQUEST, bizName + "包含敏感词：" + item.getWord());
             }
         }
+    }
+
+    private SensitiveScanResult scanSensitiveWords(String... texts) {
+        if (texts == null || texts.length == 0) {
+            return new SensitiveScanResult(List.of(), List.of());
+        }
+        StringBuilder allText = new StringBuilder();
+        for (String text : texts) {
+            if (StringUtils.hasText(text)) {
+                allText.append(text).append(' ');
+            }
+        }
+        if (allText.isEmpty()) {
+            return new SensitiveScanResult(List.of(), List.of());
+        }
+
+        List<CmsSensitiveWord> words = sensitiveWordMapper.selectList(new LambdaQueryWrapper<CmsSensitiveWord>()
+            .eq(CmsSensitiveWord::getEnabled, 1));
+        if (words == null || words.isEmpty()) {
+            return new SensitiveScanResult(List.of(), List.of());
+        }
+
+        String target = allText.toString().toLowerCase();
+        List<SensitiveHit> blockedHits = new ArrayList<>();
+        List<SensitiveHit> reviewHits = new ArrayList<>();
+        Set<String> dedup = new LinkedHashSet<>();
+        for (CmsSensitiveWord item : words) {
+            if (item == null || !StringUtils.hasText(item.getWord())) {
+                continue;
+            }
+            String normalizedWord = item.getWord().trim().toLowerCase();
+            if (!StringUtils.hasText(normalizedWord) || !target.contains(normalizedWord)) {
+                continue;
+            }
+            Integer level = item.getLevel() == null ? 2 : item.getLevel();
+            String key = normalizedWord + "#" + level;
+            if (!dedup.add(key)) {
+                continue;
+            }
+            SensitiveHit hit = new SensitiveHit(
+                item.getWord().trim(),
+                level,
+                item.getCategory(),
+                item.getHitActionDesc(),
+                item.getReasonTemplate()
+            );
+            if (level == SENSITIVE_LEVEL_REVIEW) {
+                reviewHits.add(hit);
+            } else {
+                blockedHits.add(hit);
+            }
+        }
+        return new SensitiveScanResult(blockedHits, reviewHits);
+    }
+
+    private void throwIfBlocked(String bizName, SensitiveScanResult result) {
+        if (result == null || result.blockedHits().isEmpty()) {
+            return;
+        }
+        SensitiveHit first = result.blockedHits().get(0);
+        if (StringUtils.hasText(first.reasonTemplate())) {
+            throw new BizException(ResultCode.BAD_REQUEST, first.reasonTemplate());
+        }
+        throw new BizException(ResultCode.BAD_REQUEST, bizName + "包含敏感词：" + first.word());
+    }
+
+    private void createOrRefreshRuleAudit(Integer bizType,
+                                          Long bizId,
+                                          Long submitUserId,
+                                          List<SensitiveHit> reviewHits) {
+        if (bizType == null || bizId == null || reviewHits == null || reviewHits.isEmpty()) {
+            return;
+        }
+        JsonNode hitDetail = objectMapper.valueToTree(reviewHits);
+        CmsAudit exists = cmsAuditMapper.selectOne(new LambdaQueryWrapper<CmsAudit>()
+            .eq(CmsAudit::getBizType, bizType)
+            .eq(CmsAudit::getBizId, bizId)
+            .eq(CmsAudit::getTriggerSource, AUDIT_TRIGGER_RULE)
+            .eq(CmsAudit::getAuditStatus, 1)
+            .last("LIMIT 1"));
+        if (exists != null) {
+            exists.setAuditType(AUDIT_TYPE_RULE);
+            exists.setModelLabel("sensitive_rule");
+            exists.setModelScore(null);
+            exists.setHitDetail(hitDetail);
+            exists.setSubmitUserId(submitUserId);
+            cmsAuditMapper.updateById(exists);
+            return;
+        }
+        CmsAudit audit = new CmsAudit();
+        audit.setBizType(bizType);
+        audit.setBizId(bizId);
+        audit.setTriggerSource(AUDIT_TRIGGER_RULE);
+        audit.setAuditType(AUDIT_TYPE_RULE);
+        audit.setAuditStatus(1);
+        audit.setAction(null);
+        audit.setModelLabel("sensitive_rule");
+        audit.setModelScore(null);
+        audit.setHitDetail(hitDetail);
+        audit.setRejectReason(null);
+        audit.setSubmitUserId(submitUserId);
+        cmsAuditMapper.insert(audit);
+    }
+
+    private record SensitiveScanResult(List<SensitiveHit> blockedHits, List<SensitiveHit> reviewHits) {
+    }
+
+    private record SensitiveHit(String word, Integer level, String category, String hitActionDesc, String reasonTemplate) {
     }
 
     private void indexKbForEs(KbEntry entry) {

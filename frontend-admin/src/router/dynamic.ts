@@ -7,6 +7,7 @@ import RoleManage from "../views/rbac/RoleManage.vue";
 import PermManage from "../views/rbac/PermManage.vue";
 import ReportHandle from "../views/content/ReportHandle.vue";
 import AuditHandle from "../views/content/AuditHandle.vue";
+import SensitiveWordManage from "../views/content/SensitiveWordManage.vue";
 import QaManage from "../views/content/QaManage.vue";
 import CategoryManage from "../views/operation/CategoryManage.vue";
 import TagManage from "../views/operation/TagManage.vue";
@@ -74,6 +75,12 @@ const routeByCode: Record<string, RouteRecordRaw> = {
     component: QaManage,
     meta: { title: "问答管理" }
   },
+  "menu:content:sensitive": {
+    path: "sensitive",
+    name: "SensitiveWordManage",
+    component: SensitiveWordManage,
+    meta: { title: "敏感词规则" }
+  },
   "menu:operation": {
     path: "/operation",
     name: "OperationRoot",
@@ -114,6 +121,7 @@ const parentByCode: Record<string, string> = {
   "menu:content:report": "menu:content",
   "menu:content:audit": "menu:content",
   "menu:content:qa": "menu:content",
+  "menu:content:sensitive": "menu:content",
   "menu:operation:category": "menu:operation",
   "menu:operation:tag": "menu:operation",
   "menu:operation:topic": "menu:operation",

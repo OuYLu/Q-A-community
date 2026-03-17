@@ -70,7 +70,16 @@
       AND (q.title LIKE CONCAT('%', #{query}, '%')
         OR q.content LIKE CONCAT('%', #{query}, '%'))
     <if test="categoryId != null">
-      AND q.category_id = #{categoryId}
+      AND (
+        q.category_id = #{categoryId}
+        OR q.category_id IN (
+          SELECT c.id
+          FROM qa_category c
+          WHERE c.parent_id = #{categoryId}
+            AND c.delete_flag = 0
+            AND c.status = 1
+        )
+      )
     </if>
     <if test="topicId != null">
       AND q.topic_id = #{topicId}
@@ -110,7 +119,16 @@
         #{id}
       </foreach>
     <if test="categoryId != null">
-      AND q.category_id = #{categoryId}
+      AND (
+        q.category_id = #{categoryId}
+        OR q.category_id IN (
+          SELECT c.id
+          FROM qa_category c
+          WHERE c.parent_id = #{categoryId}
+            AND c.delete_flag = 0
+            AND c.status = 1
+        )
+      )
     </if>
     <if test="topicId != null">
       AND q.topic_id = #{topicId}
@@ -241,7 +259,16 @@
         OR q.content LIKE CONCAT('%', #{keyword}, '%'))
     </if>
     <if test="categoryId != null">
-      AND q.category_id = #{categoryId}
+      AND (
+        q.category_id = #{categoryId}
+        OR q.category_id IN (
+          SELECT c.id
+          FROM qa_category c
+          WHERE c.parent_id = #{categoryId}
+            AND c.delete_flag = 0
+            AND c.status = 1
+        )
+      )
     </if>
     <if test="topicId != null">
       AND q.topic_id = #{topicId}

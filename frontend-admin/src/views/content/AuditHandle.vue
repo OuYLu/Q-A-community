@@ -22,9 +22,9 @@
         </el-form-item>
         <el-form-item label="触发来源">
           <el-select v-model="query.triggerSource" clearable placeholder="全部来源" style="width: 140px">
-            <el-option label="用户提交" :value="1" />
-            <el-option label="模型触发" :value="2" />
-            <el-option label="人工转审" :value="3" />
+            <el-option label="规则触发（敏感词）" :value="1" />
+            <el-option label="举报触发" :value="2" />
+            <el-option label="人工复审" :value="3" />
           </el-select>
         </el-form-item>
         <el-form-item label="关键词">
@@ -43,7 +43,6 @@
         <el-form-item label="排序字段">
           <el-select v-model="query.sortBy" clearable placeholder="默认" style="width: 140px">
             <el-option label="创建时间" value="createdAt" />
-            <el-option label="模型分数" value="modelScore" />
           </el-select>
         </el-form-item>
         <el-form-item label="排序方式">
@@ -91,9 +90,6 @@
         <template #default="scope">
           <span>{{ riskText(scope.row) }}</span>
         </template>
-      </el-table-column>
-      <el-table-column label="模型分" width="90">
-        <template #default="scope">{{ scoreText(scope.row.modelScore) }}</template>
       </el-table-column>
       <el-table-column label="审核状态" width="110">
         <template #default="scope">
@@ -273,8 +269,7 @@ const auditKeyLabelMap: Record<string, string> = {
   auditType: "审核类型",
   auditStatus: "审核状态",
   action: "处理动作",
-  modelLabel: "模型标签",
-  modelScore: "模型分数",
+  modelLabel: "规则标签",
   hitDetail: "命中详情",
   rejectReason: "驳回原因",
   submitUserId: "提交人ID",
@@ -288,11 +283,12 @@ const auditKeyLabelMap: Record<string, string> = {
 
 const auditPairs = computed(() => {
   if (!detail.value?.audit) return [];
-  return Object.entries(detail.value.audit).map(([key, value]) => ({
-    key: auditKeyLabelMap[key] || `字段(${key})`,
-    value: formatAuditFieldValue(key, value)
-  }))
-    .filter((item) => item.key !== "审核ID" && item.key !== "业务ID");
+  return Object.entries(detail.value.audit)
+    .filter(([key]) => key !== "id" && key !== "bizId" && key !== "modelScore")
+    .map(([key, value]) => ({
+      key: auditKeyLabelMap[key] || `字段(${key})`,
+      value: formatAuditFieldValue(key, value)
+    }));
 });
 
 const bizTypeText = (value?: number) => {
@@ -311,7 +307,7 @@ const auditStatusText = (status?: number) => {
 };
 
 const auditTypeText = (value?: number) => {
-  if (value === 1) return "模型审核";
+  if (value === 1) return "规则审核";
   if (value === 2) return "人工审核";
   return value == null ? "-" : String(value);
 };
@@ -324,9 +320,9 @@ const auditStatusTagType = (status?: number) => {
 };
 
 const triggerSourceText = (value?: number) => {
-  if (value === 1) return "用户提交";
-  if (value === 2) return "模型触发";
-  if (value === 3) return "人工转审";
+  if (value === 1) return "规则触发（敏感词）";
+  if (value === 2) return "举报触发";
+  if (value === 3) return "人工复审";
   return value == null ? "-" : String(value);
 };
 
@@ -337,11 +333,10 @@ const contentStatusText = (status?: number) => {
   return status == null ? "-" : String(status);
 };
 
-const scoreText = (score?: number) => (typeof score === "number" ? String(score) : "-");
-
 const riskText = (row: CmsAuditPageItemVO) => {
   if (row.riskLabel) return row.riskLabel;
   if (row.riskLevel) return row.riskLevel;
+  if (row.modelLabel === "sensitive_rule") return "敏感词规则";
   if (row.modelLabel) return row.modelLabel;
   return "-";
 };

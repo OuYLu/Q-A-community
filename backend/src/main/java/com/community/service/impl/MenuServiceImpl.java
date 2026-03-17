@@ -23,9 +23,11 @@ import java.util.Set;
 public class MenuServiceImpl implements MenuService {
     private static final String CONTENT_MENU_CODE = "menu:content";
     private static final String QA_MANAGE_MENU_CODE = "menu:content:qa";
+    private static final String SENSITIVE_MENU_CODE = "menu:content:sensitive";
     private static final Set<String> CONTENT_RELATED_MENU_CODES = Set.of(
         "menu:content:report",
-        "menu:content:audit"
+        "menu:content:audit",
+        SENSITIVE_MENU_CODE
     );
 
     private final PermissionMapper permissionMapper;
@@ -39,6 +41,7 @@ public class MenuServiceImpl implements MenuService {
 
         List<Permission> menus = permissionMapper.selectMenusByUserId(securityUser.getId());
         appendQaManageMenu(menus);
+        appendSensitiveMenu(menus);
         return buildTree(menus);
     }
 
@@ -115,5 +118,37 @@ public class MenuServiceImpl implements MenuService {
         qaMenu.setSort(15);
         qaMenu.setVisible(1);
         menus.add(qaMenu);
+    }
+
+    private void appendSensitiveMenu(List<Permission> menus) {
+        if (menus == null || menus.isEmpty()) {
+            return;
+        }
+        boolean exists = menus.stream().anyMatch(item -> SENSITIVE_MENU_CODE.equals(item.getCode()));
+        if (exists) {
+            return;
+        }
+        Permission contentRoot = menus.stream()
+            .filter(item -> CONTENT_MENU_CODE.equals(item.getCode()))
+            .findFirst()
+            .orElse(null);
+        if (contentRoot == null || contentRoot.getId() == null) {
+            return;
+        }
+        boolean hasContentMenu = menus.stream().anyMatch(item ->
+            "menu:content:report".equals(item.getCode()) || "menu:content:audit".equals(item.getCode()));
+        if (!hasContentMenu) {
+            return;
+        }
+        Permission menu = new Permission();
+        menu.setId(-1002L);
+        menu.setCode(SENSITIVE_MENU_CODE);
+        menu.setName("敏感词规则");
+        menu.setType("menu");
+        menu.setParentId(contentRoot.getId());
+        menu.setPathOrApi("/content/sensitive");
+        menu.setSort(16);
+        menu.setVisible(1);
+        menus.add(menu);
     }
 }

@@ -43,7 +43,6 @@ public class SecurityUser implements UserDetails {
                 .map(code -> (GrantedAuthority) new SimpleGrantedAuthority(code))
                 .collect(Collectors.toList());
 
-        // 合并 + 去重
         this.authorities = Stream.concat(roleAuths.stream(), permAuths.stream())
                 .collect(Collectors.collectingAndThen(
                         Collectors.toMap(GrantedAuthority::getAuthority, a -> a, (a, b) -> a),

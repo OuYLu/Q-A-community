@@ -57,10 +57,22 @@ const discoverApi = {
       experts: ((data == null ? void 0 : data.experts) || []).map((x) => normalizeExpert(x))
     }));
   },
-  getCategories() {
+  getCategories(limit = 4) {
     return api_http.request({
-      url: "/api/customer/discover/categories"
+      url: "/api/customer/discover/categories",
+      params: { limit }
     }).then((data) => (data || []).map((x) => normalizeCategory(x)));
+  },
+  getAllCategories() {
+    return api_http.request({
+      url: "/api/customer/discover/categories/all"
+    }).then((data) => (data || []).map((x) => normalizeCategory(x)));
+  },
+  getKbCategories(limit = 4) {
+    return api_http.request({
+      url: "/api/customer/discover/categories/kb",
+      params: { limit }
+    });
   },
   getCategoryTree(parentId) {
     return api_http.request({

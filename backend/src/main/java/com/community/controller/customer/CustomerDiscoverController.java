@@ -7,6 +7,7 @@ import com.community.service.QaCategoryAdminService;
 import com.community.vo.AppCategoryVO;
 import com.community.vo.AppExpertCardVO;
 import com.community.vo.AppGuestHomeVO;
+import com.community.vo.AppKbCategoryVO;
 import com.community.vo.AppQuestionHotItemVO;
 import com.community.vo.AppQuestionListItemVO;
 import com.community.vo.AppTopicListItemVO;
@@ -32,7 +33,7 @@ public class CustomerDiscoverController {
     private final QaCategoryAdminService qaCategoryAdminService;
 
     @GetMapping("/home")
-    @Operation(summary = "游客首页预览")
+    @Operation(summary = "首页内容")
     public Result<AppGuestHomeVO> home(@RequestParam(required = false) Integer topicLimit,
                                        @RequestParam(required = false) Integer questionLimit,
                                        @RequestParam(required = false) Integer expertLimit) {
@@ -40,25 +41,37 @@ public class CustomerDiscoverController {
     }
 
     @GetMapping("/questions")
-    @Operation(summary = "发现页问题分页（支持按分类切换）")
+    @Operation(summary = "问答分页")
     public Result<PageInfo<AppQuestionListItemVO>> questions(@ModelAttribute AppQuestionPageQueryDTO query) {
         return Result.success(customerDiscoverService.questionPage(query));
     }
 
     @GetMapping("/categories")
-    @Operation(summary = "发现页分类")
-    public Result<List<AppCategoryVO>> categories() {
-        return Result.success(customerDiscoverService.listCategories());
+    @Operation(summary = "问答分类推荐")
+    public Result<List<AppCategoryVO>> categories(@RequestParam(required = false) Integer limit) {
+        return Result.success(customerDiscoverService.listCategories(limit));
+    }
+
+    @GetMapping("/categories/all")
+    @Operation(summary = "问答分类全量")
+    public Result<List<AppCategoryVO>> allCategories() {
+        return Result.success(customerDiscoverService.listAllCategories());
+    }
+
+    @GetMapping("/categories/kb")
+    @Operation(summary = "知识库分类推荐")
+    public Result<List<AppKbCategoryVO>> kbCategories(@RequestParam(required = false) Integer limit) {
+        return Result.success(customerDiscoverService.listKbCategories(limit));
     }
 
     @GetMapping("/categories/tree")
-    @Operation(summary = "分类树懒加载列表")
+    @Operation(summary = "分类树懒加载")
     public Result<List<CategoryTreeVO>> categoryTree(@RequestParam(required = false) Long parentId) {
         return Result.success(qaCategoryAdminService.listTreeLazy(parentId));
     }
 
     @GetMapping("/topics/hot")
-    @Operation(summary = "热门话题")
+    @Operation(summary = "热门专题")
     public Result<List<AppTopicListItemVO>> hotTopics(@RequestParam(required = false) Integer limit) {
         return Result.success(customerDiscoverService.hotTopics(limit));
     }

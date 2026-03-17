@@ -1,8 +1,13 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { onReachBottom, onShow } from "@dcloudio/uni-app";
-import { discoverApi, type AppCategoryVO, type AppDiscoverQuestionItemVO } from "@/api/discover";
-import { expertApi, type AppExpertPostCategoryVO, type AppExpertPostItemVO } from "@/api/expert";
+import {
+  discoverApi,
+  type AppCategoryVO,
+  type AppDiscoverQuestionItemVO,
+  type AppKbCategoryVO
+} from "@/api/discover";
+import { expertApi, type AppExpertPostItemVO } from "@/api/expert";
 import { useAuthStore } from "@/stores/auth";
 import { openAskPage, openExpertPostCreatePage, openExpertPostDetailPage, openQuestionDetail } from "@/utils/nav";
 import { meApi } from "@/api/me";
@@ -18,7 +23,7 @@ const activeZone = ref<ZoneKey>("science");
 const loading = ref(false);
 const errorText = ref("");
 
-const scienceCategories = ref<AppExpertPostCategoryVO[]>([]);
+const scienceCategories = ref<AppKbCategoryVO[]>([]);
 const scienceSelectedCategoryId = ref<number | undefined>(undefined);
 const scienceSortBy = ref<SortKey>("hot");
 const sciencePage = ref(1);
@@ -50,7 +55,7 @@ async function loadHomeBase() {
   loading.value = true;
   errorText.value = "";
   try {
-    const [kbCategories, home] = await Promise.all([expertApi.categories(), discoverApi.getHome()]);
+    const [kbCategories, home] = await Promise.all([discoverApi.getKbCategories(4), discoverApi.getHome()]);
     scienceCategories.value = kbCategories || [];
     qaCategories.value = home.categories || [];
   } catch {
@@ -154,7 +159,7 @@ function switchSort(key: SortKey) {
   loadQaQuestions(true);
 }
 
-function selectScienceCategory(item?: AppExpertPostCategoryVO) {
+function selectScienceCategory(item?: AppKbCategoryVO) {
   const next = item?.id;
   if (scienceSelectedCategoryId.value === next) return;
   scienceSelectedCategoryId.value = next;

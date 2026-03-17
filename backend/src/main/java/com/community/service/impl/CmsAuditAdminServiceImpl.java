@@ -155,6 +155,8 @@ public class CmsAuditAdminServiceImpl implements CmsAuditAdminService {
     public void reopen(Long id) {
         CmsAudit audit = getAuditOrThrow(id);
         audit.setAuditStatus(1);
+        audit.setTriggerSource(3);
+        audit.setAuditType(2);
         audit.setAction(null);
         audit.setRejectReason(null);
         audit.setAuditorId(null);

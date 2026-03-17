@@ -15,6 +15,12 @@ export interface AppCategoryVO {
   questionCount: number;
 }
 
+export interface AppKbCategoryVO {
+  id: number;
+  parentId?: number | null;
+  name: string;
+}
+
 export interface AppCategoryTreeNodeVO {
   id: number;
   name: string;
@@ -132,10 +138,22 @@ export const discoverApi = {
       experts: (data?.experts || []).map((x) => normalizeExpert(x))
     }));
   },
-  getCategories() {
+  getCategories(limit = 4) {
     return request<AppCategoryVO[]>({
-      url: "/api/customer/discover/categories"
+      url: "/api/customer/discover/categories",
+      params: { limit }
     }).then((data) => (data || []).map((x) => normalizeCategory(x)));
+  },
+  getAllCategories() {
+    return request<AppCategoryVO[]>({
+      url: "/api/customer/discover/categories/all"
+    }).then((data) => (data || []).map((x) => normalizeCategory(x)));
+  },
+  getKbCategories(limit = 4) {
+    return request<AppKbCategoryVO[]>({
+      url: "/api/customer/discover/categories/kb",
+      params: { limit }
+    });
   },
   getCategoryTree(parentId?: number) {
     return request<AppCategoryTreeNodeVO[]>({

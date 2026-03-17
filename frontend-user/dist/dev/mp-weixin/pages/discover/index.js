@@ -37,7 +37,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       loading.value = true;
       try {
         const [categoryData, kbCategoryData, topicData, rankData, expertData] = await Promise.all([
-          api_discover.discoverApi.getCategories(),
+          api_discover.discoverApi.getAllCategories(),
           api_expert.expertApi.categories(),
           api_discover.discoverApi.getHotTopics(12),
           api_discover.discoverApi.getHotQuestions(20),

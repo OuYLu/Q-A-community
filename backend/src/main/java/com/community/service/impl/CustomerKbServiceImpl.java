@@ -5,11 +5,13 @@ import com.community.common.BizException;
 import com.community.common.ResultCode;
 import com.community.common.SecurityUser;
 import com.community.dto.AppAnswerCommentCreateDTO;
+import com.community.entity.CmsAudit;
 import com.community.entity.CmsSensitiveWord;
 import com.community.entity.KbEntry;
 import com.community.entity.QaComment;
 import com.community.entity.QaVote;
 import com.community.entity.User;
+import com.community.mapper.CmsAuditMapper;
 import com.community.mapper.CmsSensitiveWordMapper;
 import com.community.mapper.ExpertPostMapper;
 import com.community.mapper.QaCommentMapper;
@@ -20,6 +22,8 @@ import com.community.service.EsSearchService;
 import com.community.service.RecommendationBehaviorService;
 import com.community.vo.AppKbCommentVO;
 import com.community.vo.AppKbInteractVO;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,7 +32,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -39,12 +47,18 @@ public class CustomerKbServiceImpl implements CustomerKbService {
     // Keep favorite in another biz type to avoid conflict with legacy unique key (biz_type,biz_id,user_id).
     private static final int KB_FAVORITE_BIZ_TYPE = 6;
     private static final int VOTE_TYPE_DEFAULT = 1;
+    private static final int SENSITIVE_LEVEL_REVIEW = 1;
+    private static final int AUDIT_TRIGGER_RULE = 1;
+    private static final int AUDIT_TYPE_RULE = 1;
+    private static final int AUDIT_BIZ_TYPE_COMMENT = 3;
 
     private final ExpertPostMapper expertPostMapper;
     private final QaVoteMapper qaVoteMapper;
     private final QaCommentMapper qaCommentMapper;
     private final UserMapper userMapper;
+    private final CmsAuditMapper cmsAuditMapper;
     private final CmsSensitiveWordMapper sensitiveWordMapper;
+    private final ObjectMapper objectMapper;
     private final EsSearchService esSearchService;
     private final RecommendationBehaviorService recommendationBehaviorService;
 
@@ -134,7 +148,12 @@ public class CustomerKbServiceImpl implements CustomerKbService {
         Long userId = requireUserId();
         assertUserCanPublish(userId);
         requirePublishedKb(kbEntryId);
-        validateNoSensitiveWords(dto == null ? null : dto.getContent());
+        String content = dto == null ? null : dto.getContent();
+        if (!StringUtils.hasText(content)) {
+            throw new BizException(ResultCode.BAD_REQUEST, "comment content is required");
+        }
+        SensitiveScanResult sensitive = scanSensitiveWords(content);
+        throwIfBlocked("comment", sensitive);
 
         Long parentId = dto == null ? null : dto.getParentId();
         if (parentId != null) {
@@ -153,11 +172,12 @@ public class CustomerKbServiceImpl implements CustomerKbService {
         comment.setBizId(kbEntryId);
         comment.setUserId(userId);
         comment.setParentId(parentId);
-        comment.setContent(dto.getContent().trim());
+        comment.setContent(content.trim());
         comment.setStatus(1);
         comment.setRejectReason(null);
         comment.setDeleteFlag(0);
         qaCommentMapper.insert(comment);
+        createOrRefreshRuleAudit(AUDIT_BIZ_TYPE_COMMENT, comment.getId(), userId, sensitive.reviewHits());
         return comment.getId();
     }
 
@@ -221,25 +241,95 @@ public class CustomerKbServiceImpl implements CustomerKbService {
         }
     }
 
-    private void validateNoSensitiveWords(String text) {
+    private SensitiveScanResult scanSensitiveWords(String text) {
         if (!StringUtils.hasText(text)) {
-            throw new BizException(ResultCode.BAD_REQUEST, "comment content is required");
+            return new SensitiveScanResult(List.of(), List.of());
         }
         List<CmsSensitiveWord> words = sensitiveWordMapper.selectList(new LambdaQueryWrapper<CmsSensitiveWord>()
             .eq(CmsSensitiveWord::getEnabled, 1));
         if (words == null || words.isEmpty()) {
-            return;
+            return new SensitiveScanResult(List.of(), List.of());
         }
-        String target = text.trim().toLowerCase();
+        String target = text.trim().toLowerCase(Locale.ROOT);
+        List<SensitiveHit> blockedHits = new ArrayList<>();
+        List<SensitiveHit> reviewHits = new ArrayList<>();
+        Set<String> dedup = new LinkedHashSet<>();
         for (CmsSensitiveWord item : words) {
             if (item == null || !StringUtils.hasText(item.getWord())) {
                 continue;
             }
-            String word = item.getWord().trim().toLowerCase();
-            if (target.contains(word)) {
-                throw new BizException(ResultCode.BAD_REQUEST, "评论包含敏感词：" + item.getWord());
+            String word = item.getWord().trim();
+            if (!StringUtils.hasText(word) || !target.contains(word.toLowerCase(Locale.ROOT))) {
+                continue;
+            }
+            Integer level = item.getLevel() == null ? 2 : item.getLevel();
+            String key = word.toLowerCase(Locale.ROOT) + "#" + level;
+            if (!dedup.add(key)) {
+                continue;
+            }
+            SensitiveHit hit = new SensitiveHit(
+                word,
+                level,
+                item.getCategory(),
+                item.getHitActionDesc(),
+                item.getReasonTemplate()
+            );
+            if (level == SENSITIVE_LEVEL_REVIEW) {
+                reviewHits.add(hit);
+            } else {
+                blockedHits.add(hit);
             }
         }
+        return new SensitiveScanResult(blockedHits, reviewHits);
+    }
+
+    private void throwIfBlocked(String bizName, SensitiveScanResult result) {
+        if (result == null || result.blockedHits().isEmpty()) {
+            return;
+        }
+        SensitiveHit first = result.blockedHits().get(0);
+        if (StringUtils.hasText(first.reasonTemplate())) {
+            throw new BizException(ResultCode.BAD_REQUEST, first.reasonTemplate());
+        }
+        throw new BizException(ResultCode.BAD_REQUEST, bizName + " contains sensitive word: " + first.word());
+    }
+
+    private void createOrRefreshRuleAudit(Integer bizType,
+                                          Long bizId,
+                                          Long submitUserId,
+                                          List<SensitiveHit> reviewHits) {
+        if (bizType == null || bizId == null || reviewHits == null || reviewHits.isEmpty()) {
+            return;
+        }
+        JsonNode hitDetail = objectMapper.valueToTree(reviewHits);
+        CmsAudit exists = cmsAuditMapper.selectOne(new LambdaQueryWrapper<CmsAudit>()
+            .eq(CmsAudit::getBizType, bizType)
+            .eq(CmsAudit::getBizId, bizId)
+            .eq(CmsAudit::getTriggerSource, AUDIT_TRIGGER_RULE)
+            .eq(CmsAudit::getAuditStatus, 1)
+            .last("LIMIT 1"));
+        if (exists != null) {
+            exists.setAuditType(AUDIT_TYPE_RULE);
+            exists.setModelLabel("sensitive_rule");
+            exists.setModelScore(null);
+            exists.setHitDetail(hitDetail);
+            exists.setSubmitUserId(submitUserId);
+            cmsAuditMapper.updateById(exists);
+            return;
+        }
+        CmsAudit audit = new CmsAudit();
+        audit.setBizType(bizType);
+        audit.setBizId(bizId);
+        audit.setTriggerSource(AUDIT_TRIGGER_RULE);
+        audit.setAuditType(AUDIT_TYPE_RULE);
+        audit.setAuditStatus(1);
+        audit.setAction(null);
+        audit.setModelLabel("sensitive_rule");
+        audit.setModelScore(null);
+        audit.setHitDetail(hitDetail);
+        audit.setRejectReason(null);
+        audit.setSubmitUserId(submitUserId);
+        cmsAuditMapper.insert(audit);
     }
 
     private void syncKbForEs(Long kbEntryId) {
@@ -247,5 +337,11 @@ public class CustomerKbServiceImpl implements CustomerKbService {
             return;
         }
         esSearchService.syncKbById(kbEntryId);
+    }
+
+    private record SensitiveScanResult(List<SensitiveHit> blockedHits, List<SensitiveHit> reviewHits) {
+    }
+
+    private record SensitiveHit(String word, Integer level, String category, String hitActionDesc, String reasonTemplate) {
     }
 }

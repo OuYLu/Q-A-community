@@ -40,7 +40,15 @@
     LEFT JOIN kb_category c ON c.id = e.category_id
     WHERE e.status = 1
     <if test="categoryId != null">
-      AND e.category_id = #{categoryId}
+      AND (
+        e.category_id = #{categoryId}
+        OR e.category_id IN (
+          SELECT c.id
+          FROM kb_category c
+          WHERE c.parent_id = #{categoryId}
+            AND c.status = 1
+        )
+      )
     </if>
     <if test="keyword != null and keyword != ''">
       AND (e.title LIKE CONCAT('%', #{keyword}, '%')
