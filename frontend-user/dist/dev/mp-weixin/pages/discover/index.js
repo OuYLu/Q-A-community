@@ -4,6 +4,8 @@ const api_discover = require("../../api/discover.js");
 const api_expert = require("../../api/expert.js");
 const stores_auth = require("../../stores/auth.js");
 const utils_nav = require("../../utils/nav.js");
+const CLICK_GUARD_MS = 450;
+const NAV_LOCK_MS = 700;
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   __name: "index",
   setup(__props) {
@@ -20,6 +22,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const failedCategoryIconIds = common_vendor.ref([]);
     const failedTopicCoverIds = common_vendor.ref([]);
     const failedAvatarIds = common_vendor.ref([]);
+    const showAt = common_vendor.ref(0);
+    const navLock = common_vendor.ref(false);
     const tabs = [
       { key: "category", label: "分类", icon: "/static/tabbar/topic.png", activeIcon: "/static/tabbar/topic-active.png" },
       { key: "rank", label: "热榜", icon: "/static/tabbar/hot.png", activeIcon: "/static/tabbar/hot-active.png" },
@@ -83,6 +87,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       failedCategoryIconIds.value = [...failedCategoryIconIds.value, id];
     }
     function openCategory(item) {
+      if (!canNavigateByTap())
+        return;
       const type = categoryBizType.value;
       common_vendor.index.navigateTo({
         url: `/pages/discover/category-detail?categoryId=${item.id}&categoryName=${encodeURIComponent(item.name || "")}&categoryType=${type}`
@@ -105,14 +111,20 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       failedAvatarIds.value = [...failedAvatarIds.value, userId];
     }
     function openTopic(item) {
+      if (!canNavigateByTap())
+        return;
       common_vendor.index.navigateTo({
         url: `/pages/discover/topic-detail?topicId=${item.id}&topicTitle=${encodeURIComponent(item.title || "")}`
       });
     }
     function openHotQuestion(item) {
+      if (!canNavigateByTap())
+        return;
       utils_nav.openQuestionDetail(item.id);
     }
     function openExpert(item) {
+      if (!canNavigateByTap())
+        return;
       if (!(item == null ? void 0 : item.userId))
         return;
       utils_nav.openUserHomePage(Number(item.userId));
@@ -123,10 +135,26 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       });
     }
     common_vendor.onShow(async () => {
+      showAt.value = Date.now();
+      navLock.value = false;
       if (needLogin.value)
         return;
       await loadData();
     });
+    function canNavigateByTap() {
+      const now = Date.now();
+      if (now - showAt.value < CLICK_GUARD_MS) {
+        return false;
+      }
+      if (navLock.value) {
+        return false;
+      }
+      navLock.value = true;
+      setTimeout(() => {
+        navLock.value = false;
+      }, NAV_LOCK_MS);
+      return true;
+    }
     return (_ctx, _cache) => {
       return common_vendor.e({
         a: needLogin.value

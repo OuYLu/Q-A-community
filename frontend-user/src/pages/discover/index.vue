@@ -30,6 +30,11 @@ const experts = ref<AppExpertCardVO[]>([]);
 const failedCategoryIconIds = ref<number[]>([]);
 const failedTopicCoverIds = ref<number[]>([]);
 const failedAvatarIds = ref<number[]>([]);
+const showAt = ref(0);
+const navLock = ref(false);
+
+const CLICK_GUARD_MS = 450;
+const NAV_LOCK_MS = 700;
 
 const tabs: Array<{ key: DiscoverTab; label: string; icon: string; activeIcon: string }> = [
   { key: "category", label: "分类", icon: "/static/tabbar/topic.png", activeIcon: "/static/tabbar/topic-active.png" },
@@ -97,6 +102,7 @@ function onCategoryIconError(categoryId: number | string) {
 }
 
 function openCategory(item: CategoryCard) {
+  if (!canNavigateByTap()) return;
   const type = categoryBizType.value;
   uni.navigateTo({
     url: `/pages/discover/category-detail?categoryId=${item.id}&categoryName=${encodeURIComponent(item.name || "")}&categoryType=${type}`
@@ -122,16 +128,19 @@ function onAvatarError(userId: number) {
 }
 
 function openTopic(item: AppTopicListItemVO) {
+  if (!canNavigateByTap()) return;
   uni.navigateTo({
     url: `/pages/discover/topic-detail?topicId=${item.id}&topicTitle=${encodeURIComponent(item.title || "")}`
   });
 }
 
 function openHotQuestion(item: AppQuestionHotItemVO) {
+  if (!canNavigateByTap()) return;
   openQuestionDetail(item.id);
 }
 
 function openExpert(item: AppExpertCardVO) {
+  if (!canNavigateByTap()) return;
   if (!item?.userId) return;
   openUserHomePage(Number(item.userId));
 }
@@ -143,9 +152,26 @@ function goLogin() {
 }
 
 onShow(async () => {
+  showAt.value = Date.now();
+  navLock.value = false;
   if (needLogin.value) return;
   await loadData();
 });
+
+function canNavigateByTap() {
+  const now = Date.now();
+  if (now - showAt.value < CLICK_GUARD_MS) {
+    return false;
+  }
+  if (navLock.value) {
+    return false;
+  }
+  navLock.value = true;
+  setTimeout(() => {
+    navLock.value = false;
+  }, NAV_LOCK_MS);
+  return true;
+}
 </script>
 
 <template>
