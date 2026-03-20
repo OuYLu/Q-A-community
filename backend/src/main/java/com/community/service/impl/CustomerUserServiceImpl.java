@@ -57,26 +57,30 @@ public class CustomerUserServiceImpl implements CustomerUserService {
         }
         boolean self = currentUserId.equals(userId);
         boolean profileVisible = self || isProfileVisible(userId);
-        boolean statsVisible = self || (profileVisible && isStatsVisible(userId));
+        boolean statsVisible = profileVisible;
 
-        UserStat stat = userStatMapper.selectById(userId);
         int questionCount = 0;
         int answerCount = 0;
         int followerCount = 0;
         int followingCount = 0;
         if (statsVisible) {
-            questionCount = Math.toIntExact(qaQuestionMapper.selectCount(new LambdaQueryWrapper<QaQuestion>()
+            LambdaQueryWrapper<QaQuestion> questionCountQuery = new LambdaQueryWrapper<QaQuestion>()
                 .eq(QaQuestion::getUserId, userId)
-                .eq(QaQuestion::getDeleteFlag, 0)
-                .eq(QaQuestion::getStatus, 1)));
-            Long effectiveAnswerCount = qaAnswerMapper.countUserEffectiveAnswers(userId);
+                .eq(QaQuestion::getDeleteFlag, 0);
+            if (self) {
+                questionCountQuery.in(QaQuestion::getStatus, QaQuestion.STATUS_PUBLISHED, QaQuestion.STATUS_SELF_ONLY);
+            } else {
+                questionCountQuery.eq(QaQuestion::getStatus, QaQuestion.STATUS_PUBLISHED);
+            }
+            questionCount = Math.toIntExact(qaQuestionMapper.selectCount(questionCountQuery));
+            Long effectiveAnswerCount = self
+                ? qaAnswerMapper.countMyEffectiveAnswers(userId)
+                : qaAnswerMapper.countUserEffectiveAnswers(userId);
             answerCount = effectiveAnswerCount == null ? 0 : Math.toIntExact(effectiveAnswerCount);
-            followerCount = stat != null && stat.getFollowerCount() != null
-                ? stat.getFollowerCount()
-                : (user.getFollowerCount() == null ? 0 : user.getFollowerCount());
-            followingCount = stat != null && stat.getFollowingCount() != null
-                ? stat.getFollowingCount()
-                : (user.getFollowingCount() == null ? 0 : user.getFollowingCount());
+            followerCount = Math.toIntExact(userFollowMapper.selectCount(new LambdaQueryWrapper<UserFollow>()
+                .eq(UserFollow::getFolloweeId, userId)));
+            followingCount = Math.toIntExact(userFollowMapper.selectCount(new LambdaQueryWrapper<UserFollow>()
+                .eq(UserFollow::getFollowerId, userId)));
         }
 
         boolean followed = !self && userFollowMapper.selectCount(new LambdaQueryWrapper<UserFollow>()
@@ -277,16 +281,6 @@ public class CustomerUserServiceImpl implements CustomerUserService {
             return true;
         }
         return setting.getProfileVisible() == 1;
-    }
-
-    private boolean isStatsVisible(Long userId) {
-        UserPrivacySetting setting = userPrivacySettingMapper.selectOne(new LambdaQueryWrapper<UserPrivacySetting>()
-            .eq(UserPrivacySetting::getUserId, userId)
-            .last("LIMIT 1"));
-        if (setting == null || setting.getStatsVisible() == null) {
-            return true;
-        }
-        return setting.getStatsVisible() == 1;
     }
 
     private Long requireUserId() {

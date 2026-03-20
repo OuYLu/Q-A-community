@@ -34,12 +34,24 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const isFollowList = common_vendor.computed(() => type.value === "following" || type.value === "followers");
     const questionItems = common_vendor.computed(() => items.value || []);
     const followItems = common_vendor.computed(() => items.value || []);
+    const favoriteItems = common_vendor.computed(() => items.value || []);
+    const favoriteGroups = common_vendor.computed(() => {
+      if (type.value !== "favorites")
+        return [];
+      const source = favoriteItems.value;
+      const groups = [
+        { key: 1, title: "问题收藏", items: source.filter((x) => Number((x == null ? void 0 : x.bizType) || 1) === 1) },
+        { key: 3, title: "回答收藏", items: source.filter((x) => Number((x == null ? void 0 : x.bizType) || 1) === 3) },
+        { key: 2, title: "科普收藏", items: source.filter((x) => Number((x == null ? void 0 : x.bizType) || 1) === 2) }
+      ];
+      return groups.filter((g) => g.items.length > 0);
+    });
     const headText = common_vendor.computed(() => {
       if (type.value === "answers")
-        return `共 ${answerEffectiveCount.value} 条（有效）`;
+        return "共 " + answerEffectiveCount.value + " 条（有效）";
       if (type.value === "questions")
-        return `共 ${questionEffectiveCount.value} 条（有效）`;
-      return `共 ${total.value} 条`;
+        return "共 " + questionEffectiveCount.value + " 条（有效）";
+      return "共 " + total.value + " 条";
     });
     function normalizeType(raw) {
       const valid = [
@@ -77,6 +89,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       return Number((item == null ? void 0 : item.status) || 0) === 4;
     }
     function rowMainText(item) {
+      if (type.value === "favorites") {
+        const bizType = Number((item == null ? void 0 : item.bizType) || 1);
+        if (bizType === 3)
+          return item.questionTitle || item.title || "";
+        return item.title || "";
+      }
       if (type.value === "answers")
         return `问题：${item.questionTitle || ""}`;
       if (type.value === "following" || type.value === "followers")
@@ -85,8 +103,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     function rowSubText(item) {
       if (type.value === "favorites") {
-        if (Number((item == null ? void 0 : item.bizType) || 1) === 2) {
-          return `${item.likeCount || 0} 点赞 ${item.favoriteCount || 0} 收藏`;
+        const bizType = Number((item == null ? void 0 : item.bizType) || 1);
+        if (bizType === 2) {
+          return item.contentPreview || `${item.likeCount || 0} 点赞 ${item.favoriteCount || 0} 收藏`;
+        }
+        if (bizType === 3) {
+          return item.contentPreview || "暂无回答内容";
         }
         return `${item.answerCount || 0} 回答 ${item.likeCount || 0} 点赞`;
       }
@@ -225,12 +247,17 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         return;
       }
       if (type.value === "favorites") {
-        if (Number((item == null ? void 0 : item.bizType) || 1) === 2 && (item == null ? void 0 : item.bizId)) {
+        const bizType = Number((item == null ? void 0 : item.bizType) || 1);
+        if (bizType === 2 && (item == null ? void 0 : item.bizId)) {
           utils_nav.openExpertPostDetailPage(Number(item.bizId));
           return;
         }
-        if (item == null ? void 0 : item.questionId) {
-          utils_nav.openQuestionDetail(Number(item.questionId));
+        if (bizType === 3 && ((item == null ? void 0 : item.answerId) || (item == null ? void 0 : item.bizId))) {
+          utils_nav.openAnswerDetailPage(Number(item.answerId || item.bizId));
+          return;
+        }
+        if (((item == null ? void 0 : item.questionId) || (item == null ? void 0 : item.bizId)) && bizType === 1) {
+          utils_nav.openQuestionDetail(Number(item.questionId || item.bizId));
           return;
         }
       }
@@ -345,8 +372,25 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             g: common_vendor.o(($event) => openRow(item), item.userId)
           });
         })
+      } : type.value === "favorites" ? {
+        h: common_vendor.f(favoriteGroups.value, (group, k0, i0) => {
+          return {
+            a: common_vendor.t(group.title),
+            b: common_vendor.t(group.items.length),
+            c: common_vendor.f(group.items, (item, idx, i1) => {
+              return {
+                a: common_vendor.t(rowMainText(item)),
+                b: common_vendor.t(rowSubText(item)),
+                c: common_vendor.t(rowTimeText(item)),
+                d: `${group.key}-${item.bizId || idx}`,
+                e: common_vendor.o(($event) => openRow(item), `${group.key}-${item.bizId || idx}`)
+              };
+            }),
+            d: group.key
+          };
+        })
       } : {
-        g: common_vendor.f(items.value, (item, idx, i0) => {
+        i: common_vendor.f(items.value, (item, idx, i0) => {
           return common_vendor.e({
             a: common_vendor.t(rowMainText(item)),
             b: isInvalidAnswerRow(item)
@@ -361,9 +405,10 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         })
       }, {
         e: isFollowList.value,
-        h: loading.value
+        g: type.value === "favorites",
+        j: loading.value
       }, loading.value ? {} : finished.value && items.value.length ? {} : {}, {
-        i: finished.value && items.value.length
+        k: finished.value && items.value.length
       });
     };
   }

@@ -8,7 +8,10 @@
       merged.bizType,
       merged.bizId,
       merged.questionId,
+      merged.answerId,
       merged.title,
+      merged.questionTitle,
+      merged.contentPreview,
       merged.answerCount,
       merged.likeCount,
       merged.favoriteCount,
@@ -18,7 +21,10 @@
         1 AS bizType,
         f.question_id AS bizId,
         f.question_id AS questionId,
+        NULL AS answerId,
         q.title AS title,
+        q.title AS questionTitle,
+        LEFT(COALESCE(q.content, ''), 120) AS contentPreview,
         q.answer_count AS answerCount,
         q.like_count AS likeCount,
         q.favorite_count AS favoriteCount,
@@ -27,7 +33,7 @@
       JOIN qa_question q ON q.id = f.question_id
       WHERE f.user_id = #{userId}
         AND q.delete_flag = 0
-        AND q.status IN (1, 5)
+        AND (q.status = 1 OR (q.status = 5 AND q.user_id = #{userId}))
 
       UNION ALL
 
@@ -35,7 +41,10 @@
         2 AS bizType,
         v.biz_id AS bizId,
         NULL AS questionId,
+        NULL AS answerId,
         kb.title AS title,
+        NULL AS questionTitle,
+        LEFT(COALESCE(kb.summary, ''), 120) AS contentPreview,
         0 AS answerCount,
         kb.like_count AS likeCount,
         kb.favorite_count AS favoriteCount,
@@ -46,6 +55,38 @@
         AND v.biz_type = 6
         AND v.vote_type = 1
         AND kb.status = 1
+
+      UNION ALL
+
+      SELECT
+        3 AS bizType,
+        a.id AS bizId,
+        a.question_id AS questionId,
+        a.id AS answerId,
+        q.title AS title,
+        q.title AS questionTitle,
+        LEFT(COALESCE(a.content, ''), 120) AS contentPreview,
+        0 AS answerCount,
+        a.like_count AS likeCount,
+        COALESCE(af.favorite_count, 0) AS favoriteCount,
+        v.created_at AS favoriteAt
+      FROM qa_vote v
+      JOIN qa_answer a ON a.id = v.biz_id
+      JOIN qa_question q ON q.id = a.question_id
+      LEFT JOIN (
+        SELECT biz_id, COUNT(1) AS favorite_count
+        FROM qa_vote
+        WHERE biz_type = 2
+          AND vote_type = 2
+        GROUP BY biz_id
+      ) af ON af.biz_id = a.id
+      WHERE v.user_id = #{userId}
+        AND v.biz_type = 2
+        AND v.vote_type = 2
+        AND a.delete_flag = 0
+        AND a.status = 1
+        AND q.delete_flag = 0
+        AND (q.status = 1 OR (q.status = 5 AND q.user_id = #{userId}))
     ) merged
     ORDER BY merged.favoriteAt DESC, merged.bizId DESC
   </select>

@@ -195,15 +195,15 @@ onShow(() => {
 
         <view class="answer-actions">
           <view class="mini-action like-btn" :class="{ active: detail.answer.liked }" @click="toggleLike">
-            <text class="mini-icon">赞</text>
+            <text class="mini-icon">👍</text>
             <text>{{ detail.answer.likeCount || 0 }}</text>
           </view>
           <view class="mini-action" :class="{ active: detail.answer.favorited }" @click="toggleFavorite">
-            <text class="mini-icon">藏</text>
+            <text class="mini-icon">♥</text>
             <text>{{ detail.answer.favoriteCount || 0 }}</text>
           </view>
           <view class="mini-action">
-            <text class="mini-icon">评</text>
+            <text class="mini-icon">💬</text>
             <text>{{ detail.answer.commentCount || 0 }}</text>
           </view>
         </view>
@@ -408,6 +408,11 @@ page {
   border-color: #ec9aab;
   color: #d95b78;
   background: #fff0f4;
+}
+
+.mini-icon {
+  font-size: 24rpx;
+  line-height: 1;
 }
 
 .section-title {

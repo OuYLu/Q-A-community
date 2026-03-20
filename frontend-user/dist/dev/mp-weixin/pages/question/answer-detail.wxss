@@ -131,6 +131,10 @@ page {
   color: #d95b78;
   background: #fff0f4;
 }
+.mini-icon {
+  font-size: 24rpx;
+  line-height: 1;
+}
 .section-title {
   margin: 18rpx 4rpx 10rpx;
   font-size: 30rpx;

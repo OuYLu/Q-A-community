@@ -224,6 +224,32 @@
     ORDER BY q.created_at DESC, q.id DESC
   </select>
 
+  <select id="selectMyEffectiveQuestions" resultType="com.community.vo.AppMyQuestionItemVO">
+    SELECT
+      q.id,
+      q.title,
+      c.name AS categoryName,
+      q.image_urls AS imageUrlsRaw,
+      q.status,
+      (
+        SELECT COUNT(1)
+        FROM qa_answer a
+        WHERE a.question_id = q.id
+          AND a.delete_flag = 0
+          AND a.status = 1
+      ) AS answerCount,
+      q.like_count AS likeCount,
+      q.view_count AS viewCount,
+      q.accepted_answer_id AS acceptedAnswerId,
+      q.created_at AS createdAt
+    FROM qa_question q
+    LEFT JOIN qa_category c ON c.id = q.category_id
+    WHERE q.user_id = #{userId}
+      AND q.delete_flag = 0
+      AND q.status IN (1, 5)
+    ORDER BY q.created_at DESC, q.id DESC
+  </select>
+
   <select id="selectAppQuestionPage" resultType="com.community.vo.AppQuestionListItemVO">
     SELECT
       q.id,

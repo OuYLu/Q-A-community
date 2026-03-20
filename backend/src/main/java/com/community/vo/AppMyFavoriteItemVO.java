@@ -8,12 +8,15 @@ import java.time.LocalDateTime;
 @Data
 public class AppMyFavoriteItemVO {
     /**
-     * 1-question, 2-kb entry
+     * 1-question, 2-kb entry, 3-answer
      */
     private Integer bizType;
     private Long bizId;
     private Long questionId;
+    private Long answerId;
     private String title;
+    private String questionTitle;
+    private String contentPreview;
     private Integer answerCount;
     private Integer likeCount;
     private Integer favoriteCount;

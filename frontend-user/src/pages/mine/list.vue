@@ -12,7 +12,7 @@ import {
 import { expertApi, type AppExpertPostItemVO } from "@/api/expert";
 import { ensurePageAuth } from "@/utils/auth-guard";
 import { questionApi, type AppMyQuestionItemVO } from "@/api/question";
-import { openExpertPostDetailPage, openQuestionDetail, openUserHomePage } from "@/utils/nav";
+import { openAnswerDetailPage, openExpertPostDetailPage, openQuestionDetail, openUserHomePage } from "@/utils/nav";
 import { BASE_URL } from "@/utils/constants";
 
 type ListType =
@@ -60,10 +60,21 @@ const isQuestionList = computed(() => type.value === "questions");
 const isFollowList = computed(() => type.value === "following" || type.value === "followers");
 const questionItems = computed(() => (items.value as AppMyQuestionItemVO[]) || []);
 const followItems = computed(() => (items.value as AppFollowUserItemVO[]) || []);
+const favoriteItems = computed(() => (items.value as AppMyFavoriteItemVO[]) || []);
+const favoriteGroups = computed(() => {
+  if (type.value !== "favorites") return [] as Array<{ key: number; title: string; items: AppMyFavoriteItemVO[] }>;
+  const source = favoriteItems.value;
+  const groups = [
+    { key: 1, title: "问题收藏", items: source.filter((x) => Number(x?.bizType || 1) === 1) },
+    { key: 3, title: "回答收藏", items: source.filter((x) => Number(x?.bizType || 1) === 3) },
+    { key: 2, title: "科普收藏", items: source.filter((x) => Number(x?.bizType || 1) === 2) }
+  ];
+  return groups.filter((g) => g.items.length > 0);
+});
 const headText = computed(() => {
-  if (type.value === "answers") return `共 ${answerEffectiveCount.value} 条（有效）`;
-  if (type.value === "questions") return `共 ${questionEffectiveCount.value} 条（有效）`;
-  return `共 ${total.value} 条`;
+  if (type.value === "answers") return "共 " + answerEffectiveCount.value + " 条（有效）";
+  if (type.value === "questions") return "共 " + questionEffectiveCount.value + " 条（有效）";
+  return "共 " + total.value + " 条";
 });
 
 function normalizeType(raw?: string): ListType {
@@ -99,7 +110,13 @@ function isInvalidQuestionRow(item: any) {
   return Number(item?.status || 0) === 4;
 }
 
+
 function rowMainText(item: any) {
+  if (type.value === "favorites") {
+    const bizType = Number(item?.bizType || 1);
+    if (bizType === 3) return item.questionTitle || item.title || "";
+    return item.title || "";
+  }
   if (type.value === "answers") return `问题：${item.questionTitle || ""}`;
   if (type.value === "following" || type.value === "followers") return item.nickname || `用户 ${item.userId}`;
   return item.title || "";
@@ -107,8 +124,12 @@ function rowMainText(item: any) {
 
 function rowSubText(item: any) {
   if (type.value === "favorites") {
-    if (Number(item?.bizType || 1) === 2) {
-      return `${item.likeCount || 0} 点赞 ${item.favoriteCount || 0} 收藏`;
+    const bizType = Number(item?.bizType || 1);
+    if (bizType === 2) {
+      return item.contentPreview || `${item.likeCount || 0} 点赞 ${item.favoriteCount || 0} 收藏`;
+    }
+    if (bizType === 3) {
+      return item.contentPreview || "暂无回答内容";
     }
     return `${item.answerCount || 0} 回答 ${item.likeCount || 0} 点赞`;
   }
@@ -134,6 +155,7 @@ function formatDate(input?: string) {
   if (value.length >= 10) return value.slice(0, 10);
   return value;
 }
+
 
 function questionStatusText(item: AppMyQuestionItemVO) {
   if ((item as any).acceptedAnswerId) return "已采纳最佳答案";
@@ -237,12 +259,17 @@ function openRow(item: any) {
     return;
   }
   if (type.value === "favorites") {
-    if (Number(item?.bizType || 1) === 2 && item?.bizId) {
+    const bizType = Number(item?.bizType || 1);
+    if (bizType === 2 && item?.bizId) {
       openExpertPostDetailPage(Number(item.bizId));
       return;
     }
-    if (item?.questionId) {
-      openQuestionDetail(Number(item.questionId));
+    if (bizType === 3 && (item?.answerId || item?.bizId)) {
+      openAnswerDetailPage(Number(item.answerId || item.bizId));
+      return;
+    }
+    if ((item?.questionId || item?.bizId) && bizType === 1) {
+      openQuestionDetail(Number(item.questionId || item.bizId));
       return;
     }
   }
@@ -358,6 +385,27 @@ onReachBottom(() => {
         <view class="follow-info">
           <view class="follow-name">{{ item.nickname || `用户 ${item.userId}` }}</view>
           <view class="follow-time">关注日期：{{ formatDate(item.followedAt) || "-" }}</view>
+        </view>
+      </view>
+    </template>
+
+    <template v-else-if="type === 'favorites'">
+      <view v-for="group in favoriteGroups" :key="group.key" class="fav-group">
+        <view class="fav-group-head">
+          <text class="fav-group-title">{{ group.title }}</text>
+          <text class="fav-group-count">{{ group.items.length }}</text>
+        </view>
+        <view
+          v-for="(item, idx) in group.items"
+          :key="`${group.key}-${item.bizId || idx}`"
+          class="card app-card"
+          @tap="openRow(item)"
+        >
+          <view class="main-row">
+            <view class="main">{{ rowMainText(item) }}</view>
+          </view>
+          <view class="sub">{{ rowSubText(item) }}</view>
+          <view class="time">{{ rowTimeText(item) }}</view>
         </view>
       </view>
     </template>
@@ -514,6 +562,31 @@ onReachBottom(() => {
 .card {
   padding: 20rpx;
   margin-bottom: 12rpx;
+}
+
+.fav-group + .fav-group {
+  margin-top: 4rpx;
+}
+
+.fav-group-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 4rpx 2rpx 10rpx;
+}
+
+.fav-group-title {
+  font-size: 27rpx;
+  color: #5f7388;
+  font-weight: 700;
+}
+
+.fav-group-count {
+  font-size: 22rpx;
+  color: #7e93a7;
+  background: #edf3f8;
+  border-radius: 999rpx;
+  padding: 3rpx 12rpx;
 }
 
 .card-disabled {

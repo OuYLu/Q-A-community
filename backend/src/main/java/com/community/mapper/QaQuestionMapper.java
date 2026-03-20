@@ -42,6 +42,8 @@ public interface QaQuestionMapper extends BaseMapper<QaQuestion> {
 
     List<AppMyQuestionItemVO> selectMyQuestions(@Param("userId") Long userId);
 
+    List<AppMyQuestionItemVO> selectMyEffectiveQuestions(@Param("userId") Long userId);
+
     List<AppQuestionListItemVO> selectAppQuestionPage(@Param("keyword") String keyword,
                                                       @Param("categoryId") Long categoryId,
                                                       @Param("topicId") Long topicId,

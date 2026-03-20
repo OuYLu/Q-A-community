@@ -13,7 +13,6 @@ import com.community.dto.AppPageQueryDTO;
 import com.community.entity.ExpertProfile;
 import com.community.entity.UserPrivacySetting;
 import com.community.entity.User;
-import com.community.entity.UserStat;
 import com.community.mapper.ExpertPostMapper;
 import com.community.mapper.ExpertProfileMapper;
 import com.community.mapper.QaAnswerMapper;
@@ -25,7 +24,6 @@ import com.community.mapper.UserBrowseHistoryMapper;
 import com.community.mapper.UserFollowMapper;
 import com.community.mapper.UserMapper;
 import com.community.mapper.UserPrivacySettingMapper;
-import com.community.mapper.UserStatMapper;
 import com.community.service.CustomerMeService;
 import com.community.vo.AppDocVO;
 import com.community.vo.AppFollowTopicItemVO;
@@ -57,7 +55,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CustomerMeServiceImpl implements CustomerMeService {
     private final UserMapper userMapper;
-    private final UserStatMapper userStatMapper;
     private final QaFavoriteMapper qaFavoriteMapper;
     private final QaVoteMapper qaVoteMapper;
     private final UserBrowseHistoryMapper userBrowseHistoryMapper;
@@ -81,7 +78,6 @@ public class CustomerMeServiceImpl implements CustomerMeService {
             throw new BizException(ResultCode.BAD_REQUEST, "user not found");
         }
 
-        UserStat stat = userStatMapper.selectById(userId);
         int questionCount = Math.toIntExact(qaQuestionMapper.selectCount(new LambdaQueryWrapper<com.community.entity.QaQuestion>()
             .eq(com.community.entity.QaQuestion::getUserId, userId)
             .eq(com.community.entity.QaQuestion::getDeleteFlag, 0)
@@ -89,12 +85,10 @@ public class CustomerMeServiceImpl implements CustomerMeService {
         Long effectiveAnswerCount = qaAnswerMapper.countMyEffectiveAnswers(userId);
         int answerCount = effectiveAnswerCount == null ? 0 : Math.toIntExact(effectiveAnswerCount);
         int likeReceivedCount = Math.toIntExact(qaAnswerMapper.sumLikeCountByUserId(userId));
-        int followerCount = stat != null && stat.getFollowerCount() != null
-            ? stat.getFollowerCount()
-            : (user.getFollowerCount() == null ? 0 : user.getFollowerCount());
-        int followingCount = stat != null && stat.getFollowingCount() != null
-            ? stat.getFollowingCount()
-            : (user.getFollowingCount() == null ? 0 : user.getFollowingCount());
+        int followerCount = Math.toIntExact(userFollowMapper.selectCount(new LambdaQueryWrapper<com.community.entity.UserFollow>()
+            .eq(com.community.entity.UserFollow::getFolloweeId, userId)));
+        int followingCount = Math.toIntExact(userFollowMapper.selectCount(new LambdaQueryWrapper<com.community.entity.UserFollow>()
+            .eq(com.community.entity.UserFollow::getFollowerId, userId)));
         int topicFollowCount = Math.toIntExact(qaTopicFollowMapper.selectCount(
             new LambdaQueryWrapper<com.community.entity.QaTopicFollow>()
                 .eq(com.community.entity.QaTopicFollow::getUserId, userId)
@@ -102,11 +96,15 @@ public class CustomerMeServiceImpl implements CustomerMeService {
 
         int questionFavoriteCount = Math.toIntExact(qaFavoriteMapper.selectCount(new LambdaQueryWrapper<com.community.entity.QaFavorite>()
             .eq(com.community.entity.QaFavorite::getUserId, userId)));
+        int answerFavoriteCount = Math.toIntExact(qaVoteMapper.selectCount(new LambdaQueryWrapper<com.community.entity.QaVote>()
+            .eq(com.community.entity.QaVote::getUserId, userId)
+            .eq(com.community.entity.QaVote::getBizType, 2)
+            .eq(com.community.entity.QaVote::getVoteType, 2)));
         int kbFavoriteCount = Math.toIntExact(qaVoteMapper.selectCount(new LambdaQueryWrapper<com.community.entity.QaVote>()
             .eq(com.community.entity.QaVote::getUserId, userId)
             .eq(com.community.entity.QaVote::getBizType, 6)
             .eq(com.community.entity.QaVote::getVoteType, 1)));
-        int favoriteCount = questionFavoriteCount + kbFavoriteCount;
+        int favoriteCount = questionFavoriteCount + answerFavoriteCount + kbFavoriteCount;
         LocalDateTime retainedFrom = LocalDateTime.now().minusDays(Math.max(1, historyRetentionDays));
         Long historyCountValue = userBrowseHistoryMapper.countMyHistory(userId, retainedFrom);
         int historyCount = historyCountValue == null ? 0 : Math.toIntExact(historyCountValue);
@@ -232,7 +230,7 @@ public class CustomerMeServiceImpl implements CustomerMeService {
     public PageInfo<AppMyQuestionItemVO> myQuestions(AppPageQueryDTO query) {
         Long userId = requireUserId();
         PageHelper.startPage(resolvePage(query), resolvePageSize(query));
-        return new PageInfo<>(qaQuestionMapper.selectMyQuestions(userId));
+        return new PageInfo<>(qaQuestionMapper.selectMyEffectiveQuestions(userId));
     }
 
     @Override

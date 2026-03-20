@@ -106,6 +106,27 @@
   padding: 20rpx;
   margin-bottom: 12rpx;
 }
+.fav-group + .fav-group.data-v-688829fb {
+  margin-top: 4rpx;
+}
+.fav-group-head.data-v-688829fb {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 4rpx 2rpx 10rpx;
+}
+.fav-group-title.data-v-688829fb {
+  font-size: 27rpx;
+  color: #5f7388;
+  font-weight: 700;
+}
+.fav-group-count.data-v-688829fb {
+  font-size: 22rpx;
+  color: #7e93a7;
+  background: #edf3f8;
+  border-radius: 999rpx;
+  padding: 3rpx 12rpx;
+}
 .card-disabled.data-v-688829fb {
   opacity: 0.55;
 }

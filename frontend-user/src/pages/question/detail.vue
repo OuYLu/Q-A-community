@@ -348,11 +348,11 @@ onShow(() => {
           </view>
           <view class="actions">
             <view class="action-btn like-btn" :class="{ active: question.liked }" @click="toggleLike">
-              <text class="action-icon">赞</text>
+              <text class="action-icon">👍</text>
               <text>{{ question.likeCount || 0 }}</text>
             </view>
             <view class="action-btn" :class="{ active: question.favorited }" @click="toggleFavorite">
-              <text class="action-icon">藏</text>
+              <text class="action-icon">♥</text>
               <text>{{ question.favoriteCount || 0 }}</text>
             </view>
           </view>
@@ -399,15 +399,15 @@ onShow(() => {
 
         <view class="answer-actions" @click.stop>
           <view class="mini-action like-btn" :class="{ active: item.liked }" @tap="toggleAnswerLike(item.id)">
-            <text class="mini-icon">赞</text>
+            <text class="mini-icon">👍</text>
             <text>{{ item.likeCount || 0 }}</text>
           </view>
           <view class="mini-action" @tap="openAnswerDetail(item.id)">
-            <text class="mini-icon">评</text>
+            <text class="mini-icon">💬</text>
             <text>{{ item.commentCount || 0 }}</text>
           </view>
           <view class="mini-action" :class="{ active: item.favorited }" @tap="toggleAnswerFavorite(item.id)">
-            <text class="mini-icon">藏</text>
+            <text class="mini-icon">♥</text>
             <text>{{ item.favoriteCount || 0 }}</text>
           </view>
         </view>
@@ -599,6 +599,12 @@ onShow(() => {
   border-color: #ec9aab;
   color: #d95b78;
   background: #fff0f4;
+}
+
+.action-icon,
+.mini-icon {
+  font-size: 24rpx;
+  line-height: 1;
 }
 
 .answer-btn {

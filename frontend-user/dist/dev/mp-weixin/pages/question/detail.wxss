@@ -156,6 +156,11 @@
   color: #d95b78;
   background: #fff0f4;
 }
+.action-icon.data-v-76570c52,
+.mini-icon.data-v-76570c52 {
+  font-size: 24rpx;
+  line-height: 1;
+}
 .answer-btn.data-v-76570c52 {
   margin-top: 14rpx;
   border: none;

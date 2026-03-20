@@ -83,17 +83,23 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     async function refreshAll() {
       await Promise.all([loadUnread(), loadList(true)]);
     }
-    function typeText(type) {
+    function typeText(item) {
+      if (!(item == null ? void 0 : item.type))
+        return "消息";
+      if (item.type === 7) {
+        if (Number(item.bizType || 0) === 6)
+          return "专家认证";
+        return "审核反馈";
+      }
       const map = {
         1: "系统",
         2: "点赞",
         3: "收藏",
         4: "关注",
         5: "评论",
-        6: "回答",
-        7: "举报反馈"
+        6: "回答"
       };
-      return type ? map[type] || "消息" : "消息";
+      return map[item.type] || "消息";
     }
     async function markRead(id) {
       var _a;
@@ -112,8 +118,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     }
     async function jumpBiz(item) {
-      if (item.type === 7 && item.bizId) {
-        common_vendor.index.navigateTo({ url: `/pages/notice/report-feedback?id=${item.bizId}` });
+      if (item.type === 7) {
+        if (Number(item.bizType || 0) === 6) {
+          common_vendor.index.navigateTo({ url: "/pages/mine/expert-apply" });
+          return;
+        }
+        if (item.bizId) {
+          common_vendor.index.navigateTo({ url: `/pages/notice/report-feedback?id=${item.bizId}` });
+        }
         return;
       }
       if (item.bizType === 1 && item.bizId) {
@@ -221,7 +233,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
             a: item.isRead !== 1
           }, item.isRead !== 1 ? {} : {}, {
             b: common_vendor.t(item.title),
-            c: common_vendor.t(typeText(item.type)),
+            c: common_vendor.t(typeText(item)),
             d: common_vendor.t(item.content),
             e: common_vendor.t(item.createdAt),
             f: item.id,

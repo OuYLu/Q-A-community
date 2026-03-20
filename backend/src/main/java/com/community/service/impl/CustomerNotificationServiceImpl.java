@@ -152,6 +152,10 @@ public class CustomerNotificationServiceImpl implements CustomerNotificationServ
             if (item == null || item.getType() == null || item.getType() != 7 || item.getBizId() == null) {
                 continue;
             }
+            Integer bizType = item.getBizType();
+            if (bizType == null || (bizType != 1 && bizType != 2 && bizType != 3 && bizType != 4)) {
+                continue;
+            }
             AppReportFeedbackDetailVO detail = cmsReportMapper.selectAppReportFeedbackDetail(item.getBizId(), userId);
             if (detail == null) {
                 continue;

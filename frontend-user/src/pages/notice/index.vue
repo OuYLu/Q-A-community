@@ -93,17 +93,21 @@ async function refreshAll() {
   await Promise.all([loadUnread(), loadList(true)]);
 }
 
-function typeText(type?: number) {
+function typeText(item?: AppNotificationItemVO) {
+  if (!item?.type) return "消息";
+  if (item.type === 7) {
+    if (Number(item.bizType || 0) === 6) return "专家认证";
+    return "审核反馈";
+  }
   const map: Record<number, string> = {
     1: "系统",
     2: "点赞",
     3: "收藏",
     4: "关注",
     5: "评论",
-    6: "回答",
-    7: "举报反馈"
+    6: "回答"
   };
-  return type ? map[type] || "消息" : "消息";
+  return map[item.type] || "消息";
 }
 
 async function markRead(id: number) {
@@ -121,8 +125,14 @@ async function markRead(id: number) {
 }
 
 async function jumpBiz(item: AppNotificationItemVO) {
-  if (item.type === 7 && item.bizId) {
-    uni.navigateTo({ url: `/pages/notice/report-feedback?id=${item.bizId}` });
+  if (item.type === 7) {
+    if (Number(item.bizType || 0) === 6) {
+      uni.navigateTo({ url: "/pages/mine/expert-apply" });
+      return;
+    }
+    if (item.bizId) {
+      uni.navigateTo({ url: `/pages/notice/report-feedback?id=${item.bizId}` });
+    }
     return;
   }
   if (item.bizType === 1 && item.bizId) {
@@ -254,7 +264,7 @@ onPullDownRefresh(async () => {
           <view v-if="item.isRead !== 1" class="unread-dot"></view>
           <view class="title-row">
             <text class="title">{{ item.title }}</text>
-            <text class="type">{{ typeText(item.type) }}</text>
+            <text class="type">{{ typeText(item) }}</text>
           </view>
           <view class="content">{{ item.content }}</view>
           <view class="time">{{ item.createdAt }}</view>

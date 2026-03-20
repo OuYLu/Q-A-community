@@ -31,10 +31,13 @@ export interface AppMeOverviewVO {
 }
 
 export interface AppMyFavoriteItemVO {
-  bizType?: number;
+  bizType?: 1 | 2 | 3;
   bizId?: number;
   questionId?: number;
+  answerId?: number;
   title: string;
+  questionTitle?: string;
+  contentPreview?: string;
   answerCount: number;
   likeCount: number;
   favoriteCount: number;

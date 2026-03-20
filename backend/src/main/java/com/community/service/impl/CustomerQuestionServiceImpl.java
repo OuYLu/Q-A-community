@@ -62,6 +62,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -132,7 +133,7 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
         int page = query == null || query.getPage() == null || query.getPage() <= 0 ? 1 : query.getPage();
         int pageSize = query == null || query.getPageSize() == null || query.getPageSize() <= 0 ? 10 : query.getPageSize();
         PageHelper.startPage(page, Math.min(pageSize, 50));
-        List<AppMyQuestionItemVO> rows = qaQuestionMapper.selectMyQuestions(userId);
+        List<AppMyQuestionItemVO> rows = qaQuestionMapper.selectMyEffectiveQuestions(userId);
         for (AppMyQuestionItemVO row : rows) {
             fillImageUrls(row);
             List<String> tags = qaQuestionTagMapper.selectTagNamesByQuestionId(row.getId());
@@ -651,18 +652,20 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
             vote.setBizId(answerId);
             vote.setUserId(userId);
             vote.setVoteType(1);
-            qaVoteMapper.insert(vote);
-            answer.setLikeCount((answer.getLikeCount() == null ? 0 : answer.getLikeCount()) + 1);
-            adjustUserAnswerLikeReceivedCount(answer.getUserId(), 1);
-            createNotifyIfNeeded(
-                answer.getUserId(),
-                2,
-                2,
-                answerId,
-                "收到点赞",
-                actorName(userId) + " 点赞了你的回答"
-            );
-            recommendationBehaviorService.recordAnswerLike(userId, answerId, resolveQuestionCategoryId(answer.getQuestionId()), true);
+            boolean inserted = insertAnswerVote(vote);
+            if (inserted) {
+                answer.setLikeCount((answer.getLikeCount() == null ? 0 : answer.getLikeCount()) + 1);
+                adjustUserAnswerLikeReceivedCount(answer.getUserId(), 1);
+                createNotifyIfNeeded(
+                    answer.getUserId(),
+                    2,
+                    2,
+                    answerId,
+                    "收到点赞",
+                    actorName(userId) + " 点赞了你的回答"
+                );
+                recommendationBehaviorService.recordAnswerLike(userId, answerId, resolveQuestionCategoryId(answer.getQuestionId()), true);
+            }
         } else {
             qaVoteMapper.deleteById(existed.getId());
             int old = answer.getLikeCount() == null ? 0 : answer.getLikeCount();
@@ -691,16 +694,18 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
             vote.setBizId(answerId);
             vote.setUserId(userId);
             vote.setVoteType(2);
-            qaVoteMapper.insert(vote);
-            createNotifyIfNeeded(
-                answer.getUserId(),
-                3,
-                2,
-                answerId,
-                "收到收藏",
-                actorName(userId) + " 收藏了你的回答"
-            );
-            recommendationBehaviorService.recordAnswerFavorite(userId, answerId, resolveQuestionCategoryId(answer.getQuestionId()), true);
+            boolean inserted = insertAnswerVote(vote);
+            if (inserted) {
+                createNotifyIfNeeded(
+                    answer.getUserId(),
+                    3,
+                    2,
+                    answerId,
+                    "收到收藏",
+                    actorName(userId) + " 收藏了你的回答"
+                );
+                recommendationBehaviorService.recordAnswerFavorite(userId, answerId, resolveQuestionCategoryId(answer.getQuestionId()), true);
+            }
         } else {
             qaVoteMapper.deleteById(existed.getId());
             recommendationBehaviorService.recordAnswerFavorite(userId, answerId, resolveQuestionCategoryId(answer.getQuestionId()), false);
@@ -1394,6 +1399,24 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
             .eq(QaVote::getBizId, answerId)
             .eq(QaVote::getVoteType, 2)
             .eq(QaVote::getUserId, userId)) > 0;
+    }
+
+    private boolean insertAnswerVote(QaVote vote) {
+        try {
+            qaVoteMapper.insert(vote);
+            return true;
+        } catch (DuplicateKeyException ex) {
+            QaVote sameVoteType = qaVoteMapper.selectOne(new LambdaQueryWrapper<QaVote>()
+                .eq(QaVote::getBizType, vote.getBizType())
+                .eq(QaVote::getBizId, vote.getBizId())
+                .eq(QaVote::getUserId, vote.getUserId())
+                .eq(QaVote::getVoteType, vote.getVoteType()));
+            if (sameVoteType != null) {
+                return false;
+            }
+            throw new BizException(ResultCode.BAD_REQUEST,
+                "点赞/收藏索引冲突，请先执行数据库脚本：20260319_fix_qa_vote_unique_key.sql");
+        }
     }
 
     private Long resolveQuestionCategoryId(Long questionId) {
