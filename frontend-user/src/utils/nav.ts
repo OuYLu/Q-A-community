@@ -1,4 +1,4 @@
-import { requireAuth } from "@/utils/auth-guard";
+import { openLoginPage, requireAuth } from "@/utils/auth-guard";
 import { useAuthStore } from "@/stores/auth";
 
 export function openQuestionDetail(id: number) {
@@ -16,8 +16,7 @@ export function openQuestionDetail(id: number) {
     cancelText: "返回首页",
     success: (res) => {
       if (res.confirm) {
-        const target = encodeURIComponent(detailUrl);
-        uni.navigateTo({ url: `/pages/auth/login?redirect=${target}` });
+        openLoginPage({ redirect: detailUrl, preferReplace: true });
         return;
       }
       uni.switchTab({ url: "/pages/home/index" });
@@ -44,8 +43,7 @@ export function openAskPage(params?: { topicId?: number | string; topicTitle?: s
       cancelText: "取消",
       success: (res) => {
         if (!res.confirm) return;
-        const target = encodeURIComponent(askUrl);
-        uni.navigateTo({ url: `/pages/auth/login?redirect=${target}` });
+        openLoginPage({ redirect: askUrl, preferReplace: true });
       }
     });
     return;
@@ -79,8 +77,7 @@ export function openExpertPostDetailPage(id: number) {
     cancelText: "返回首页",
     success: (res) => {
       if (res.confirm) {
-        const target = encodeURIComponent(detailUrl);
-        uni.navigateTo({ url: `/pages/auth/login?redirect=${target}` });
+        openLoginPage({ redirect: detailUrl, preferReplace: true });
         return;
       }
       uni.switchTab({ url: "/pages/home/index" });

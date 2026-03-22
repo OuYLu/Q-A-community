@@ -9,6 +9,7 @@ import com.community.dto.ExpertApplyQueryDTO;
 import com.community.dto.ExpertReviewDTO;
 import com.community.entity.ExpertApply;
 import com.community.entity.ExpertProfile;
+import com.community.entity.NotifyMessage;
 import com.community.entity.Role;
 import com.community.entity.User;
 import com.community.entity.UserRole;
@@ -16,6 +17,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.community.mapper.ExpertApplyMapper;
 import com.community.mapper.ExpertProfileMapper;
+import com.community.mapper.NotifyMessageMapper;
 import com.community.mapper.RoleMapper;
 import com.community.mapper.UserMapper;
 import com.community.mapper.UserRoleMapper;
@@ -32,10 +34,13 @@ import java.time.LocalDateTime;
 @Service
 @RequiredArgsConstructor
 public class ExpertAdminServiceImpl extends ServiceImpl<ExpertApplyMapper, ExpertApply> implements ExpertAdminService {
+    private static final int NOTIFY_BIZ_TYPE_EXPERT_APPLY = 6;
+
     private final UserMapper userMapper;
     private final ExpertProfileMapper expertProfileMapper;
     private final RoleMapper roleMapper;
     private final UserRoleMapper userRoleMapper;
+    private final NotifyMessageMapper notifyMessageMapper;
 
     @Override
     public PageInfo<ExpertApply> listApplies(ExpertApplyQueryDTO query) {
@@ -156,6 +161,7 @@ public class ExpertAdminServiceImpl extends ServiceImpl<ExpertApplyMapper, Exper
         }
 
         this.updateById(apply);
+        createExpertReviewNotify(user.getId(), apply.getId(), status, apply.getRejectReason());
     }
 
     @Override
@@ -186,5 +192,27 @@ public class ExpertAdminServiceImpl extends ServiceImpl<ExpertApplyMapper, Exper
             return null;
         }
         return securityUser;
+    }
+
+    private void createExpertReviewNotify(Long receiverId, Long applyId, Integer reviewStatus, String rejectReason) {
+        if (receiverId == null || applyId == null || reviewStatus == null) {
+            return;
+        }
+        NotifyMessage notify = new NotifyMessage();
+        notify.setReceiverId(receiverId);
+        notify.setType(NotifyMessage.TYPE_REPORT_FEEDBACK);
+        notify.setBizType(NOTIFY_BIZ_TYPE_EXPERT_APPLY);
+        notify.setBizId(applyId);
+        notify.setTitle("专家认证审核结果");
+        if (reviewStatus == 2) {
+            notify.setContent("你的专家认证申请已通过审核，已开通专家权限。");
+        } else if (reviewStatus == 3) {
+            String reason = StringUtils.hasText(rejectReason) ? rejectReason.trim() : "请补充资质后重新提交";
+            notify.setContent("你的专家认证申请未通过。原因：" + reason);
+        } else {
+            return;
+        }
+        notify.setIsRead(0);
+        notifyMessageMapper.insert(notify);
     }
 }

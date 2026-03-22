@@ -1,7 +1,7 @@
 <template>
   <el-card>
     <h2>问答管理</h2>
-    <p>后台人员可对全量问题与回答进行检索、上下架和删除操作。</p>
+    <p>后台人员可对全量问题与回答进行检索与下架操作。</p>
 
     <el-tabs v-model="activeTab" class="qa-tabs">
       <el-tab-pane label="问题管理" name="question">
@@ -21,13 +21,6 @@
                 <el-option label="待审核" :value="2" />
                 <el-option label="驳回" :value="3" />
                 <el-option label="下架" :value="4" />
-                <el-option label="用户删除" :value="6" />
-              </el-select>
-            </el-form-item>
-            <el-form-item label="删除标记">
-              <el-select v-model="questionQuery.deleteFlag" clearable placeholder="默认未删除" style="width: 130px">
-                <el-option label="未删除" :value="0" />
-                <el-option label="已删除" :value="1" />
               </el-select>
             </el-form-item>
             <el-form-item label="分类ID">
@@ -97,13 +90,6 @@
               </el-tag>
             </template>
           </el-table-column>
-          <el-table-column label="删除" width="90">
-            <template #default="scope">
-              <el-tag :type="scope.row.deleteFlag === 1 ? 'danger' : 'success'">
-                {{ scope.row.deleteFlag === 1 ? "已删" : "正常" }}
-              </el-tag>
-            </template>
-          </el-table-column>
           <el-table-column label="回答" width="80">
             <template #default="scope">{{ scope.row.answerCount ?? 0 }}</template>
           </el-table-column>
@@ -119,32 +105,15 @@
           <el-table-column prop="updatedAt" label="更新时间" width="176">
             <template #default="scope">{{ formatDateTime(scope.row.updatedAt) }}</template>
           </el-table-column>
-          <el-table-column label="操作" width="220" fixed="right">
+          <el-table-column label="操作" width="100" fixed="right">
             <template #default="scope">
               <el-button
-                v-if="scope.row.deleteFlag !== 1 && scope.row.status !== 1"
-                size="small"
-                type="success"
-                @click="changeQuestionStatus(scope.row, 1)"
-              >
-                发布
-              </el-button>
-              <el-button
-                v-if="scope.row.deleteFlag !== 1 && scope.row.status === 1"
+                v-if="scope.row.status === 1"
                 size="small"
                 type="warning"
-                @click="changeQuestionStatus(scope.row, 4)"
+                @click="changeQuestionStatus(scope.row)"
               >
                 下架
-              </el-button>
-              <el-button
-                v-if="scope.row.deleteFlag !== 1"
-                size="small"
-                type="danger"
-                plain
-                @click="removeQuestion(scope.row)"
-              >
-                删除
               </el-button>
             </template>
           </el-table-column>
@@ -180,12 +149,6 @@
                 <el-option label="待审核" :value="2" />
                 <el-option label="驳回" :value="3" />
                 <el-option label="下架" :value="4" />
-              </el-select>
-            </el-form-item>
-            <el-form-item label="删除标记">
-              <el-select v-model="answerQuery.deleteFlag" clearable placeholder="默认未删除" style="width: 130px">
-                <el-option label="未删除" :value="0" />
-                <el-option label="已删除" :value="1" />
               </el-select>
             </el-form-item>
             <el-form-item label="问题ID">
@@ -245,13 +208,6 @@
               </el-tag>
             </template>
           </el-table-column>
-          <el-table-column label="删除" width="90">
-            <template #default="scope">
-              <el-tag :type="scope.row.deleteFlag === 1 ? 'danger' : 'success'">
-                {{ scope.row.deleteFlag === 1 ? "已删" : "正常" }}
-              </el-tag>
-            </template>
-          </el-table-column>
           <el-table-column label="点赞" width="80">
             <template #default="scope">{{ scope.row.likeCount ?? 0 }}</template>
           </el-table-column>
@@ -261,32 +217,15 @@
           <el-table-column prop="updatedAt" label="更新时间" width="176">
             <template #default="scope">{{ formatDateTime(scope.row.updatedAt) }}</template>
           </el-table-column>
-          <el-table-column label="操作" width="220" fixed="right">
+          <el-table-column label="操作" width="100" fixed="right">
             <template #default="scope">
               <el-button
-                v-if="scope.row.deleteFlag !== 1 && scope.row.status !== 1"
-                size="small"
-                type="success"
-                @click="changeAnswerStatus(scope.row, 1)"
-              >
-                发布
-              </el-button>
-              <el-button
-                v-if="scope.row.deleteFlag !== 1 && scope.row.status === 1"
+                v-if="scope.row.status === 1"
                 size="small"
                 type="warning"
-                @click="changeAnswerStatus(scope.row, 4)"
+                @click="changeAnswerStatus(scope.row)"
               >
                 下架
-              </el-button>
-              <el-button
-                v-if="scope.row.deleteFlag !== 1"
-                size="small"
-                type="danger"
-                plain
-                @click="removeAnswer(scope.row)"
-              >
-                删除
               </el-button>
             </template>
           </el-table-column>
@@ -312,8 +251,6 @@
 import { onMounted, reactive, ref } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import {
-  deleteQaManageAnswer,
-  deleteQaManageQuestion,
   pageQaManageAnswers,
   pageQaManageQuestions,
   updateQaManageAnswerStatus,
@@ -372,7 +309,6 @@ const questionStatusText = (status?: number) => {
   if (status === 3) return "驳回";
   if (status === 4) return "下架";
   if (status === 5) return "仅自己可见";
-  if (status === 6) return "用户删除";
   return status == null ? "-" : String(status);
 };
 
@@ -382,7 +318,6 @@ const questionStatusTagType = (status?: number) => {
   if (status === 3) return "danger";
   if (status === 4) return "info";
   if (status === 5) return "info";
-  if (status === 6) return "danger";
   return "info";
 };
 
@@ -391,7 +326,6 @@ const answerStatusText = (status?: number) => {
   if (status === 2) return "待审核";
   if (status === 3) return "驳回";
   if (status === 4) return "下架";
-  if (status === 0) return "删除";
   return status == null ? "-" : String(status);
 };
 
@@ -400,7 +334,6 @@ const answerStatusTagType = (status?: number) => {
   if (status === 2) return "warning";
   if (status === 3) return "danger";
   if (status === 4) return "info";
-  if (status === 0) return "danger";
   return "info";
 };
 
@@ -503,37 +436,19 @@ const handleAnswerSizeChange = (size: number) => {
   loadAnswerData();
 };
 
-const changeQuestionStatus = async (row: AdminQaQuestionPageItemVO, status: 1 | 4) => {
+const changeQuestionStatus = async (row: AdminQaQuestionPageItemVO) => {
   if (!row.id) return;
-  const actionText = status === 1 ? "发布" : "下架";
-  await ElMessageBox.confirm(`确认${actionText}该问题吗？`, "提示", { type: "warning" });
-  await updateQaManageQuestionStatus(row.id, { status });
-  ElMessage.success(`${actionText}成功`);
+  await ElMessageBox.confirm("确认下架该问题吗？", "提示", { type: "warning" });
+  await updateQaManageQuestionStatus(row.id, { status: 4 });
+  ElMessage.success("下架成功");
   await loadQuestionData();
 };
 
-const changeAnswerStatus = async (row: AdminQaAnswerPageItemVO, status: 1 | 4) => {
+const changeAnswerStatus = async (row: AdminQaAnswerPageItemVO) => {
   if (!row.id) return;
-  const actionText = status === 1 ? "发布" : "下架";
-  await ElMessageBox.confirm(`确认${actionText}该回答吗？`, "提示", { type: "warning" });
-  await updateQaManageAnswerStatus(row.id, { status });
-  ElMessage.success(`${actionText}成功`);
-  await loadAnswerData();
-};
-
-const removeQuestion = async (row: AdminQaQuestionPageItemVO) => {
-  if (!row.id) return;
-  await ElMessageBox.confirm("确认删除该问题吗？删除后将不可在前台展示。", "提示", { type: "warning" });
-  await deleteQaManageQuestion(row.id);
-  ElMessage.success("删除成功");
-  await loadQuestionData();
-};
-
-const removeAnswer = async (row: AdminQaAnswerPageItemVO) => {
-  if (!row.id) return;
-  await ElMessageBox.confirm("确认删除该回答吗？删除后将不可在前台展示。", "提示", { type: "warning" });
-  await deleteQaManageAnswer(row.id);
-  ElMessage.success("删除成功");
+  await ElMessageBox.confirm("确认下架该回答吗？", "提示", { type: "warning" });
+  await updateQaManageAnswerStatus(row.id, { status: 4 });
+  ElMessage.success("下架成功");
   await loadAnswerData();
 };
 

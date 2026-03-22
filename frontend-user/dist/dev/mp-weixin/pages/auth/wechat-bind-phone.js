@@ -13,6 +13,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const redirect = common_vendor.ref("");
     const nicknameHint = common_vendor.ref("微信用户");
     const loading = common_vendor.ref(false);
+    function safeDecode(value) {
+      if (!value)
+        return "";
+      try {
+        return decodeURIComponent(value);
+      } catch {
+        return value;
+      }
+    }
     function jumpAfterLogin(target) {
       const to = target || "";
       if (to.startsWith("/pages/search/")) {
@@ -109,9 +118,9 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     common_vendor.onLoad((options) => {
       console.log(LOG_PREFIX, "onLoad options", options);
-      bindTicket.value = decodeURIComponent((options == null ? void 0 : options.bindTicket) || "");
-      redirect.value = decodeURIComponent((options == null ? void 0 : options.redirect) || "");
-      nicknameHint.value = decodeURIComponent((options == null ? void 0 : options.nickname) || "微信用户");
+      bindTicket.value = safeDecode((options == null ? void 0 : options.bindTicket) || "");
+      redirect.value = safeDecode((options == null ? void 0 : options.redirect) || "");
+      nicknameHint.value = safeDecode((options == null ? void 0 : options.nickname) || "微信用户");
       console.log(LOG_PREFIX, "onLoad parsed", {
         hasBindTicket: Boolean(bindTicket.value),
         redirect: redirect.value,

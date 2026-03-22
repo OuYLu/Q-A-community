@@ -9,10 +9,21 @@ const password = ref("");
 const accountLoading = ref(false);
 const wechatLoading = ref(false);
 
+function safeDecode(value?: string) {
+  if (!value) return "";
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
+
 function getRouteRedirect() {
   const pages = getCurrentPages();
   const route = pages[pages.length - 1];
-  return decodeURIComponent((route.options?.redirect as string) || "");
+  const redirect = safeDecode((route?.options?.redirect as string) || "");
+  if (redirect.startsWith("/pages/auth/login")) return "";
+  return redirect;
 }
 
 function jumpAfterLogin(redirectRaw?: string) {
@@ -35,7 +46,12 @@ function jumpAfterLogin(redirectRaw?: string) {
     return;
   }
   if (redirect) {
-    uni.redirectTo({ url: redirect });
+    uni.redirectTo({
+      url: redirect,
+      fail: () => {
+        uni.switchTab({ url: "/pages/home/index" });
+      }
+    });
     return;
   }
   uni.switchTab({ url: "/pages/home/index" });

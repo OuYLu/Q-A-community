@@ -11,6 +11,7 @@ import {
   type AppSearchSimilarQuestionVO
 } from "@/api/search";
 import { useAuthStore } from "@/stores/auth";
+import { openLoginPage } from "@/utils/auth-guard";
 import { openAnswerDetailPage, openExpertPostDetailPage, openQuestionDetail } from "@/utils/nav";
 import { BASE_URL } from "@/utils/constants";
 
@@ -334,9 +335,7 @@ async function loadMoreAnswers() {
 }
 
 function goLogin() {
-  uni.navigateTo({
-    url: `/pages/auth/login?redirect=${encodeURIComponent("/pages/search/index")}`
-  });
+  openLoginPage({ redirect: "/pages/search/index", preferReplace: true });
 }
 
 onShow(async () => {

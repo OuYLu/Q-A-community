@@ -3,6 +3,7 @@ const common_vendor = require("../../common/vendor.js");
 const api_notification = require("../../api/notification.js");
 const api_question = require("../../api/question.js");
 const stores_auth = require("../../stores/auth.js");
+const utils_authGuard = require("../../utils/auth-guard.js");
 const utils_noticeBadge = require("../../utils/notice-badge.js");
 const pageSize = 10;
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
@@ -179,9 +180,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       loadList(true);
     }
     function goLogin() {
-      common_vendor.index.navigateTo({
-        url: `/pages/auth/login?redirect=${encodeURIComponent("/pages/notice/index")}`
-      });
+      utils_authGuard.openLoginPage({ redirect: "/pages/notice/index", preferReplace: true });
     }
     common_vendor.onShow(async () => {
       if (needLogin.value) {

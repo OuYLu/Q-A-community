@@ -2,6 +2,7 @@
 const common_vendor = require("../../common/vendor.js");
 const common_assets = require("../../common/assets.js");
 const stores_auth = require("../../stores/auth.js");
+const utils_authGuard = require("../../utils/auth-guard.js");
 const api_me = require("../../api/me.js");
 const utils_constants = require("../../utils/constants.js");
 const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
@@ -92,9 +93,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       common_vendor.index.reLaunch({ url: "/pages/home/index" });
     }
     function goLogin() {
-      common_vendor.index.navigateTo({
-        url: `/pages/auth/login?redirect=${encodeURIComponent("/pages/mine/index")}`
-      });
+      utils_authGuard.openLoginPage({ redirect: "/pages/mine/index", preferReplace: true });
     }
     function editProfile() {
       common_vendor.index.navigateTo({ url: "/pages/mine/edit-profile" });

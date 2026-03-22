@@ -11,6 +11,7 @@ import com.community.entity.User;
 import com.community.mapper.UserMapper;
 import com.community.service.UserAdminService;
 import com.community.vo.UserManageVO;
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.RequiredArgsConstructor;
@@ -37,12 +38,19 @@ public class UserAdminServiceImpl extends ServiceImpl<UserMapper, User> implemen
 
         PageHelper.startPage(pageNum, pageSize);
         List<User> users = this.baseMapper.selectManageableUsers(username, nickname, status, roleCode);
-        List<UserManageVO> items = new ArrayList<>();
+        List<UserManageVO> items = new ArrayList<>(users.size());
         for (User user : users) {
             List<String> roleCodes = this.baseMapper.selectRoleCodesByUserId(user.getId());
             items.add(toVO(user, roleCodes));
         }
-        return new PageInfo<>(items);
+        Page<UserManageVO> pageRows = new Page<>(pageNum, pageSize, true);
+        if (users instanceof Page<?> sourcePage) {
+            pageRows.setTotal(sourcePage.getTotal());
+        } else {
+            pageRows.setTotal(items.size());
+        }
+        pageRows.addAll(items);
+        return new PageInfo<>(pageRows);
     }
 
     @Override
@@ -137,7 +145,6 @@ public class UserAdminServiceImpl extends ServiceImpl<UserMapper, User> implemen
         vo.setAvatar(user.getAvatar());
         vo.setCreatedAt(user.getCreatedAt());
         vo.setDisplayRole(resolveDisplayRole(roleCodes));
-        vo.setCreatedAt(user.getCreatedAt());
         return vo;
     }
 

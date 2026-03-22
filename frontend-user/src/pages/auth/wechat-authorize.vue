@@ -10,6 +10,15 @@ const loading = ref(false);
 const redirect = ref("");
 const WX_PROFILE_CACHE_KEY = "wx_login_profile_cache";
 
+function safeDecode(value?: string) {
+  if (!value) return "";
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
+
 function jumpAfterLogin(target?: string) {
   const to = target || "";
   if (to.startsWith("/pages/search/")) {
@@ -125,7 +134,7 @@ function cancelAndBack() {
 }
 
 onLoad((options) => {
-  redirect.value = decodeURIComponent((options?.redirect as string) || "");
+  redirect.value = safeDecode((options?.redirect as string) || "");
 });
 </script>
 

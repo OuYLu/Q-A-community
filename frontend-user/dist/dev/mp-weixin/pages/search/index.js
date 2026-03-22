@@ -2,6 +2,7 @@
 const common_vendor = require("../../common/vendor.js");
 const api_search = require("../../api/search.js");
 const stores_auth = require("../../stores/auth.js");
+const utils_authGuard = require("../../utils/auth-guard.js");
 const utils_nav = require("../../utils/nav.js");
 const utils_constants = require("../../utils/constants.js");
 const KB_INIT_LIMIT = 5;
@@ -304,9 +305,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       }
     }
     function goLogin() {
-      common_vendor.index.navigateTo({
-        url: `/pages/auth/login?redirect=${encodeURIComponent("/pages/search/index")}`
-      });
+      utils_authGuard.openLoginPage({ redirect: "/pages/search/index", preferReplace: true });
     }
     common_vendor.onShow(async () => {
       if (needLogin.value)

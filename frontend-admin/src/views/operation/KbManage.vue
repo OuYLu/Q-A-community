@@ -104,7 +104,7 @@
               <el-button @click="resetEntryQuery">重置</el-button>
             </el-form-item>
           </el-form>
-          <el-button type="primary" @click="openEntryCreate">新增条目</el-button>
+          <el-button class="entry-create-btn" type="primary" @click="openEntryCreate">新增条目</el-button>
         </div>
 
         <el-table :data="entryRows" v-loading="entryLoading" style="width: 100%">
@@ -218,7 +218,7 @@
   <el-dialog v-model="entryEditVisible" :title="entryEditMode === 'create' ? '新增条目' : '编辑条目'" width="760px">
     <el-form ref="entryFormRef" :model="entryForm" :rules="entryRules" label-width="90px">
       <el-form-item label="所属分类" prop="categoryId">
-        <el-select v-model="entryForm.categoryId" style="width: 100%" filterable>
+        <el-select v-model="entryForm.categoryId" style="width: 100%" filterable placeholder="请选择">
           <el-option v-for="item in flatCategories" :key="item.id" :label="item.name" :value="item.id" />
         </el-select>
       </el-form-item>
@@ -235,7 +235,7 @@
         <el-input v-model="entryForm.source" maxlength="120" show-word-limit />
       </el-form-item>
       <el-form-item label="标签">
-        <el-select v-model="entryForm.tagIds" multiple filterable clearable style="width: 100%">
+        <el-select v-model="entryForm.tagIds" multiple filterable clearable style="width: 100%" placeholder="请选择">
           <el-option v-for="item in tagOptions" :key="item.id" :label="item.name" :value="item.id" />
         </el-select>
       </el-form-item>
@@ -666,6 +666,10 @@ onMounted(async () => {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+.entry-create-btn {
+  margin-left: auto;
 }
 
 .pager {

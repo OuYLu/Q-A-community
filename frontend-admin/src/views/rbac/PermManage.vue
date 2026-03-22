@@ -200,7 +200,11 @@ const submitEdit = async () => {
 };
 
 const removePermission = async (row: Permission) => {
-  await ElMessageBox.confirm("确认删除该权限点吗？", "提示", { type: "warning" });
+  await ElMessageBox.confirm("确认删除该权限点吗？", "提示", {
+    type: "warning",
+    confirmButtonText: "确定",
+    cancelButtonText: "取消"
+  });
   await deletePermission(row.id);
   ElMessage.success("删除成功");
   await loadData();

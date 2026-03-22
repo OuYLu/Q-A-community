@@ -10,11 +10,23 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const password = common_vendor.ref("");
     const accountLoading = common_vendor.ref(false);
     const wechatLoading = common_vendor.ref(false);
+    function safeDecode(value) {
+      if (!value)
+        return "";
+      try {
+        return decodeURIComponent(value);
+      } catch {
+        return value;
+      }
+    }
     function getRouteRedirect() {
       var _a;
       const pages = getCurrentPages();
       const route = pages[pages.length - 1];
-      return decodeURIComponent(((_a = route.options) == null ? void 0 : _a.redirect) || "");
+      const redirect = safeDecode(((_a = route == null ? void 0 : route.options) == null ? void 0 : _a.redirect) || "");
+      if (redirect.startsWith("/pages/auth/login"))
+        return "";
+      return redirect;
     }
     function jumpAfterLogin(redirectRaw) {
       const redirect = redirectRaw ?? getRouteRedirect();
@@ -35,7 +47,12 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
         return;
       }
       if (redirect) {
-        common_vendor.index.redirectTo({ url: redirect });
+        common_vendor.index.redirectTo({
+          url: redirect,
+          fail: () => {
+            common_vendor.index.switchTab({ url: "/pages/home/index" });
+          }
+        });
         return;
       }
       common_vendor.index.switchTab({ url: "/pages/home/index" });

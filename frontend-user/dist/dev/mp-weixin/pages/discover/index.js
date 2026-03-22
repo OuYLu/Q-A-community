@@ -3,6 +3,7 @@ const common_vendor = require("../../common/vendor.js");
 const api_discover = require("../../api/discover.js");
 const api_expert = require("../../api/expert.js");
 const stores_auth = require("../../stores/auth.js");
+const utils_authGuard = require("../../utils/auth-guard.js");
 const utils_nav = require("../../utils/nav.js");
 const CLICK_GUARD_MS = 450;
 const NAV_LOCK_MS = 700;
@@ -130,9 +131,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       utils_nav.openUserHomePage(Number(item.userId));
     }
     function goLogin() {
-      common_vendor.index.navigateTo({
-        url: `/pages/auth/login?redirect=${encodeURIComponent("/pages/discover/index")}`
-      });
+      utils_authGuard.openLoginPage({ redirect: "/pages/discover/index", preferReplace: true });
     }
     common_vendor.onShow(async () => {
       showAt.value = Date.now();

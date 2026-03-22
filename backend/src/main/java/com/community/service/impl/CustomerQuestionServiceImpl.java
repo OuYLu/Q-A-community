@@ -112,17 +112,17 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
     @Override
     public PageInfo<AppQuestionListItemVO> page(AppQuestionPageQueryDTO query) {
         int page = query == null || query.getPage() == null || query.getPage() <= 0 ? 1 : query.getPage();
-        int pageSize = query == null || query.getPageSize() == null || query.getPageSize() <= 0 ? 10 : query.getPageSize();
+        int pageSize = query == null || query.getPageSize() == null || query.getPageSize() <= 0 ? 10
+                : query.getPageSize();
         PageHelper.startPage(page, Math.min(pageSize, 50));
         List<AppQuestionListItemVO> rows = qaQuestionMapper.selectAppQuestionPage(
-            query == null ? null : query.getKeyword(),
-            query == null ? null : query.getCategoryId(),
-            query == null ? null : query.getTopicId(),
-            query == null ? null : query.getSortBy(),
-            query == null ? null : query.getOnlyUnsolved(),
-            requireUserId(),
-            false
-        );
+                query == null ? null : query.getKeyword(),
+                query == null ? null : query.getCategoryId(),
+                query == null ? null : query.getTopicId(),
+                query == null ? null : query.getSortBy(),
+                query == null ? null : query.getOnlyUnsolved(),
+                requireUserId(),
+                false);
         rows.forEach(this::fillImageUrls);
         return new PageInfo<>(rows);
     }
@@ -131,7 +131,8 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
     public PageInfo<AppMyQuestionItemVO> myQuestions(AppPageQueryDTO query) {
         Long userId = requireUserId();
         int page = query == null || query.getPage() == null || query.getPage() <= 0 ? 1 : query.getPage();
-        int pageSize = query == null || query.getPageSize() == null || query.getPageSize() <= 0 ? 10 : query.getPageSize();
+        int pageSize = query == null || query.getPageSize() == null || query.getPageSize() <= 0 ? 10
+                : query.getPageSize();
         PageHelper.startPage(page, Math.min(pageSize, 50));
         List<AppMyQuestionItemVO> rows = qaQuestionMapper.selectMyEffectiveQuestions(userId);
         for (AppMyQuestionItemVO row : rows) {
@@ -184,15 +185,16 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
             answer.setFavoriteCount(countAnswerFavorites(answer.getId()));
             answer.setLiked(isAnswerLikedByUser(answer.getId(), userId));
             answer.setFavorited(isAnswerFavoritedByUser(answer.getId(), userId));
-            boolean isBest = question.getAcceptedAnswerId() != null && question.getAcceptedAnswerId().equals(answer.getId());
+            boolean isBest = question.getAcceptedAnswerId() != null
+                    && question.getAcceptedAnswerId().equals(answer.getId());
             answer.setBestAnswer(isBest);
             answer.setCanRecommend(userId.equals(question.getUserId()));
         }
         answers.sort(
-            Comparator.comparing((AppQuestionAnswerVO a) -> Boolean.TRUE.equals(a.getBestAnswer()) ? 0 : 1)
-                .thenComparing(AppQuestionAnswerVO::getCreatedAt, Comparator.nullsLast(Comparator.naturalOrder()))
-                .thenComparing(AppQuestionAnswerVO::getId, Comparator.nullsLast(Comparator.naturalOrder()))
-        );
+                Comparator.comparing((AppQuestionAnswerVO a) -> Boolean.TRUE.equals(a.getBestAnswer()) ? 0 : 1)
+                        .thenComparing(AppQuestionAnswerVO::getCreatedAt,
+                                Comparator.nullsLast(Comparator.naturalOrder()))
+                        .thenComparing(AppQuestionAnswerVO::getId, Comparator.nullsLast(Comparator.naturalOrder())));
         vo.setAnswers(answers);
         return vo;
     }
@@ -278,19 +280,19 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
 
         // delete question likes and related notifications
         qaVoteMapper.delete(new LambdaQueryWrapper<QaVote>()
-            .eq(QaVote::getBizId, id)
-            .eq(QaVote::getVoteType, 1));
+                .eq(QaVote::getBizId, id)
+                .eq(QaVote::getVoteType, 1));
         notifyMessageMapper.delete(new LambdaQueryWrapper<NotifyMessage>()
-            .eq(NotifyMessage::getType, 2)
-            .eq(NotifyMessage::getBizType, 1)
-            .eq(NotifyMessage::getBizId, id));
+                .eq(NotifyMessage::getType, 2)
+                .eq(NotifyMessage::getBizType, 1)
+                .eq(NotifyMessage::getBizId, id));
         removeQuestionTags(id);
 
         qaQuestionMapper.update(null, new LambdaUpdateWrapper<QaQuestion>()
-            .eq(QaQuestion::getId, id)
-            .set(QaQuestion::getStatus, QaQuestion.STATUS_DELETED_BY_USER)
-            .set(QaQuestion::getDeleteFlag, 1)
-            .set(QaQuestion::getUpdatedAt, LocalDateTime.now()));
+                .eq(QaQuestion::getId, id)
+                .set(QaQuestion::getStatus, QaQuestion.STATUS_DELETED_BY_USER)
+                .set(QaQuestion::getDeleteFlag, 1)
+                .set(QaQuestion::getUpdatedAt, LocalDateTime.now()));
         if (question.getStatus() != null && question.getStatus() == QaQuestion.STATUS_PUBLISHED) {
             increaseTopicQuestionCount(question.getTopicId(), -1);
         }
@@ -316,9 +318,9 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
             return;
         }
         qaQuestionMapper.update(null, new LambdaUpdateWrapper<QaQuestion>()
-            .eq(QaQuestion::getId, id)
-            .set(QaQuestion::getStatus, QaQuestion.STATUS_SELF_ONLY)
-            .set(QaQuestion::getUpdatedAt, LocalDateTime.now()));
+                .eq(QaQuestion::getId, id)
+                .set(QaQuestion::getStatus, QaQuestion.STATUS_SELF_ONLY)
+                .set(QaQuestion::getUpdatedAt, LocalDateTime.now()));
         if (question.getStatus() != null && question.getStatus() == QaQuestion.STATUS_PUBLISHED) {
             increaseTopicQuestionCount(question.getTopicId(), -1);
         }
@@ -343,9 +345,9 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
             return;
         }
         qaQuestionMapper.update(null, new LambdaUpdateWrapper<QaQuestion>()
-            .eq(QaQuestion::getId, id)
-            .set(QaQuestion::getStatus, QaQuestion.STATUS_PUBLISHED)
-            .set(QaQuestion::getUpdatedAt, LocalDateTime.now()));
+                .eq(QaQuestion::getId, id)
+                .set(QaQuestion::getStatus, QaQuestion.STATUS_PUBLISHED)
+                .set(QaQuestion::getUpdatedAt, LocalDateTime.now()));
         if (question.getStatus() != null && question.getStatus() == QaQuestion.STATUS_SELF_ONLY) {
             increaseTopicQuestionCount(question.getTopicId(), 1);
         }
@@ -358,13 +360,13 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
         Long userId = requireUserId();
         QaQuestion question = qaQuestionMapper.selectById(id);
         if (question == null || question.getDeleteFlag() == null || question.getDeleteFlag() != 0) {
-            throw new BizException(ResultCode.BAD_REQUEST, "question not found");
+            throw new BizException(ResultCode.BAD_REQUEST, "找不到问题");
         }
         if (userId.equals(question.getUserId())) {
-            throw new BizException(ResultCode.BAD_REQUEST, "cannot report your own question");
+            throw new BizException(ResultCode.BAD_REQUEST, "不能举报你自己发布的问题");
         }
         if (question.getStatus() == null || question.getStatus() != QaQuestion.STATUS_PUBLISHED) {
-            throw new BizException(ResultCode.BAD_REQUEST, "question is not reportable");
+            throw new BizException(ResultCode.BAD_REQUEST, "这个问题不属于可举报内容");
         }
         assertNoPendingDuplicateReport(userId, CmsReport.BIZ_TYPE_QUESTION, id);
         validateNoSensitiveWords("Report", dto.getReasonDetail());
@@ -387,13 +389,13 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
         Long userId = requireUserId();
         QaAnswer answer = qaAnswerMapper.selectById(id);
         if (answer == null || answer.getDeleteFlag() == null || answer.getDeleteFlag() != 0) {
-            throw new BizException(ResultCode.BAD_REQUEST, "answer not found");
+            throw new BizException(ResultCode.BAD_REQUEST, "找不到答案");
         }
         if (userId.equals(answer.getUserId())) {
-            throw new BizException(ResultCode.BAD_REQUEST, "cannot report your own answer");
+            throw new BizException(ResultCode.BAD_REQUEST, "不能举报你自己发布的回答");
         }
         if (answer.getStatus() == null || answer.getStatus() != 1) {
-            throw new BizException(ResultCode.BAD_REQUEST, "answer is not reportable");
+            throw new BizException(ResultCode.BAD_REQUEST, "这个答案不属于可举报内容");
         }
         assertNoPendingDuplicateReport(userId, CmsReport.BIZ_TYPE_ANSWER, id);
         validateNoSensitiveWords("Report", dto.getReasonDetail());
@@ -439,8 +441,8 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
 
         qaQuestionMapper.updateAnswerCount(questionId, 1);
         qaQuestionMapper.update(null, new LambdaUpdateWrapper<QaQuestion>()
-            .eq(QaQuestion::getId, questionId)
-            .set(QaQuestion::getLastActiveAt, LocalDateTime.now()));
+                .eq(QaQuestion::getId, questionId)
+                .set(QaQuestion::getLastActiveAt, LocalDateTime.now()));
         QaQuestion updatedQuestion = qaQuestionMapper.selectById(questionId);
         if (updatedQuestion != null) {
             indexQuestionForEs(updatedQuestion);
@@ -448,13 +450,12 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
         adjustUserAnswerCount(userId, 1);
 
         createNotifyIfNeeded(
-            question.getUserId(),
-            6,
-            2,
-            answer.getId(),
-            "新回答",
-            actorName(userId) + " 回答了你的问题：" + shorten(question.getTitle(), 26)
-        );
+                question.getUserId(),
+                6,
+                2,
+                answer.getId(),
+                "新回答",
+                actorName(userId) + " 回答了你的问题：" + shorten(question.getTitle(), 26));
         return answer.getId();
     }
 
@@ -477,8 +478,8 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
         createOrRefreshRuleAudit(2, answer.getId(), userId, sensitive.reviewHits());
 
         qaQuestionMapper.update(null, new LambdaUpdateWrapper<QaQuestion>()
-            .eq(QaQuestion::getId, answer.getQuestionId())
-            .set(QaQuestion::getLastActiveAt, LocalDateTime.now()));
+                .eq(QaQuestion::getId, answer.getQuestionId())
+                .set(QaQuestion::getLastActiveAt, LocalDateTime.now()));
     }
 
     @Override
@@ -499,31 +500,31 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
         }
 
         qaAnswerMapper.update(null, new LambdaUpdateWrapper<QaAnswer>()
-            .eq(QaAnswer::getId, answerId)
-            .set(QaAnswer::getDeleteFlag, 1)
-            .set(QaAnswer::getStatus, 0)
-            .set(QaAnswer::getUpdatedAt, LocalDateTime.now()));
+                .eq(QaAnswer::getId, answerId)
+                .set(QaAnswer::getDeleteFlag, 1)
+                .set(QaAnswer::getStatus, 0)
+                .set(QaAnswer::getUpdatedAt, LocalDateTime.now()));
 
         if (answer.getStatus() != null && answer.getStatus() == 1) {
             qaQuestionMapper.updateAnswerCount(answer.getQuestionId(), -1);
         }
         if (question.getAcceptedAnswerId() != null && question.getAcceptedAnswerId().equals(answerId)) {
             qaQuestionMapper.update(
-                null,
-                new LambdaUpdateWrapper<QaQuestion>()
-                    .eq(QaQuestion::getId, question.getId())
-                    .set(QaQuestion::getAcceptedAnswerId, null)
-                    .set(QaQuestion::getAcceptedAt, null)
-                    .set(QaQuestion::getLastActiveAt, LocalDateTime.now())
-            );
+                    null,
+                    new LambdaUpdateWrapper<QaQuestion>()
+                            .eq(QaQuestion::getId, question.getId())
+                            .set(QaQuestion::getAcceptedAnswerId, null)
+                            .set(QaQuestion::getAcceptedAt, null)
+                            .set(QaQuestion::getLastActiveAt, LocalDateTime.now()));
         } else {
             qaQuestionMapper.update(null, new LambdaUpdateWrapper<QaQuestion>()
-                .eq(QaQuestion::getId, answer.getQuestionId())
-                .set(QaQuestion::getLastActiveAt, LocalDateTime.now()));
+                    .eq(QaQuestion::getId, answer.getQuestionId())
+                    .set(QaQuestion::getLastActiveAt, LocalDateTime.now()));
         }
         adjustUserAnswerCount(answer.getUserId(), -1);
         esSearchService.syncQuestionById(answer.getQuestionId());
-        adjustUserAnswerLikeReceivedCount(answer.getUserId(), -(answer.getLikeCount() == null ? 0 : answer.getLikeCount()));
+        adjustUserAnswerLikeReceivedCount(answer.getUserId(),
+                -(answer.getLikeCount() == null ? 0 : answer.getLikeCount()));
     }
 
     @Override
@@ -533,10 +534,10 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
         QaQuestion question = requirePublishedQuestion(questionId);
 
         QaVote existed = qaVoteMapper.selectOne(new LambdaQueryWrapper<QaVote>()
-            .eq(QaVote::getBizType, 1)
-            .eq(QaVote::getBizId, questionId)
-            .eq(QaVote::getUserId, userId)
-            .eq(QaVote::getVoteType, 1));
+                .eq(QaVote::getBizType, 1)
+                .eq(QaVote::getBizId, questionId)
+                .eq(QaVote::getUserId, userId)
+                .eq(QaVote::getVoteType, 1));
 
         if (existed == null) {
             QaVote vote = new QaVote();
@@ -547,13 +548,12 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
             qaVoteMapper.insert(vote);
             question.setLikeCount((question.getLikeCount() == null ? 0 : question.getLikeCount()) + 1);
             createNotifyIfNeeded(
-                question.getUserId(),
-                2,
-                1,
-                questionId,
-                "收到点赞",
-                actorName(userId) + " 点赞了你的问题：" + shorten(question.getTitle(), 26)
-            );
+                    question.getUserId(),
+                    2,
+                    1,
+                    questionId,
+                    "收到点赞",
+                    actorName(userId) + " 点赞了你的问题：" + shorten(question.getTitle(), 26));
             recommendationBehaviorService.recordQuestionLike(userId, questionId, question.getCategoryId(), true);
         } else {
             qaVoteMapper.deleteById(existed.getId());
@@ -572,8 +572,8 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
         QaQuestion question = requirePublishedQuestion(questionId);
 
         QaFavorite existed = qaFavoriteMapper.selectOne(new LambdaQueryWrapper<QaFavorite>()
-            .eq(QaFavorite::getQuestionId, questionId)
-            .eq(QaFavorite::getUserId, userId));
+                .eq(QaFavorite::getQuestionId, questionId)
+                .eq(QaFavorite::getUserId, userId));
 
         if (existed == null) {
             QaFavorite favorite = new QaFavorite();
@@ -582,13 +582,12 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
             qaFavoriteMapper.insert(favorite);
             question.setFavoriteCount((question.getFavoriteCount() == null ? 0 : question.getFavoriteCount()) + 1);
             createNotifyIfNeeded(
-                question.getUserId(),
-                3,
-                1,
-                questionId,
-                "收到收藏",
-                actorName(userId) + " 收藏了你的问题：" + shorten(question.getTitle(), 26)
-            );
+                    question.getUserId(),
+                    3,
+                    1,
+                    questionId,
+                    "收到收藏",
+                    actorName(userId) + " 收藏了你的问题：" + shorten(question.getTitle(), 26));
             recommendationBehaviorService.recordQuestionFavorite(userId, questionId, question.getCategoryId(), true);
         } else {
             qaFavoriteMapper.deleteById(existed.getId());
@@ -623,7 +622,8 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
         answer.setFavoriteCount(countAnswerFavorites(answer.getId()));
         answer.setLiked(isAnswerLikedByUser(answer.getId(), userId));
         answer.setFavorited(isAnswerFavoritedByUser(answer.getId(), userId));
-        boolean isBest = question.getAcceptedAnswerId() != null && question.getAcceptedAnswerId().equals(answer.getId());
+        boolean isBest = question.getAcceptedAnswerId() != null
+                && question.getAcceptedAnswerId().equals(answer.getId());
         answer.setBestAnswer(isBest);
         answer.setCanRecommend(userId.equals(question.getUserId()));
 
@@ -642,10 +642,10 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
         QaAnswer answer = requirePublishedAnswer(answerId);
 
         QaVote existed = qaVoteMapper.selectOne(new LambdaQueryWrapper<QaVote>()
-            .eq(QaVote::getBizType, 2)
-            .eq(QaVote::getBizId, answerId)
-            .eq(QaVote::getUserId, userId)
-            .eq(QaVote::getVoteType, 1));
+                .eq(QaVote::getBizType, 2)
+                .eq(QaVote::getBizId, answerId)
+                .eq(QaVote::getUserId, userId)
+                .eq(QaVote::getVoteType, 1));
         if (existed == null) {
             QaVote vote = new QaVote();
             vote.setBizType(2);
@@ -657,21 +657,22 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
                 answer.setLikeCount((answer.getLikeCount() == null ? 0 : answer.getLikeCount()) + 1);
                 adjustUserAnswerLikeReceivedCount(answer.getUserId(), 1);
                 createNotifyIfNeeded(
-                    answer.getUserId(),
-                    2,
-                    2,
-                    answerId,
-                    "收到点赞",
-                    actorName(userId) + " 点赞了你的回答"
-                );
-                recommendationBehaviorService.recordAnswerLike(userId, answerId, resolveQuestionCategoryId(answer.getQuestionId()), true);
+                        answer.getUserId(),
+                        2,
+                        2,
+                        answerId,
+                        "收到点赞",
+                        actorName(userId) + " 点赞了你的回答");
+                recommendationBehaviorService.recordAnswerLike(userId, answerId,
+                        resolveQuestionCategoryId(answer.getQuestionId()), true);
             }
         } else {
             qaVoteMapper.deleteById(existed.getId());
             int old = answer.getLikeCount() == null ? 0 : answer.getLikeCount();
             answer.setLikeCount(Math.max(0, old - 1));
             adjustUserAnswerLikeReceivedCount(answer.getUserId(), -1);
-            recommendationBehaviorService.recordAnswerLike(userId, answerId, resolveQuestionCategoryId(answer.getQuestionId()), false);
+            recommendationBehaviorService.recordAnswerLike(userId, answerId,
+                    resolveQuestionCategoryId(answer.getQuestionId()), false);
         }
         qaAnswerMapper.updateById(answer);
         return answerDetail(answerId);
@@ -684,10 +685,10 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
         QaAnswer answer = requirePublishedAnswer(answerId);
 
         QaVote existed = qaVoteMapper.selectOne(new LambdaQueryWrapper<QaVote>()
-            .eq(QaVote::getBizType, 2)
-            .eq(QaVote::getBizId, answerId)
-            .eq(QaVote::getUserId, userId)
-            .eq(QaVote::getVoteType, 2));
+                .eq(QaVote::getBizType, 2)
+                .eq(QaVote::getBizId, answerId)
+                .eq(QaVote::getUserId, userId)
+                .eq(QaVote::getVoteType, 2));
         if (existed == null) {
             QaVote vote = new QaVote();
             vote.setBizType(2);
@@ -697,18 +698,19 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
             boolean inserted = insertAnswerVote(vote);
             if (inserted) {
                 createNotifyIfNeeded(
-                    answer.getUserId(),
-                    3,
-                    2,
-                    answerId,
-                    "收到收藏",
-                    actorName(userId) + " 收藏了你的回答"
-                );
-                recommendationBehaviorService.recordAnswerFavorite(userId, answerId, resolveQuestionCategoryId(answer.getQuestionId()), true);
+                        answer.getUserId(),
+                        3,
+                        2,
+                        answerId,
+                        "收到收藏",
+                        actorName(userId) + " 收藏了你的回答");
+                recommendationBehaviorService.recordAnswerFavorite(userId, answerId,
+                        resolveQuestionCategoryId(answer.getQuestionId()), true);
             }
         } else {
             qaVoteMapper.deleteById(existed.getId());
-            recommendationBehaviorService.recordAnswerFavorite(userId, answerId, resolveQuestionCategoryId(answer.getQuestionId()), false);
+            recommendationBehaviorService.recordAnswerFavorite(userId, answerId,
+                    resolveQuestionCategoryId(answer.getQuestionId()), false);
         }
         return answerDetail(answerId);
     }
@@ -726,7 +728,8 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
         }
 
         QaAnswer answer = qaAnswerMapper.selectById(answerId);
-        if (answer == null || answer.getDeleteFlag() == null || answer.getDeleteFlag() != 0 || answer.getStatus() == null || answer.getStatus() != 1) {
+        if (answer == null || answer.getDeleteFlag() == null || answer.getDeleteFlag() != 0
+                || answer.getStatus() == null || answer.getStatus() != 1) {
             throw new BizException(ResultCode.BAD_REQUEST, "answer not found");
         }
         if (!questionId.equals(answer.getQuestionId())) {
@@ -736,38 +739,34 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
         boolean cancelBest = question.getAcceptedAnswerId() != null && question.getAcceptedAnswerId().equals(answerId);
         if (cancelBest) {
             qaQuestionMapper.update(
-                null,
-                new LambdaUpdateWrapper<QaQuestion>()
-                    .eq(QaQuestion::getId, questionId)
-                    .set(QaQuestion::getAcceptedAnswerId, null)
-                    .set(QaQuestion::getAcceptedAt, null)
-            );
+                    null,
+                    new LambdaUpdateWrapper<QaQuestion>()
+                            .eq(QaQuestion::getId, questionId)
+                            .set(QaQuestion::getAcceptedAnswerId, null)
+                            .set(QaQuestion::getAcceptedAt, null));
             createNotifyIfNeeded(
-                answer.getUserId(),
-                1,
-                2,
-                answerId,
-                "最佳回答变更",
-                "你的回答已取消最佳"
-            );
+                    answer.getUserId(),
+                    1,
+                    2,
+                    answerId,
+                    "最佳回答变更",
+                    "你的回答已取消最佳");
         } else {
             question.setAcceptedAnswerId(answerId);
             question.setAcceptedAt(LocalDateTime.now());
             createNotifyIfNeeded(
-                answer.getUserId(),
-                1,
-                2,
-                answerId,
-                "最佳回答",
-                "你的回答被采纳为最佳"
-            );
+                    answer.getUserId(),
+                    1,
+                    2,
+                    answerId,
+                    "最佳回答",
+                    "你的回答被采纳为最佳");
             qaQuestionMapper.update(
-                null,
-                new LambdaUpdateWrapper<QaQuestion>()
-                    .eq(QaQuestion::getId, questionId)
-                    .set(QaQuestion::getAcceptedAnswerId, answerId)
-                    .set(QaQuestion::getAcceptedAt, LocalDateTime.now())
-            );
+                    null,
+                    new LambdaUpdateWrapper<QaQuestion>()
+                            .eq(QaQuestion::getId, questionId)
+                            .set(QaQuestion::getAcceptedAnswerId, answerId)
+                            .set(QaQuestion::getAcceptedAt, LocalDateTime.now()));
         }
     }
 
@@ -789,21 +788,19 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
         QaAnswer accepted = qaAnswerMapper.selectById(question.getAcceptedAnswerId());
         if (accepted != null && accepted.getUserId() != null) {
             createNotifyIfNeeded(
-                accepted.getUserId(),
-                1,
-                2,
-                accepted.getId(),
-                "最佳回答变更",
-                "你的回答已取消最佳"
-            );
+                    accepted.getUserId(),
+                    1,
+                    2,
+                    accepted.getId(),
+                    "最佳回答变更",
+                    "你的回答已取消最佳");
         }
         qaQuestionMapper.update(
-            null,
-            new LambdaUpdateWrapper<QaQuestion>()
-                .eq(QaQuestion::getId, questionId)
-                .set(QaQuestion::getAcceptedAnswerId, null)
-                .set(QaQuestion::getAcceptedAt, null)
-        );
+                null,
+                new LambdaUpdateWrapper<QaQuestion>()
+                        .eq(QaQuestion::getId, questionId)
+                        .set(QaQuestion::getAcceptedAnswerId, null)
+                        .set(QaQuestion::getAcceptedAt, null));
     }
 
     @Override
@@ -830,10 +827,10 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
         if (parentId != null) {
             parentComment = qaCommentMapper.selectById(parentId);
             if (parentComment == null
-                || parentComment.getDeleteFlag() == null || parentComment.getDeleteFlag() != 0
-                || parentComment.getStatus() == null || parentComment.getStatus() != 1
-                || parentComment.getBizType() == null || parentComment.getBizType() != 2
-                || !answerId.equals(parentComment.getBizId())) {
+                    || parentComment.getDeleteFlag() == null || parentComment.getDeleteFlag() != 0
+                    || parentComment.getStatus() == null || parentComment.getStatus() != 1
+                    || parentComment.getBizType() == null || parentComment.getBizType() != 2
+                    || !answerId.equals(parentComment.getBizId())) {
                 throw new BizException(ResultCode.BAD_REQUEST, "parent comment not found");
             }
         }
@@ -847,23 +844,21 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
         if (parentComment == null) {
             // first-level comment: notify answer author
             createNotifyIfNeeded(
-                answer.getUserId(),
-                5,
-                2,
-                answerId,
-                "收到评论",
-                actorName(userId) + " 评论了你的回答"
-            );
+                    answer.getUserId(),
+                    5,
+                    2,
+                    answerId,
+                    "收到评论",
+                    actorName(userId) + " 评论了你的回答");
         } else {
             // reply comment: notify target comment author
             createNotifyIfNeeded(
-                parentComment.getUserId(),
-                5,
-                2,
-                answerId,
-                "收到回复",
-                actorName(userId) + " 回复了你的评论"
-            );
+                    parentComment.getUserId(),
+                    5,
+                    2,
+                    answerId,
+                    "收到回复",
+                    actorName(userId) + " 回复了你的评论");
         }
         return comment.getId();
     }
@@ -872,7 +867,7 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
         if (categoryId != null) {
             QaCategory category = qaCategoryMapper.selectById(categoryId);
             if (category == null || category.getDeleteFlag() == null || category.getDeleteFlag() != 0
-                || category.getStatus() == null || category.getStatus() != 1) {
+                    || category.getStatus() == null || category.getStatus() != 1) {
                 throw new BizException(ResultCode.BAD_REQUEST, "category is invalid");
             }
         }
@@ -917,7 +912,7 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
         removedTagIds.removeAll(uniqueTagIds);
 
         qaQuestionTagMapper.delete(new LambdaQueryWrapper<QaQuestionTag>()
-            .eq(QaQuestionTag::getQuestionId, questionId));
+                .eq(QaQuestionTag::getQuestionId, questionId));
         for (Long tagId : uniqueTagIds) {
             QaQuestionTag rel = new QaQuestionTag();
             rel.setQuestionId(questionId);
@@ -939,7 +934,7 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
             return;
         }
         qaQuestionTagMapper.delete(new LambdaQueryWrapper<QaQuestionTag>()
-            .eq(QaQuestionTag::getQuestionId, questionId));
+                .eq(QaQuestionTag::getQuestionId, questionId));
         for (Long tagId : oldTagIds) {
             adjustTagUseCount(tagId, -1);
         }
@@ -950,7 +945,7 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
             return Collections.emptySet();
         }
         List<QaQuestionTag> rels = qaQuestionTagMapper.selectList(new LambdaQueryWrapper<QaQuestionTag>()
-            .eq(QaQuestionTag::getQuestionId, questionId));
+                .eq(QaQuestionTag::getQuestionId, questionId));
         if (rels == null || rels.isEmpty()) {
             return Collections.emptySet();
         }
@@ -1038,7 +1033,7 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
         }
 
         List<CmsSensitiveWord> words = sensitiveWordMapper.selectList(new LambdaQueryWrapper<CmsSensitiveWord>()
-            .eq(CmsSensitiveWord::getEnabled, 1));
+                .eq(CmsSensitiveWord::getEnabled, 1));
         if (words == null || words.isEmpty()) {
             return;
         }
@@ -1168,7 +1163,7 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
         }
 
         List<CmsSensitiveWord> words = sensitiveWordMapper.selectList(new LambdaQueryWrapper<CmsSensitiveWord>()
-            .eq(CmsSensitiveWord::getEnabled, 1));
+                .eq(CmsSensitiveWord::getEnabled, 1));
         if (words == null || words.isEmpty()) {
             return new SensitiveScanResult(List.of(), List.of());
         }
@@ -1197,12 +1192,11 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
                         continue;
                     }
                     SensitiveHit hit = new SensitiveHit(
-                        hitWord,
-                        level,
-                        item.getCategory(),
-                        item.getHitActionDesc(),
-                        item.getReasonTemplate()
-                    );
+                            hitWord,
+                            level,
+                            item.getCategory(),
+                            item.getHitActionDesc(),
+                            item.getReasonTemplate());
                     if (level == SENSITIVE_LEVEL_REVIEW) {
                         reviewHits.add(hit);
                     } else {
@@ -1226,19 +1220,19 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
     }
 
     private void createOrRefreshRuleAudit(Integer bizType,
-                                          Long bizId,
-                                          Long submitUserId,
-                                          List<SensitiveHit> reviewHits) {
+            Long bizId,
+            Long submitUserId,
+            List<SensitiveHit> reviewHits) {
         if (bizType == null || bizId == null || reviewHits == null || reviewHits.isEmpty()) {
             return;
         }
         JsonNode hitDetail = objectMapper.valueToTree(reviewHits);
         CmsAudit exists = cmsAuditMapper.selectOne(new LambdaQueryWrapper<CmsAudit>()
-            .eq(CmsAudit::getBizType, bizType)
-            .eq(CmsAudit::getBizId, bizId)
-            .eq(CmsAudit::getTriggerSource, AUDIT_TRIGGER_RULE)
-            .eq(CmsAudit::getAuditStatus, 1)
-            .last("LIMIT 1"));
+                .eq(CmsAudit::getBizType, bizType)
+                .eq(CmsAudit::getBizId, bizId)
+                .eq(CmsAudit::getTriggerSource, AUDIT_TRIGGER_RULE)
+                .eq(CmsAudit::getAuditStatus, 1)
+                .last("LIMIT 1"));
         if (exists != null) {
             exists.setAuditType(AUDIT_TYPE_RULE);
             exists.setModelLabel("sensitive_rule");
@@ -1266,7 +1260,8 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
     private record SensitiveScanResult(List<SensitiveHit> blockedHits, List<SensitiveHit> reviewHits) {
     }
 
-    private record SensitiveHit(String word, Integer level, String category, String hitActionDesc, String reasonTemplate) {
+    private record SensitiveHit(String word, Integer level, String category, String hitActionDesc,
+            String reasonTemplate) {
     }
 
     private void fillImageUrls(AppQuestionDetailVO vo) {
@@ -1327,11 +1322,11 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
             return Collections.emptyList();
         }
         return imageUrls.stream()
-            .filter(StringUtils::hasText)
-            .map(String::trim)
-            .distinct()
-            .limit(9)
-            .toList();
+                .filter(StringUtils::hasText)
+                .map(String::trim)
+                .distinct()
+                .limit(9)
+                .toList();
     }
 
     private QaQuestion requirePublishedQuestion(Long questionId) {
@@ -1347,16 +1342,16 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
 
     private boolean isQuestionLikedByUser(Long questionId, Long userId) {
         return qaVoteMapper.selectCount(new LambdaQueryWrapper<QaVote>()
-            .eq(QaVote::getBizType, 1)
-            .eq(QaVote::getBizId, questionId)
-            .eq(QaVote::getUserId, userId)
-            .eq(QaVote::getVoteType, 1)) > 0;
+                .eq(QaVote::getBizType, 1)
+                .eq(QaVote::getBizId, questionId)
+                .eq(QaVote::getUserId, userId)
+                .eq(QaVote::getVoteType, 1)) > 0;
     }
 
     private boolean isQuestionFavoritedByUser(Long questionId, Long userId) {
         return qaFavoriteMapper.selectCount(new LambdaQueryWrapper<QaFavorite>()
-            .eq(QaFavorite::getQuestionId, questionId)
-            .eq(QaFavorite::getUserId, userId)) > 0;
+                .eq(QaFavorite::getQuestionId, questionId)
+                .eq(QaFavorite::getUserId, userId)) > 0;
     }
 
     private QaAnswer requirePublishedAnswer(Long answerId) {
@@ -1372,33 +1367,33 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
 
     private int countAnswerComments(Long answerId) {
         return Math.toIntExact(qaCommentMapper.selectCount(new LambdaQueryWrapper<QaComment>()
-            .eq(QaComment::getBizType, 2)
-            .eq(QaComment::getBizId, answerId)
-            .eq(QaComment::getStatus, 1)
-            .eq(QaComment::getDeleteFlag, 0)));
+                .eq(QaComment::getBizType, 2)
+                .eq(QaComment::getBizId, answerId)
+                .eq(QaComment::getStatus, 1)
+                .eq(QaComment::getDeleteFlag, 0)));
     }
 
     private int countAnswerFavorites(Long answerId) {
         return Math.toIntExact(qaVoteMapper.selectCount(new LambdaQueryWrapper<QaVote>()
-            .eq(QaVote::getBizType, 2)
-            .eq(QaVote::getBizId, answerId)
-            .eq(QaVote::getVoteType, 2)));
+                .eq(QaVote::getBizType, 2)
+                .eq(QaVote::getBizId, answerId)
+                .eq(QaVote::getVoteType, 2)));
     }
 
     private boolean isAnswerLikedByUser(Long answerId, Long userId) {
         return qaVoteMapper.selectCount(new LambdaQueryWrapper<QaVote>()
-            .eq(QaVote::getBizType, 2)
-            .eq(QaVote::getBizId, answerId)
-            .eq(QaVote::getVoteType, 1)
-            .eq(QaVote::getUserId, userId)) > 0;
+                .eq(QaVote::getBizType, 2)
+                .eq(QaVote::getBizId, answerId)
+                .eq(QaVote::getVoteType, 1)
+                .eq(QaVote::getUserId, userId)) > 0;
     }
 
     private boolean isAnswerFavoritedByUser(Long answerId, Long userId) {
         return qaVoteMapper.selectCount(new LambdaQueryWrapper<QaVote>()
-            .eq(QaVote::getBizType, 2)
-            .eq(QaVote::getBizId, answerId)
-            .eq(QaVote::getVoteType, 2)
-            .eq(QaVote::getUserId, userId)) > 0;
+                .eq(QaVote::getBizType, 2)
+                .eq(QaVote::getBizId, answerId)
+                .eq(QaVote::getVoteType, 2)
+                .eq(QaVote::getUserId, userId)) > 0;
     }
 
     private boolean insertAnswerVote(QaVote vote) {
@@ -1407,15 +1402,15 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
             return true;
         } catch (DuplicateKeyException ex) {
             QaVote sameVoteType = qaVoteMapper.selectOne(new LambdaQueryWrapper<QaVote>()
-                .eq(QaVote::getBizType, vote.getBizType())
-                .eq(QaVote::getBizId, vote.getBizId())
-                .eq(QaVote::getUserId, vote.getUserId())
-                .eq(QaVote::getVoteType, vote.getVoteType()));
+                    .eq(QaVote::getBizType, vote.getBizType())
+                    .eq(QaVote::getBizId, vote.getBizId())
+                    .eq(QaVote::getUserId, vote.getUserId())
+                    .eq(QaVote::getVoteType, vote.getVoteType()));
             if (sameVoteType != null) {
                 return false;
             }
             throw new BizException(ResultCode.BAD_REQUEST,
-                "点赞/收藏索引冲突，请先执行数据库脚本：20260319_fix_qa_vote_unique_key.sql");
+                    "点赞/收藏索引冲突，请先执行数据库脚本：20260319_fix_qa_vote_unique_key.sql");
         }
     }
 
@@ -1432,11 +1427,11 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
         LocalDateTime cutoff = now.minusMinutes(Math.max(1L, viewDedupMinutes));
 
         UserBrowseHistory latest = userBrowseHistoryMapper.selectOne(new LambdaQueryWrapper<UserBrowseHistory>()
-            .eq(UserBrowseHistory::getUserId, userId)
-            .eq(UserBrowseHistory::getBizType, QUESTION_BROWSE_BIZ_TYPE)
-            .eq(UserBrowseHistory::getBizId, questionId)
-            .orderByDesc(UserBrowseHistory::getCreatedAt)
-            .last("LIMIT 1"));
+                .eq(UserBrowseHistory::getUserId, userId)
+                .eq(UserBrowseHistory::getBizType, QUESTION_BROWSE_BIZ_TYPE)
+                .eq(UserBrowseHistory::getBizId, questionId)
+                .orderByDesc(UserBrowseHistory::getCreatedAt)
+                .last("LIMIT 1"));
 
         if (latest != null) {
             boolean shouldCount = latest.getCreatedAt() == null || latest.getCreatedAt().isBefore(cutoff);
@@ -1461,6 +1456,7 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
         }
         return securityUser.getId();
     }
+
     private void assertUserCanPublish(Long userId) {
         User user = userMapper.selectById(userId);
         if (user == null) {
@@ -1471,16 +1467,16 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
         }
         if (user.getBanUntil() != null && user.getBanUntil().isAfter(LocalDateTime.now())) {
             throw new BizException(ResultCode.FORBIDDEN,
-                "Account is temporarily restricted from posting until: " + user.getBanUntil());
+                    "Account is temporarily restricted from posting until: " + user.getBanUntil());
         }
     }
 
     private void assertNoPendingDuplicateReport(Long reporterId, Integer bizType, Long bizId) {
         long pendingCount = cmsReportMapper.selectCount(new LambdaQueryWrapper<CmsReport>()
-            .eq(CmsReport::getReporterId, reporterId)
-            .eq(CmsReport::getBizType, bizType)
-            .eq(CmsReport::getBizId, bizId)
-            .eq(CmsReport::getStatus, CmsReport.STATUS_PENDING));
+                .eq(CmsReport::getReporterId, reporterId)
+                .eq(CmsReport::getBizType, bizType)
+                .eq(CmsReport::getBizId, bizId)
+                .eq(CmsReport::getStatus, CmsReport.STATUS_PENDING));
         if (pendingCount > 0) {
             throw new BizException(ResultCode.BAD_REQUEST, "你的举报正在处理中，请勿重复提交。");
         }
@@ -1500,11 +1496,11 @@ public class CustomerQuestionServiceImpl implements CustomerQuestionService {
     }
 
     private void createNotifyIfNeeded(Long receiverId,
-                                      Integer type,
-                                      Integer bizType,
-                                      Long bizId,
-                                      String title,
-                                      String content) {
+            Integer type,
+            Integer bizType,
+            Long bizId,
+            String title,
+            String content) {
         Long actorId = currentUserIdOrNull();
         if (receiverId == null || (actorId != null && receiverId.equals(actorId))) {
             return;

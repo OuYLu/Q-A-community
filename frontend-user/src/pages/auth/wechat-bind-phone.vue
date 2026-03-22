@@ -13,6 +13,15 @@ const loading = ref(false);
 const WX_PROFILE_CACHE_KEY = "wx_login_profile_cache";
 const LOG_PREFIX = "[wechat-bind-phone]";
 
+function safeDecode(value?: string) {
+  if (!value) return "";
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
+
 function jumpAfterLogin(target?: string) {
   const to = target || "";
   if (to.startsWith("/pages/search/")) {
@@ -116,9 +125,9 @@ function onGetPhoneNumber(e: any) {
 
 onLoad((options) => {
   console.log(LOG_PREFIX, "onLoad options", options);
-  bindTicket.value = decodeURIComponent((options?.bindTicket as string) || "");
-  redirect.value = decodeURIComponent((options?.redirect as string) || "");
-  nicknameHint.value = decodeURIComponent((options?.nickname as string) || "微信用户");
+  bindTicket.value = safeDecode((options?.bindTicket as string) || "");
+  redirect.value = safeDecode((options?.redirect as string) || "");
+  nicknameHint.value = safeDecode((options?.nickname as string) || "微信用户");
   console.log(LOG_PREFIX, "onLoad parsed", {
     hasBindTicket: Boolean(bindTicket.value),
     redirect: redirect.value,

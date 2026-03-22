@@ -24,6 +24,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
+import { ElMessageBox } from "element-plus";
 import { useAuthStore } from "../store/auth";
 import { useMenuStore } from "../store/menu";
 
@@ -62,10 +63,19 @@ const setTheme = (value: "light" | "dark" | "highlight") => {
 
 setTheme(theme.value);
 
-const handleLogout = () => {
-  authStore.clear();
-  menuStore.reset();
-  router.replace("/login");
+const handleLogout = async () => {
+  try {
+    await ElMessageBox.confirm("确认退出当前管理员账号吗？", "退出确认", {
+      type: "warning",
+      confirmButtonText: "确认退出",
+      cancelButtonText: "取消"
+    });
+    authStore.clear();
+    menuStore.reset();
+    router.replace("/login");
+  } catch {
+    // User canceled logout.
+  }
 };
 </script>
 

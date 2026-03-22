@@ -211,6 +211,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private WechatLoginVO buildWechatLoginSuccess(User user, boolean newUser) {
+        assertUserEnabled(user);
         List<String> roleCodes = userService.getRoleCodes(user.getId());
         String token = jwtUtil.generateToken(user.getId(), user.getUsername(), roleCodes);
         long expiresAt = Instant.now().plusSeconds(jwtUtil.getExpireMinutes() * 60).toEpochMilli();

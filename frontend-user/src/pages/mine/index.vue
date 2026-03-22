@@ -2,6 +2,7 @@
 import { computed, ref } from "vue";
 import { onShow } from "@dcloudio/uni-app";
 import { useAuthStore } from "@/stores/auth";
+import { openLoginPage } from "@/utils/auth-guard";
 import { meApi, type AppMeOverviewVO } from "@/api/me";
 import { BASE_URL } from "@/utils/constants";
 
@@ -87,9 +88,7 @@ function logout() {
 }
 
 function goLogin() {
-  uni.navigateTo({
-    url: `/pages/auth/login?redirect=${encodeURIComponent("/pages/mine/index")}`
-  });
+  openLoginPage({ redirect: "/pages/mine/index", preferReplace: true });
 }
 
 function editProfile() {

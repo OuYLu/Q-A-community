@@ -10,6 +10,15 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const authStore = stores_auth.useAuthStore();
     const loading = common_vendor.ref(false);
     const redirect = common_vendor.ref("");
+    function safeDecode(value) {
+      if (!value)
+        return "";
+      try {
+        return decodeURIComponent(value);
+      } catch {
+        return value;
+      }
+    }
     function jumpAfterLogin(target) {
       const to = target || "";
       if (to.startsWith("/pages/search/")) {
@@ -113,7 +122,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
       common_vendor.index.navigateBack();
     }
     common_vendor.onLoad((options) => {
-      redirect.value = decodeURIComponent((options == null ? void 0 : options.redirect) || "");
+      redirect.value = safeDecode((options == null ? void 0 : options.redirect) || "");
     });
     return (_ctx, _cache) => {
       return {

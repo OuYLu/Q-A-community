@@ -87,9 +87,33 @@
               <el-button @click="resetCustomer">重置</el-button>
             </el-form-item>
           </el-form>
+          <div class="toolbar-actions">
+            <el-button
+              type="warning"
+              plain
+              :disabled="!canBatchDisableCustomer"
+              @click="batchUpdateCustomerStatus(0)"
+            >
+              批量禁用
+            </el-button>
+            <el-button
+              type="success"
+              plain
+              :disabled="!canBatchEnableCustomer"
+              @click="batchUpdateCustomerStatus(1)"
+            >
+              批量恢复
+            </el-button>
+          </div>
         </div>
 
-        <el-table :data="customerList" v-loading="customerLoading" style="width: 100%">
+        <el-table
+          :data="customerList"
+          v-loading="customerLoading"
+          style="width: 100%"
+          @selection-change="handleCustomerSelectionChange"
+        >
+          <el-table-column type="selection" width="48" />
           <el-table-column label="头像" width="90">
             <template #default="scope">
               <el-avatar :src="resolveAvatar(scope.row)">{{ scope.row.username?.slice(0, 1) }}</el-avatar>
@@ -113,7 +137,7 @@
           <el-table-column label="操作" width="180">
             <template #default="scope">
               <el-button size="small" @click="toggleFreeze(scope.row)">
-                {{ scope.row.status === 1 ? "停用专家" : "恢复专家" }}
+                {{ scope.row.status === 1 ? "禁用账号" : "恢复账号" }}
               </el-button>
             </template>
           </el-table-column>
@@ -439,6 +463,7 @@ const expertQuery = reactive<ExpertUserQueryDTO>({ pageNum: 1, pageSize: 10 });
 const staffList = ref<UserManageVO[]>([]);
 const customerList = ref<UserManageVO[]>([]);
 const expertList = ref<ExpertManageVO[]>([]);
+const selectedCustomerRows = ref<UserManageVO[]>([]);
 const staffTotal = ref(0);
 const customerTotal = ref(0);
 const expertTotal = ref(0);
@@ -474,6 +499,8 @@ const reviewForm = reactive<ExpertReviewDTO>({ applyId: 0, status: 2, rejectReas
 const reviewConfirmText = computed(() =>
   reviewForm.status === 2 ? "是否确认通过该专家申请？" : "是否确认拒绝该专家申请？"
 );
+const canBatchDisableCustomer = computed(() => selectedCustomerRows.value.some((item) => item.status === 1));
+const canBatchEnableCustomer = computed(() => selectedCustomerRows.value.some((item) => item.status === 0));
 const createFormRef = ref<FormInstance>();
 const editFormRef = ref<FormInstance>();
 
@@ -625,6 +652,7 @@ const loadCustomer = async () => {
     const res = await listUsers(customerQuery);
     customerList.value = res.data.list;
     customerTotal.value = res.data.total;
+    selectedCustomerRows.value = [];
   } finally {
     customerLoading.value = false;
   }
@@ -818,6 +846,37 @@ const toggleFreeze = async (row: UserManageVO) => {
   const nextStatus = row.status === 1 ? 0 : 1;
   await updateUserStatus(row.id, { status: nextStatus });
   row.status = nextStatus;
+  ElMessage.success(nextStatus === 0 ? "账号已禁用，无法登录" : "账号已恢复");
+};
+
+const handleCustomerSelectionChange = (selected: UserManageVO[]) => {
+  selectedCustomerRows.value = selected || [];
+};
+
+const batchUpdateCustomerStatus = async (nextStatus: 0 | 1) => {
+  const targets = selectedCustomerRows.value.filter((item) => item.status !== nextStatus);
+  if (!targets.length) {
+    ElMessage.info(nextStatus === 0 ? "所选用户均已禁用" : "所选用户均已恢复");
+    return;
+  }
+
+  const actionText = nextStatus === 0 ? "批量禁用" : "批量恢复";
+  await ElMessageBox.confirm(`确认${actionText}选中的 ${targets.length} 个账号吗？`, "提示", {
+    type: "warning",
+    confirmButtonText: "确定",
+    cancelButtonText: "取消"
+  });
+
+  const results = await Promise.allSettled(
+    targets.map((item) => updateUserStatus(item.id, { status: nextStatus }))
+  );
+  const failedCount = results.filter((item) => item.status === "rejected").length;
+  if (failedCount === 0) {
+    ElMessage.success(nextStatus === 0 ? "批量禁用成功" : "批量恢复成功");
+  } else {
+    ElMessage.warning(`成功 ${targets.length - failedCount} 个，失败 ${failedCount} 个`);
+  }
+  await loadCustomer();
 };
 
 const toggleExpertStatus = async (row: ExpertManageVO) => {
@@ -827,7 +886,11 @@ const toggleExpertStatus = async (row: ExpertManageVO) => {
 };
 
 const removeUser = async (row: UserManageVO) => {
-  await ElMessageBox.confirm("确认删除该用户吗？", "提示", { type: "warning" });
+  await ElMessageBox.confirm("确认删除该用户吗？", "提示", {
+    type: "warning",
+    confirmButtonText: "确定",
+    cancelButtonText: "取消"
+  });
   await deleteUser(row.id);
   ElMessage.success("删除成功");
   await loadStaff();
@@ -973,6 +1036,12 @@ onMounted(() => {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+.toolbar-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .pager {

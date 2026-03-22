@@ -16,8 +16,7 @@ function openQuestionDetail(id) {
     cancelText: "返回首页",
     success: (res) => {
       if (res.confirm) {
-        const target = encodeURIComponent(detailUrl);
-        common_vendor.index.navigateTo({ url: `/pages/auth/login?redirect=${target}` });
+        utils_authGuard.openLoginPage({ redirect: detailUrl, preferReplace: true });
         return;
       }
       common_vendor.index.switchTab({ url: "/pages/home/index" });
@@ -43,8 +42,7 @@ function openAskPage(params) {
       success: (res) => {
         if (!res.confirm)
           return;
-        const target = encodeURIComponent(askUrl);
-        common_vendor.index.navigateTo({ url: `/pages/auth/login?redirect=${target}` });
+        utils_authGuard.openLoginPage({ redirect: askUrl, preferReplace: true });
       }
     });
     return;
@@ -77,8 +75,7 @@ function openExpertPostDetailPage(id) {
     cancelText: "返回首页",
     success: (res) => {
       if (res.confirm) {
-        const target = encodeURIComponent(detailUrl);
-        common_vendor.index.navigateTo({ url: `/pages/auth/login?redirect=${target}` });
+        utils_authGuard.openLoginPage({ redirect: detailUrl, preferReplace: true });
         return;
       }
       common_vendor.index.switchTab({ url: "/pages/home/index" });

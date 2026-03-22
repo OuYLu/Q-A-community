@@ -10,6 +10,7 @@ import {
 } from "@/api/discover";
 import { expertApi, type AppExpertPostCategoryVO } from "@/api/expert";
 import { useAuthStore } from "@/stores/auth";
+import { openLoginPage } from "@/utils/auth-guard";
 import { openQuestionDetail, openUserHomePage } from "@/utils/nav";
 
 type DiscoverTab = "category" | "rank" | "expert";
@@ -146,9 +147,7 @@ function openExpert(item: AppExpertCardVO) {
 }
 
 function goLogin() {
-  uni.navigateTo({
-    url: `/pages/auth/login?redirect=${encodeURIComponent("/pages/discover/index")}`
-  });
+  openLoginPage({ redirect: "/pages/discover/index", preferReplace: true });
 }
 
 onShow(async () => {

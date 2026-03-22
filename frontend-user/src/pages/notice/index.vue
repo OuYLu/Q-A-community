@@ -8,6 +8,7 @@ import {
 } from "@/api/notification";
 import { questionApi } from "@/api/question";
 import { useAuthStore } from "@/stores/auth";
+import { openLoginPage } from "@/utils/auth-guard";
 import { refreshNoticeTabDot, syncNoticeTabDot } from "@/utils/notice-badge";
 
 type TypeTabKey = "all" | "system" | "interaction" | "comment" | "answer";
@@ -189,9 +190,7 @@ function switchRead(key: ReadTabKey) {
 }
 
 function goLogin() {
-  uni.navigateTo({
-    url: `/pages/auth/login?redirect=${encodeURIComponent("/pages/notice/index")}`
-  });
+  openLoginPage({ redirect: "/pages/notice/index", preferReplace: true });
 }
 
 onShow(async () => {
